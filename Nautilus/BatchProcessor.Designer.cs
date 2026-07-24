@@ -61,6 +61,7 @@
             this.gameRB2 = new System.Windows.Forms.RadioButton();
             this.gameRB3 = new System.Windows.Forms.RadioButton();
             this.chkAddYear = new System.Windows.Forms.CheckBox();
+            this.chkFamilyFriendly = new System.Windows.Forms.CheckBox();
             this.chkDIYStems = new System.Windows.Forms.CheckBox();
             this.chkSubgenre = new System.Windows.Forms.CheckBox();
             this.chkForceNumericOverride = new System.Windows.Forms.CheckBox();
@@ -143,13 +144,13 @@
             this.exportLogFileToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(123, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(122, 26);
             // 
             // exportLogFileToolStripMenuItem
             // 
             this.exportLogFileToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.exportLogFileToolStripMenuItem.Name = "exportLogFileToolStripMenuItem";
-            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.exportLogFileToolStripMenuItem.Text = "Export log file";
             this.exportLogFileToolStripMenuItem.Click += new System.EventHandler(this.exportLogFileToolStripMenuItem_Click);
             // 
@@ -259,14 +260,14 @@
             // separateDTA
             // 
             this.separateDTA.Name = "separateDTA";
-            this.separateDTA.Size = new System.Drawing.Size(158, 20);
+            this.separateDTA.Size = new System.Drawing.Size(159, 20);
             this.separateDTA.Text = "Separate bundled DTA files";
             this.separateDTA.Click += new System.EventHandler(this.separateDTA_Click);
             // 
             // sortSongsByDTALanguageToolStripMenuItem
             // 
             this.sortSongsByDTALanguageToolStripMenuItem.Name = "sortSongsByDTALanguageToolStripMenuItem";
-            this.sortSongsByDTALanguageToolStripMenuItem.Size = new System.Drawing.Size(165, 20);
+            this.sortSongsByDTALanguageToolStripMenuItem.Size = new System.Drawing.Size(166, 20);
             this.sortSongsByDTALanguageToolStripMenuItem.Text = "Sort songs by DTA language";
             this.sortSongsByDTALanguageToolStripMenuItem.Click += new System.EventHandler(this.sortSongsByDTALanguageToolStripMenuItem_Click);
             // 
@@ -421,6 +422,17 @@
             this.chkAddYear.Text = "Add year to song name";
             this.chkAddYear.UseVisualStyleBackColor = true;
             // 
+            // chkFamilyFriendly
+            // 
+            this.chkFamilyFriendly.AutoSize = true;
+            this.chkFamilyFriendly.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.chkFamilyFriendly.Location = new System.Drawing.Point(12, 494);
+            this.chkFamilyFriendly.Name = "chkFamilyFriendly";
+            this.chkFamilyFriendly.Size = new System.Drawing.Size(175, 17);
+            this.chkFamilyFriendly.TabIndex = 83;
+            this.chkFamilyFriendly.Text = "Change rating to Family Friendly";
+            this.chkFamilyFriendly.UseVisualStyleBackColor = true;
+            // 
             // chkDIYStems
             // 
             this.chkDIYStems.AutoSize = true;
@@ -474,7 +486,7 @@
             this.AllowDrop = true;
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.ClientSize = new System.Drawing.Size(614, 495);
+            this.ClientSize = new System.Drawing.Size(614, 519);
             this.Controls.Add(this.chkDefAutID);
             this.Controls.Add(this.chkForceNumericOverride);
             this.Controls.Add(this.chkSubgenre);
@@ -494,6 +506,7 @@
             this.Controls.Add(this.chkOverrideAuthor);
             this.Controls.Add(this.txtOrigin);
             this.Controls.Add(this.chkOrigin);
+            this.Controls.Add(this.chkFamilyFriendly);
             this.Controls.Add(this.chkAuthor);
             this.Controls.Add(this.picPin);
             this.Controls.Add(this.picWorking);
@@ -540,6 +553,7 @@
         private System.ComponentModel.BackgroundWorker PhaseShiftRenamer;
         private System.Windows.Forms.PictureBox picPin;
         private System.Windows.Forms.CheckBox chkAuthor;
+        private System.Windows.Forms.CheckBox chkFamilyFriendly;
         private System.Windows.Forms.CheckBox chkOrigin;
         private System.Windows.Forms.TextBox txtOrigin;
         private System.Windows.Forms.MenuStrip menuStrip1;
