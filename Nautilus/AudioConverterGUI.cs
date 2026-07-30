@@ -28,7 +28,7 @@ namespace Nautilus
 
         private void DoErrorMessage()
         {
-            MessageBox.Show("This is an interface for the CLI application Audio Converter by TrojanNemo\n\nIt appears that AudioConverter.exe is missing from the bin folder\n\nI can't work without it\n\nClick OK to exit", "Missing File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("This is an interface for the CLI application Audio Converter by Nemo\n\nIt appears that AudioConverter.exe is missing from the bin folder\n\nI can't work without it\n\nClick OK to exit", "Missing File", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void btnOgg_DragEnter(object sender, DragEventArgs e)
@@ -142,7 +142,7 @@ namespace Nautilus
 
         private void btnAbout_Click(object sender, System.EventArgs e)
         {
-            MessageBox.Show("Audio Converter by TrojanNemo, 2024-2025", "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Audio Converter by Nemo, 2024-2026", "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void timer1_Tick(object sender, System.EventArgs e)

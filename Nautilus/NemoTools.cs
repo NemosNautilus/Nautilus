@@ -853,7 +853,7 @@ namespace Nautilus
                     try
                     {
                         var mip = isSaveFileArt || isSaveFileCharacter ? "-nomips " : ""; //need to disable mips, otherwise always enable
-                        //save as 512x512 / 1024x1024 DXT5 textures - first time ever in RB3 customs @ TrojanNemo 2014 bitches
+                        //save as 512x512 / 1024x1024 DXT5 textures - first time ever in RB3 customs @ Nemo 2014 bitches
                         var arg = mip + "-nocuda " + (useDXT5 ? "-bc3" : "-bc1") + " \"" + tgafile + "\" \"" + ddsfile + "\"";
                         var startInfo = new ProcessStartInfo
                         {

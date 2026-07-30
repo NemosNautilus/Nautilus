@@ -1659,7 +1659,7 @@ namespace Nautilus
         {
             var version = GetAppVersion();
             var message = Tools.ReadHelpFile("about");
-            MessageBox.Show(Text + " " + version + "\nDeveloped by TrojanNemo\n© 2013-2025\n\n" + message, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(Text + " " + version + "\nDeveloped by Nemo\n© Nemo's Nautilus, 2013-2025\n\n" + message, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void viewChangeLogToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2069,7 +2069,7 @@ namespace Nautilus
         private void gifTmr_Tick(object sender, EventArgs e)
         {
             gifTmr.Enabled = false;
-            //MessageBox.Show("Thank you, for everything.\n\n- TrojanNemo", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //MessageBox.Show("Thank you, for everything.\n\n- Nemo", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
             ResetEverything(true);
         }
 
