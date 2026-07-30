@@ -1,6 +1,6 @@
 # ⚓ Nautilus
 
-![Nautilus](https://nemosnautilus.com/nautilus/nautilusv550.png)
+![Nautilus](https://nemosnautilus.com/nautilus/nautilusv565.png)
 
 ---
 
@@ -19,7 +19,7 @@ See **BUILDING.md** for compile instructions.
 **Nautilus** is a multi-tool suite originally created to **create, edit, and work with Rock Band files**. Over time, it has grown to support files from **other rhythm games** as well.
 
 Development began in **2013** and continues to the present  
-(as of this edit, **March 13, 2026**).
+(as of this edit, **July 29, 2026**).
 
 Nautilus has accumulated a large number of tools over the years — explore the interface and see if it does what you need. Most features include Help documentation; however, not all of it has been kept fully up to date. Contributions to documentation are always welcome.
 
@@ -40,7 +40,7 @@ All of these are required for correct operation.
 
 - **Language:** C#  
 - **Framework:** .NET Framework **4.8.0**  
-- **IDE:** Visual Studio **2022 Community Edition**
+- **IDE:** Visual Studio **2022 Community Edition or newer**
 
 For best results, use the same environment.
 
