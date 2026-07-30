@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Nautilus")]
-[assembly: AssemblyDescription("Tool suite to create, edit and work with Rock Band files")]
+[assembly: AssemblyDescription("Tool suite to create, edit and work with Rock Band and other rhythm game files")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Nautilus")]
-[assembly: AssemblyCopyright("Copyright © TrojanNemo, 2013-2026")]
+[assembly: AssemblyCopyright("Copyright © Nemo's Nautilus, 2013-2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
