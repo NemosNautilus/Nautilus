@@ -1501,7 +1501,7 @@ namespace Nautilus
                 .Replace("#", "")
                 .Replace("^", "")
                 .Replace("$", "")
-                .Replace("+", "^")
+                .Replace("+", "")//.Replace("+", "^")
                 .Replace("§", "‿")
                 .Trim();
         }
