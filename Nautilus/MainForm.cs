@@ -1705,17 +1705,41 @@ namespace Nautilus
             var ofd = new OpenFileDialog { Multiselect = true, Title = "Choose CON/LIVE file to open..." };
             if (ofd.ShowDialog() != DialogResult.OK) return;
 
-            if (VariousFunctions.ReadFileType(ofd.FileName) == XboxFileType.STFS)
+            var invalid = new List<string>();
+            var opened = 0;
+            foreach (var file in ofd.FileNames)
             {
+                if (opened == 10)
+                {
+                    MessageBox.Show("You already opened 10 song files.\nTo make sure I don't burn down your computer,\nI'm going to stop loading any more.\nFeel free to load more when you're done\n with the 10 you have open.",
+                        "Too many files!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    break;
+                }
+                bool isCON;
+                try
+                {
+                    isCON = VariousFunctions.ReadFileType(file) == XboxFileType.STFS;
+                }
+                catch (Exception)
+                {
+                    isCON = false;
+                }
+                if (!isCON)
+                {
+                    invalid.Add(Path.GetFileName(file));
+                    continue;
+                }
                 var xExplorer = new CONExplorer(btnCONCreator.BackColor, btnCONCreator.ForeColor);
-                xExplorer.LoadCON(ofd.FileName);
+                xExplorer.LoadCON(file);
                 activeForm = xExplorer;
                 activeForms.Add(activeForm);
                 xExplorer.Show();
+                opened++;
             }
-            else
+            if (invalid.Count > 0)
             {
-                MessageBox.Show("That's not a valid file...", "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show((invalid.Count == 1 ? "That's not a valid file:\n" : "These aren't valid files:\n") + string.Join("\n", invalid),
+                    "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 
