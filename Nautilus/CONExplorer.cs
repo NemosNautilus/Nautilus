@@ -44,6 +44,7 @@ namespace Nautilus
         {
             CheckForIllegalCrossThreadCalls = true;
             InitializeComponent();
+            InitializeSearchBox();
             mMenuBackground = contextMenuStrip1.BackColor;
             contextMenuStrip1.Renderer = new DarkRenderer();
             nautilus3 = new nTools();
@@ -93,8 +94,93 @@ namespace Nautilus
             }
         }
 
+        private TextBox txtSearch;
+        private Node lastClickedNode;
+
+        private void InitializeSearchBox()
+        {
+            txtSearch = new TextBox
+            {
+                Location = new Point(6, 6),
+                Size = new Size(386, 20),
+                Name = "txtSearch",
+                TabIndex = 46
+            };
+            txtSearch.TextChanged += (s, e) => RunSearch();
+            txtSearch.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode != Keys.Escape) return;
+                txtSearch.Clear();
+                e.SuppressKeyPress = true;
+            };
+            tabContents.Controls.Add(txtSearch);
+            folderTree.Location = new Point(6, 30);
+            folderTree.Size = new Size(386, 138);
+            SetSearchCue();
+        }
+
+        private void SetSearchCue()
+        {
+            //native placeholder text
+            const int EM_SETCUEBANNER = 0x1501;
+            if (txtSearch.IsHandleCreated)
+                SendMessage(txtSearch.Handle, EM_SETCUEBANNER, (IntPtr)1, "Search files and folders...");
+            else
+                txtSearch.HandleCreated += (s, e) => SetSearchCue();
+        }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, string lParam);
+
+        private void RunSearch()
+        {
+            if (xPackage == null || !xPackage.ParseSuccess) return;
+            var term = txtSearch.Text.Trim();
+            if (term.Length == 0)
+            {
+                xReturn_NodeClick(lastClickedNode ?? node1, null);
+                return;
+            }
+            fileList.BeginUpdate();
+            fileList.Items.Clear();
+            SearchFolder(xPackage.RootDirectory, "", term, false);
+            fileList.EndUpdate();
+        }
+
+        private void SearchFolder(FolderEntry folder, string path, string term, bool parentMatched)
+        {
+            var files = folder.GetSubFiles();
+            if (files != null)
+            {
+                foreach (var f in files)
+                {
+                    if (!parentMatched && f.Name.IndexOf(term, StringComparison.OrdinalIgnoreCase) < 0) continue;
+                    var item = new ListViewItem(path + f.Name);
+                    item.SubItems.Add(FormatSize(f.Size));
+                    item.Tag = f;
+                    fileList.Items.Add(item);
+                }
+            }
+            var folders = folder.GetSubFolders();
+            if (folders == null) return;
+            foreach (var sub in folders.OrderBy(x => x.Name))
+            {
+                var matched = parentMatched || sub.Name.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0;
+                SearchFolder(sub, path + sub.Name + "/", term, matched);
+            }
+        }
+
+        private static string FormatSize(long bytes)
+        {
+            if (bytes < 1024) return "1 KB";
+            if (bytes < 1048576) return decimal.Round((decimal)bytes / 1024, 2) + " KB";
+            return decimal.Round((decimal)bytes / 1048576, 2) + " MB";
+        }
+
         private void SetNodes()
         {
+            if (txtSearch != null) txtSearch.Clear();
+            lastClickedNode = null;
             node1.Nodes.Clear();
             fileList.Items.Clear();
             node1.DataKey = xPackage.RootDirectory;
@@ -130,25 +216,21 @@ namespace Nautilus
             {
                 return;
             }
+            lastClickedNode = xsender;
+            if (txtSearch != null && txtSearch.TextLength > 0)
+            {
+                if (e != null)
+                    txtSearch.Clear(); //user clicked a folder: drop the search, RunSearch shows this folder
+                else
+                    RunSearch(); //refresh after add/replace/delete while searching
+                return;
+            }
             fileList.Items.Clear();
 
             foreach (var y in xFiles)
             {
                 var z = new ListViewItem(y.Name);
-                string size;
-                if (y.Size < 1024) //1 KB
-                {
-                    size = "1 KB";
-                }
-                else if (y.Size < 1048576) //1MB
-                {
-                    size = decimal.Round((decimal)y.Size / 1024, 2) + " KB";
-                }
-                else
-                {
-                    size = decimal.Round((decimal)y.Size / 1048576, 2) + " MB";
-                }
-                z.SubItems.Add(size);
+                z.SubItems.Add(FormatSize(y.Size));
                 z.Tag = y;
                 fileList.Items.Add(z);
             }
