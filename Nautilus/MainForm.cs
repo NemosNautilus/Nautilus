@@ -1705,17 +1705,39 @@ namespace Nautilus
             var ofd = new OpenFileDialog { Multiselect = true, Title = "Choose CON/LIVE file to open..." };
             if (ofd.ShowDialog() != DialogResult.OK) return;
 
-            if (VariousFunctions.ReadFileType(ofd.FileName) == XboxFileType.STFS)
+            var invalid = new List<string>();
+            var valid = new List<string>();
+            foreach (var file in ofd.FileNames)
             {
+                bool isCON;
+                try
+                {
+                    isCON = VariousFunctions.ReadFileType(file) == XboxFileType.STFS;
+                }
+                catch (Exception)
+                {
+                    isCON = false;
+                }
+                if (!isCON)
+                {
+                    invalid.Add(Path.GetFileName(file));
+                    continue;
+                }
+                valid.Add(file);
+            }
+            if (valid.Count > 0)
+            {
+                //one window; several files are shown together in the Contents tab
                 var xExplorer = new CONExplorer(btnCONCreator.BackColor, btnCONCreator.ForeColor);
-                xExplorer.LoadCON(ofd.FileName);
+                xExplorer.LoadMultipleCON(valid);
                 activeForm = xExplorer;
                 activeForms.Add(activeForm);
                 xExplorer.Show();
             }
-            else
+            if (invalid.Count > 0)
             {
-                MessageBox.Show("That's not a valid file...", "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show((invalid.Count == 1 ? "That's not a valid file:\n" : "These aren't valid files:\n") + string.Join("\n", invalid),
+                    "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 
