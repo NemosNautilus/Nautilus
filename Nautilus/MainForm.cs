@@ -1706,15 +1706,9 @@ namespace Nautilus
             if (ofd.ShowDialog() != DialogResult.OK) return;
 
             var invalid = new List<string>();
-            var opened = 0;
+            var valid = new List<string>();
             foreach (var file in ofd.FileNames)
             {
-                if (opened == 10)
-                {
-                    MessageBox.Show("You already opened 10 song files.\nTo make sure I don't burn down your computer,\nI'm going to stop loading any more.\nFeel free to load more when you're done\n with the 10 you have open.",
-                        "Too many files!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    break;
-                }
                 bool isCON;
                 try
                 {
@@ -1729,12 +1723,16 @@ namespace Nautilus
                     invalid.Add(Path.GetFileName(file));
                     continue;
                 }
+                valid.Add(file);
+            }
+            if (valid.Count > 0)
+            {
+                //one window; several files are shown together in the Contents tab
                 var xExplorer = new CONExplorer(btnCONCreator.BackColor, btnCONCreator.ForeColor);
-                xExplorer.LoadCON(file);
+                xExplorer.LoadMultipleCON(valid);
                 activeForm = xExplorer;
                 activeForms.Add(activeForm);
                 xExplorer.Show();
-                opened++;
             }
             if (invalid.Count > 0)
             {

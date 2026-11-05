@@ -102,21 +102,154 @@ namespace Nautilus
             txtSearch = new TextBox
             {
                 Location = new Point(6, 6),
-                Size = new Size(386, 20),
+                Size = new Size(281, 20),
                 Name = "txtSearch",
                 TabIndex = 46
             };
-            txtSearch.TextChanged += (s, e) => RunSearch();
+            cboExtension = new ComboBox
+            {
+                Location = new Point(292, 5),
+                Size = new Size(100, 21),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Name = "cboExtension",
+                TabIndex = 47
+            };
+            cboExtension.Items.Add(AllExtensions);
+            cboExtension.SelectedIndex = 0;
+            cboExtension.SelectedIndexChanged += (s, e) => RunSearch();
+            tabContents.Controls.Add(cboExtension);
+
+            //checkboxes mark files for the copy list; checks persist across searches/folders
+            fileList.CheckBoxes = true;
+            fileList.ItemChecked += (s, e) =>
+            {
+                if (suppressCheck) return;
+                var f = e.Item.Tag as FileEntry;
+                if (f == null) return;
+                if (e.Item.Checked) { if (!copyList.Contains(f)) copyList.Add(f); }
+                else copyList.Remove(f);
+            };
+            toolTip1.SetToolTip(cboExtension, "Filter by file extension");
+
+            //draw a greyed-out Information tab when it's disabled (multi-file mode)
+            tabControl1.DrawMode = TabDrawMode.OwnerDrawFixed;
+            tabControl1.DrawItem += TabControl1_DrawItem;
+            txtSearch.TextChanged += (s, e) => QueueSearch();
             txtSearch.KeyDown += (s, e) =>
             {
                 if (e.KeyCode != Keys.Escape) return;
-                txtSearch.Clear();
+                ClearFilters();
+                xReturn_NodeClick(lastClickedNode ?? node1, null);
                 e.SuppressKeyPress = true;
             };
             tabContents.Controls.Add(txtSearch);
             folderTree.Location = new Point(6, 30);
             folderTree.Size = new Size(386, 138);
             SetSearchCue();
+            MakeResizable();
+        }
+
+        private void MakeResizable()
+        {
+            FormBorderStyle = FormBorderStyle.Sizable;
+            MaximizeBox = true;
+            MinimumSize = Size; //designer size is the smallest layout that fits
+
+            const AnchorStyles all = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tabControl1.Anchor = all;
+            lstLog.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            foreach (Control c in new Control[] { label5, btnDTA, btnMIDI, btnPNG, btnMOGG, btnMILO })
+            {
+                c.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            }
+
+            //contents tab: tree takes ~55% of the height, file list the rest
+            txtSearch.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            cboExtension.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            folderTree.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            fileList.Anchor = all;
+            tabContents.Resize += (s, e) => LayoutContents();
+
+            //Name column fills the width left over by Size
+            fileList.Resize += (s, e) =>
+            {
+                var w = fileList.ClientSize.Width - columnHeader2.Width;
+                if (w > 50) columnHeader1.Width = w;
+            };
+        }
+
+        private void LayoutContents()
+        {
+            const int gap = 6;
+            var top = folderTree.Top;
+            var available = tabContents.ClientSize.Height - top - gap * 2;
+            if (available < 100) return;
+            var treeHeight = available * 55 / 100;
+            folderTree.Height = treeHeight;
+            fileList.Top = top + treeHeight + gap;
+            fileList.Height = tabContents.ClientSize.Height - fileList.Top - gap;
+        }
+
+        private const string AllExtensions = "All types";
+        private const string NoExtension = "(none)";
+        private ComboBox cboExtension;
+
+        private void TabControl1_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            var page = tabControl1.TabPages[e.Index];
+            var selected = e.Index == tabControl1.SelectedIndex;
+            var back = selected ? page.BackColor : SystemColors.Control;
+            using (var brush = new SolidBrush(back))
+            {
+                e.Graphics.FillRectangle(brush, e.Bounds);
+            }
+            var color = page.Enabled ? SystemColors.ControlText : SystemColors.GrayText;
+            TextRenderer.DrawText(e.Graphics, page.Text, tabControl1.Font, e.Bounds, color,
+                TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+        }
+
+        private static string GetExtension(string name)
+        {
+            var ext = Path.GetExtension(name);
+            return string.IsNullOrEmpty(ext) ? NoExtension : ext.ToLowerInvariant();
+        }
+
+        private void PopulateExtensions()
+        {
+            var current = cboExtension.SelectedItem as string ?? AllExtensions;
+            var exts = GetSearchIndex().Select(x => x.Extension).Distinct()
+                .OrderBy(x => x == NoExtension ? 1 : 0).ThenBy(x => x).ToList();
+            cboExtension.BeginUpdate();
+            cboExtension.Items.Clear();
+            cboExtension.Items.Add(AllExtensions);
+            foreach (var ext in exts) cboExtension.Items.Add(ext);
+            var idx = cboExtension.Items.IndexOf(current);
+            suppressSearch = true;
+            cboExtension.SelectedIndex = idx < 0 ? 0 : idx;
+            suppressSearch = false;
+            cboExtension.EndUpdate();
+        }
+
+        private bool suppressSearch;
+        private bool suppressCheck;
+        private ToolStripMenuItem menuCopyFile, menuAddToCopyList, menuCopyList, menuClearCopyList;
+
+        private bool IsFiltering
+        {
+            get
+            {
+                return txtSearch != null && (txtSearch.TextLength > 0 ||
+                       (cboExtension.SelectedItem as string ?? AllExtensions) != AllExtensions);
+            }
+        }
+
+        private void ClearFilters()
+        {
+            suppressSearch = true;
+            txtSearch.Clear();
+            cboExtension.SelectedIndex = 0;
+            suppressSearch = false;
+            if (searchTimer != null) searchTimer.Stop();
         }
 
         private void SetSearchCue()
@@ -132,41 +265,121 @@ namespace Nautilus
         [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
         private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, string lParam);
 
+        private const int MaxSearchResults = 500;
+        private Timer searchTimer;
+        private List<SearchEntry> searchIndex;
+
+        private sealed class SearchEntry
+        {
+            public string Path;
+            public string Size;
+            public FileEntry File;
+            public string Extension;
+        }
+
+        private void QueueSearch()
+        {
+            //debounce: wait until the user pauses typing
+            if (suppressSearch) return;
+            if (searchTimer == null)
+            {
+                searchTimer = new Timer { Interval = 250 };
+                searchTimer.Tick += (s, e) => { searchTimer.Stop(); RunSearch(); };
+            }
+            searchTimer.Stop();
+            searchTimer.Start();
+        }
+
+        /// <summary>
+        /// Flat in-memory list of every file path, built once per load (or after edits).
+        /// Uses the package's directory lists directly; GetSubFiles/GetSubFolders scan the
+        /// whole list per call, which made the recursive search quadratic.
+        /// </summary>
+        private List<SearchEntry> GetSearchIndex()
+        {
+            if (searchIndex != null) return searchIndex;
+            searchIndex = new List<SearchEntry>();
+            var packages = IsMultiMode ? multiPackages.OrderBy(p => Path.GetFileName(p.FileNameLong)).ToList()
+                                       : new List<STFSPackage> { xPackage };
+            foreach (var pkg in packages)
+            {
+                var prefix = IsMultiMode ? Path.GetFileName(pkg.FileNameLong) + ": " : "";
+                var folders = new Dictionary<ushort, FolderEntry>();
+                foreach (var f in pkg.xFolderDirectory) folders[f.EntryID] = f;
+                var folderPaths = new Dictionary<ushort, string>();
+                Func<ushort, string> pathOf = null;
+                pathOf = id =>
+                {
+                    string p;
+                    if (folderPaths.TryGetValue(id, out p)) return p;
+                    FolderEntry f;
+                    p = folders.TryGetValue(id, out f) && f.FolderPointer != id
+                        ? pathOf(f.FolderPointer) + f.Name + "/"
+                        : ""; //root
+                    folderPaths[id] = p;
+                    return p;
+                };
+                var entries = pkg.xFileDirectory
+                    .Select(f => new SearchEntry { Path = prefix + pathOf(f.FolderPointer) + f.Name, Size = FormatSize(f.Size), File = f, Extension = GetExtension(f.Name) })
+                    .OrderBy(x => x.Path, StringComparer.OrdinalIgnoreCase);
+                searchIndex.AddRange(entries);
+            }
+            return searchIndex;
+        }
+
         private void RunSearch()
         {
+            if (searchTimer != null) searchTimer.Stop();
+            if (suppressSearch) return;
             if (xPackage == null || !xPackage.ParseSuccess) return;
             var term = txtSearch.Text.Trim();
-            if (term.Length == 0)
+            var ext = cboExtension.SelectedItem as string;
+            var anyExt = ext == null || ext == AllExtensions;
+            if (term.Length == 0 && anyExt)
             {
                 xReturn_NodeClick(lastClickedNode ?? node1, null);
                 return;
             }
+            var index = GetSearchIndex();
+            var checkedSet = new HashSet<FileEntry>(copyList);
+            var items = new List<ListViewItem>(MaxSearchResults + copyList.Count);
+
+            //checked files stay listed (on top) across searches; unchecked ones drop off on the next search
+            var byFile = new Dictionary<FileEntry, SearchEntry>();
+            foreach (var x in index) byFile[x.File] = x;
+            foreach (var f in copyList)
+            {
+                SearchEntry entry;
+                if (!byFile.TryGetValue(f, out entry)) continue;
+                var item = new ListViewItem(entry.Path) { Checked = true, Tag = f };
+                item.SubItems.Add(entry.Size);
+                items.Add(item);
+            }
+
+            var matches = index.Where(x =>
+                !checkedSet.Contains(x.File) &&
+                (anyExt || x.Extension == ext) &&
+                (term.Length == 0 || x.Path.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0));
+            var total = 0;
+            var shown = 0;
+            foreach (var m in matches)
+            {
+                total++;
+                if (shown >= MaxSearchResults) continue;
+                var item = new ListViewItem(m.Path) { Tag = m.File };
+                item.SubItems.Add(m.Size);
+                items.Add(item);
+                shown++;
+            }
             fileList.BeginUpdate();
             fileList.Items.Clear();
-            SearchFolder(xPackage.RootDirectory, "", term, false);
+            suppressCheck = true;
+            fileList.Items.AddRange(items.ToArray());
+            suppressCheck = false;
             fileList.EndUpdate();
-        }
-
-        private void SearchFolder(FolderEntry folder, string path, string term, bool parentMatched)
-        {
-            var files = folder.GetSubFiles();
-            if (files != null)
+            if (total > MaxSearchResults)
             {
-                foreach (var f in files)
-                {
-                    if (!parentMatched && f.Name.IndexOf(term, StringComparison.OrdinalIgnoreCase) < 0) continue;
-                    var item = new ListViewItem(path + f.Name);
-                    item.SubItems.Add(FormatSize(f.Size));
-                    item.Tag = f;
-                    fileList.Items.Add(item);
-                }
-            }
-            var folders = folder.GetSubFolders();
-            if (folders == null) return;
-            foreach (var sub in folders.OrderBy(x => x.Name))
-            {
-                var matched = parentMatched || sub.Name.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0;
-                SearchFolder(sub, path + sub.Name + "/", term, matched);
+                Log("Showing first " + MaxSearchResults + " of " + total + " matches, refine your search");
             }
         }
 
@@ -179,7 +392,8 @@ namespace Nautilus
 
         private void SetNodes()
         {
-            if (txtSearch != null) txtSearch.Clear();
+            if (txtSearch != null) ClearFilters();
+            searchIndex = null;
             lastClickedNode = null;
             node1.Nodes.Clear();
             fileList.Items.Clear();
@@ -190,6 +404,7 @@ namespace Nautilus
                 node1.Nodes.Add(GetNode(y));
             }
             xReturn_NodeClick(node1, null);
+            PopulateExtensions();
         }
 
         private Node GetNode(ItemEntry x)
@@ -208,7 +423,23 @@ namespace Nautilus
             }
 
             var xsender = (Node)sender;
+            if (IsMultiMode && xsender == node1)
+            {
+                //root lists the loaded packages only
+                lastClickedNode = node1;
+                if (IsFiltering)
+                {
+                    if (e == null) { RunSearch(); return; }
+                    ClearFilters();
+                }
+                fileList.Items.Clear();
+                return;
+            }
             var x = (FolderEntry)xsender.DataKey;
+            if (IsMultiMode && x != null)
+            {
+                xPackage = x.xPackage; //operate on the package this folder belongs to
+            }
             var xFiles = x.GetSubFiles();
             var xFolders = x.GetSubFolders();
 
@@ -217,13 +448,14 @@ namespace Nautilus
                 return;
             }
             lastClickedNode = xsender;
-            if (txtSearch != null && txtSearch.TextLength > 0)
+            if (IsFiltering)
             {
-                if (e != null)
-                    txtSearch.Clear(); //user clicked a folder: drop the search, RunSearch shows this folder
-                else
+                if (e == null)
+                {
                     RunSearch(); //refresh after add/replace/delete while searching
-                return;
+                    return;
+                }
+                ClearFilters(); //user clicked a folder: drop the search and show it
             }
             fileList.Items.Clear();
 
@@ -232,7 +464,10 @@ namespace Nautilus
                 var z = new ListViewItem(y.Name);
                 z.SubItems.Add(FormatSize(y.Size));
                 z.Tag = y;
+                z.Checked = copyList.Contains(y);
+                suppressCheck = true;
                 fileList.Items.Add(z);
+                suppressCheck = false;
             }
             xsender.Nodes.Clear();
 
@@ -252,6 +487,81 @@ namespace Nautilus
                     //xsender.Nodes[i].Tag = xFolders[i];
                 }
             }
+        }
+
+        private List<STFSPackage> multiPackages;
+        private bool IsMultiMode { get { return multiPackages != null; } }
+
+        /// <summary>
+        /// Loads several CON/LIVE files into one read-only window: each package becomes a
+        /// node under Root in the Contents tab, and the Information tab is disabled.
+        /// </summary>
+        public void LoadMultipleCON(IList<string> files)
+        {
+            if (files.Count == 1)
+            {
+                LoadCON(files[0]);
+                return;
+            }
+            starting = true;
+            multiPackages = new List<STFSPackage>();
+            tabControl1.Enabled = false;
+            foreach (var file in files)
+            {
+                STFSPackage pkg;
+                try
+                {
+                    pkg = new STFSPackage(file);
+                }
+                catch (Exception)
+                {
+                    pkg = null;
+                }
+                if (pkg == null || !pkg.ParseSuccess)
+                {
+                    Log("Error opening " + Path.GetFileName(file));
+                    if (pkg != null) pkg.CloseIO();
+                    continue;
+                }
+                multiPackages.Add(pkg);
+                Log("Opened " + Path.GetFileName(file));
+            }
+            if (multiPackages.Count == 0)
+            {
+                Log("No files could be opened");
+                multiPackages = null;
+                return;
+            }
+            xPackage = multiPackages[0];
+
+            node1.NodeClick += xReturn_NodeClick;
+            node1.Nodes.Clear();
+            fileList.Items.Clear();
+            node1.DataKey = null;
+            foreach (var pkg in multiPackages.OrderBy(p => Path.GetFileName(p.FileNameLong)))
+            {
+                var pkgNode = new Node { Text = Path.GetFileName(pkg.FileNameLong), DataKey = pkg.RootDirectory };
+                pkgNode.NodeClick += xReturn_NodeClick;
+                node1.Nodes.Add(pkgNode);
+            }
+            node1.Expand();
+            PopulateExtensions();
+
+            //Information tab only makes sense for a single package
+            tabInformation.Enabled = false;
+            tabControl1.SelectedTab = tabContents;
+            tabControl1.Invalidate();
+            tabControl1.Selecting += (s, ev) =>
+            {
+                if (ev.TabPage == tabInformation) ev.Cancel = true;
+            };
+            menuRenameFolder.Enabled = false;
+
+            Text = multiPackages.Count + " files loaded";
+            Log("Loaded " + multiPackages.Count + " files (read-only)");
+            Log("Ready");
+            tabControl1.Enabled = true;
+            starting = false;
         }
 
         public void LoadCON(string file)
@@ -427,6 +737,43 @@ namespace Nautilus
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
             extractFileToolStripMenuItem.Text = "Extract selected file";
+            if (menuCopyFile == null)
+            {
+                menuCopyFile = new ToolStripMenuItem { BackColor = extractFileToolStripMenuItem.BackColor };
+                menuCopyFile.Click += (s, ev) => CopySelectedFiles();
+                var back = extractFileToolStripMenuItem.BackColor;
+                menuAddToCopyList = new ToolStripMenuItem("Check selected") { BackColor = back };
+                menuAddToCopyList.Click += (s, ev) => CheckSelected(true);
+                menuCopyList = new ToolStripMenuItem { BackColor = back };
+                menuCopyList.Click += (s, ev) => CopyFiles(copyList.ToList());
+                menuClearCopyList = new ToolStripMenuItem("Uncheck all") { BackColor = back };
+                menuClearCopyList.Click += (s, ev) => ClearCopyList();
+                var at = contextMenuStrip1.Items.IndexOf(extractFileToolStripMenuItem) + 1;
+                contextMenuStrip1.Items.Insert(at++, menuCopyFile);
+                contextMenuStrip1.Items.Insert(at++, menuAddToCopyList);
+                contextMenuStrip1.Items.Insert(at++, menuCopyList);
+                contextMenuStrip1.Items.Insert(at, menuClearCopyList);
+            }
+            menuCopyFile.Enabled = fileList.SelectedIndices.Count > 0;
+            menuAddToCopyList.Enabled = fileList.SelectedIndices.Count > 0;
+            menuAddToCopyList.Visible = fileList.SelectedIndices.Count > 1;
+            menuCopyList.Text = "Copy checked files (" + copyList.Count + ")";
+            menuCopyList.Visible = copyList.Count > 0;
+            menuClearCopyList.Visible = copyList.Count > 0;
+            menuCopyFile.Text = fileList.SelectedIndices.Count > 1 ? "Copy selected files" : "Copy";
+            if (IsMultiMode)
+            {
+                //read-only: only extraction is allowed
+                replaceFileToolStripMenuItem.Visible = false;
+                injectSelectedFileToolStripMenuItem.Visible = false;
+                menuRenameFile.Visible = false;
+                menuDeleteFile.Visible = false;
+                toolStripMenuItem1.Visible = false;
+                addNewFilesToolStripMenuItem.Visible = false;
+                extractFileToolStripMenuItem.Enabled = fileList.SelectedIndices.Count > 0;
+                if (fileList.SelectedIndices.Count > 1) extractFileToolStripMenuItem.Text = "Extract selected files";
+                return;
+            }
 
             if (fileList.SelectedIndices.Count == 0)
             {
@@ -532,7 +879,12 @@ namespace Nautilus
         private void ShowChanges(bool show)
         {
             Changes = show;
-            Text = Text.Replace("*", "").Trim();
+            if (show && txtSearch != null)
+            {
+                searchIndex = null; //contents changed, rebuild index and extension list
+                PopulateExtensions();
+            }
+            Text =Text.Replace("*", "").Trim();
             if (show)
             {
                 Text = "* " + Text + " *";
@@ -545,6 +897,7 @@ namespace Nautilus
             {
                 var x = (FileEntry)fileList.SelectedItems[0].Tag;
                 xPackage.xDeleteEntry(x);
+                copyList.Remove(x);
                 Log("Deleted file " + x.Name + " successfully");
                 fileList.SelectedItems[0].Remove();
                 ShowChanges(true);
@@ -594,6 +947,11 @@ namespace Nautilus
         private void listView1_DragDrop(object sender, DragEventArgs e)
         {
             if (picWorking.Visible) return;
+            if (IsMultiMode)
+            {
+                internalDrop = false;
+                return;
+            }
             if (internalDrop)
             {
                 internalDrop = false;
@@ -888,7 +1246,14 @@ namespace Nautilus
                 }
             }
 
-            xPackage.CloseIO();
+            if (IsMultiMode)
+            {
+                foreach (var pkg in multiPackages) pkg.CloseIO();
+            }
+            else if (xPackage != null)
+            {
+                xPackage.CloseIO();
+            }
             Tools.DeleteFolder(Application.StartupPath + "\\packex\\", true);
             Tools.DeleteFolder(Application.StartupPath + "\\temp\\", true);
         }
@@ -1243,6 +1608,7 @@ namespace Nautilus
         
         private void CONExplorer_Shown(object sender, EventArgs e)
         {
+            if (IsMultiMode || xPackage == null) return;
             var xfile = xPackage.GetFile("songs/songs.dta") ?? xPackage.GetFile("songs_upgrades/upgrades.dta");
             if (xfile == null) return;
 
@@ -1399,6 +1765,84 @@ namespace Nautilus
                 Log("Could not extract file " + Path.GetFileName(ext_file[0]));
             }
         }        
+
+        /// <summary>
+        /// Extracts the selected list entries to temp and puts them on the clipboard as files,
+        /// so they can be pasted in Explorer (same as the DTA/MIDI/MOGG buttons).
+        /// </summary>
+        private List<FileEntry> SelectedEntries()
+        {
+            return fileList.SelectedItems.Cast<ListViewItem>().Select(i => i.Tag as FileEntry).Where(f => f != null).ToList();
+        }
+
+        private void CopySelectedFiles()
+        {
+            CopyFiles(SelectedEntries());
+        }
+
+        //files collected across searches/folders, copied together
+        private readonly List<FileEntry> copyList = new List<FileEntry>();
+
+        private void CheckSelected(bool check)
+        {
+            foreach (ListViewItem item in fileList.SelectedItems) item.Checked = check; //ItemChecked updates copyList
+        }
+
+        private void ClearCopyList()
+        {
+            copyList.Clear();
+            suppressCheck = true;
+            foreach (ListViewItem item in fileList.Items) item.Checked = false;
+            suppressCheck = false;
+            Log("Copy list cleared");
+        }
+
+        private void CopyFiles(List<FileEntry> entries)
+        {
+            if (entries.Count == 0) return;
+
+            var ext_folder = Path.Combine(Application.StartupPath, "temp", "copy");
+            Tools.DeleteFolder(ext_folder, true);
+            Directory.CreateDirectory(ext_folder);
+
+            Enabled = false;
+            var paths = new List<string>();
+            foreach (var xent in entries)
+            {
+                //same name from different packages/folders: put each in its own subfolder
+                var folder = ext_folder;
+                var n = 1;
+                while (File.Exists(Path.Combine(folder, xent.Name)))
+                {
+                    folder = Path.Combine(ext_folder, (n++).ToString());
+                }
+                Directory.CreateDirectory(folder);
+                var path = Path.Combine(folder, xent.Name);
+                Log("Extracting " + xent.Name);
+                if (!xent.ExtractToFile(path) || !File.Exists(path))
+                {
+                    Log("Error extracting " + xent.Name);
+                    continue;
+                }
+                paths.Add(path);
+            }
+            Enabled = true;
+            if (paths.Count == 0) return;
+
+            if (Tools.IsRunningOnWine())
+            {
+                foreach (var p in paths) SaveFileUsingDialog(p);
+                return;
+            }
+            var data = new DataObject();
+            var dropList = new StringCollection();
+            dropList.AddRange(paths.ToArray());
+            data.SetFileDropList(dropList);
+            data.SetData("Preferred DropEffect", new MemoryStream(new byte[] { 1, 0, 0, 0 })); //copy
+            Clipboard.Clear();
+            Clipboard.SetDataObject(data, true);
+            Log(paths.Count > 1 ? paths.Count + " files are in your clipboard, paste them anywhere" : "File is in your clipboard, paste it anywhere");
+        }
 
         /// <summary>
         /// Prompts the user with a Save File Dialog and copies the extracted file to the chosen location.
@@ -1668,7 +2112,7 @@ namespace Nautilus
 
         private void contextMenuStrip4_Opening(object sender, CancelEventArgs e)
         {
-            menuRenameFolder.Visible = folderTree.SelectedNode != null;        
+            menuRenameFolder.Visible = folderTree.SelectedNode != null && !IsMultiMode;
         }
 
         private void menuRenameFolder_Click(object sender, EventArgs e)
