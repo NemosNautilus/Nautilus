@@ -333,7 +333,7 @@ namespace Nautilus
                             {
                                 Directory.CreateDirectory(UltraStarFolder);
                             }
-                            var songFolder = UltraStarFolder + Tools.CleanString(Parser.Songs[0].Artist, false).Replace("\"", "") + " - " + Tools.CleanString(Parser.Songs[0].Name, false).Replace("\"", "") + "\\";
+                            var songFolder = UltraStarFolder + Tools.CleanString(Parser.Songs[0].Artist.Replace("\"", "") + " - " + Parser.Songs[0].Name.Replace("\"", ""), false) + "\\";
                             if (!Directory.Exists(songFolder))
                             {
                                 Directory.CreateDirectory(songFolder);
@@ -513,7 +513,7 @@ namespace Nautilus
             string artist = Parser.Songs[0].Artist.Replace("\"", "");
             string title = Parser.Songs[0].Name.Replace("\"", "");
 
-            string txtPath = Path.Combine(path, artist + " - " + title + ".txt");
+            string txtPath = Path.Combine(path, (Tools.CleanString(artist + " - " + title, false) + ".txt"));
 
             Log("Writing TXT file:");
             Log(txtPath);
@@ -657,7 +657,7 @@ namespace Nautilus
             if (lyric.EndsWith("-") || lyric.EndsWith("="))
                 lyric = lyric.Substring(0, lyric.Length - 1);
 
-            lyric = lyric.Replace("+", "");
+            lyric = lyric.Replace("+", "~"); //preserve the slide
             lyric = lyric.Replace("_", " ");
             lyric = lyric.Replace("/", "");
 
@@ -764,7 +764,7 @@ namespace Nautilus
 
         private void fromXbox(string image)
         {
-            var jpgFile = UltraStarFolder + Parser.Songs[0].Artist.Replace("\"", "") + " - " + Parser.Songs[0].Name.Replace("\"", "") + "\\" + Parser.Songs[0].Artist.Replace("\"", "") + " - " + Parser.Songs[0].Name.Replace("\"", "") + " [CO].jpg";
+            var jpgFile = UltraStarFolder + (Tools.CleanString(Parser.Songs[0].Artist.Replace("\"", "") + " - " + Parser.Songs[0].Name.Replace("\"", ""), false) + "\\" + Tools.CleanString(Parser.Songs[0].Artist.Replace("\"", "") + " - " + Parser.Songs[0].Name.Replace("\"", ""), false) + " [CO].jpg");
             try
             {
                 Log(Tools.ConvertRBImage(image, jpgFile, "jpg", true) ? "Converted album art file successfully" : "There was an error when converting the album art file");
@@ -783,7 +783,7 @@ namespace Nautilus
         private void DownMixAudio(string CON, string folder, string fileName)
         {
             folder = folder.Replace("\"", "");
-            fileName = fileName.Replace("\"", "");
+            fileName = Tools.CleanString(fileName.Replace("\"", ""), false);
 
             var ext = radioMP3.Checked ? ".mp3" : (radioWAV.Checked ? ".wav" : ".ogg");
             if (backgroundWorker1.CancellationPending) return;

@@ -53,6 +53,7 @@
             this.removeSpacesFromFileName = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceSpacesWithUnderscores = new System.Windows.Forms.ToolStripMenuItem();
             this.ignoreXboxFilesystemLimitations = new System.Windows.Forms.ToolStripMenuItem();
+            this.fullNameNoAccents = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.batchRenamePhaseShift = new System.Windows.Forms.ToolStripMenuItem();
             this.sortingOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,7 +68,6 @@
             this.picWorking = new System.Windows.Forms.PictureBox();
             this.folderScanner = new System.ComponentModel.BackgroundWorker();
             this.PhaseShiftRenamer = new System.ComponentModel.BackgroundWorker();
-            this.fullNameNoAccents = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picPin)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -342,6 +342,15 @@
             this.ignoreXboxFilesystemLimitations.Text = "Ignore Xbox file system limitations";
             this.ignoreXboxFilesystemLimitations.Click += new System.EventHandler(this.ignoreXboxFilesystemLimitations_Click);
             // 
+            // fullNameNoAccents
+            // 
+            this.fullNameNoAccents.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.fullNameNoAccents.CheckOnClick = true;
+            this.fullNameNoAccents.Name = "fullNameNoAccents";
+            this.fullNameNoAccents.Size = new System.Drawing.Size(299, 22);
+            this.fullNameNoAccents.Text = "Full name, no accents or special characters";
+            this.fullNameNoAccents.Click += new System.EventHandler(this.fullNameNoAccents_Click);
+            // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
@@ -465,15 +474,6 @@
             this.PhaseShiftRenamer.WorkerSupportsCancellation = true;
             this.PhaseShiftRenamer.DoWork += new System.ComponentModel.DoWorkEventHandler(this.PhaseShiftRenamer_DoWork);
             this.PhaseShiftRenamer.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.PhaseShiftRenamer_RunWorkerCompleted);
-            // 
-            // fullNameNoAccents
-            // 
-            this.fullNameNoAccents.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.fullNameNoAccents.CheckOnClick = true;
-            this.fullNameNoAccents.Name = "fullNameNoAccents";
-            this.fullNameNoAccents.Size = new System.Drawing.Size(299, 22);
-            this.fullNameNoAccents.Text = "Full name, no accents or special characters";
-            this.fullNameNoAccents.Click += new System.EventHandler(this.fullNameNoAccents_Click);
             // 
             // BatchRenamer
             // 

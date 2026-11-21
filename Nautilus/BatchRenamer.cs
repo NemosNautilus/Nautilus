@@ -44,6 +44,76 @@ namespace Nautilus
             }
         }
 
+        private void SaveConfig()
+        {
+            var configFolder = Application.StartupPath + "\\bin\\config";
+            if (!Directory.Exists(configFolder))
+            {
+                Directory.CreateDirectory(configFolder);
+            }
+            var configFile = Path.Combine(configFolder, "renamer.config");
+            var sw = new StreamWriter(configFile, false);
+            sw.WriteLine(renameFiles.Checked ? "True" : "False");
+            sw.WriteLine(renameInternalName.Checked ? "True" : "False");
+            sw.WriteLine(ezloDQMode.Checked ? "True" : "False");
+            sw.WriteLine(renameTheArtistSong.Checked ? "True" : "False");
+            sw.WriteLine(renameArtistTheSong.Checked ? "True" : "False");
+            sw.WriteLine(renameSongTheArtist.Checked ? "True" : "False");
+            sw.WriteLine(renameSongArtistThe.Checked ? "True" : "False");
+            sw.WriteLine(renameYearArtist.Checked ? "True" : "False");
+            sw.WriteLine(renameYearSong.Checked ? "True" : "False");
+            sw.WriteLine(normalizeFeaturedArtists.Checked ? "True" : "False");
+            sw.WriteLine(removeSpacesFromFileName.Checked ? "True" : "False");
+            sw.WriteLine(ignoreXboxFilesystemLimitations.Checked ? "True" : "False");
+            sw.WriteLine(fullNameNoAccents.Checked ? "True" : "False");
+            sw.WriteLine(tryToSortFiles.Checked ? "True" : "False");
+            sw.WriteLine(tryDetailedSubsorting.Checked ? "True" : "False");
+            sw.WriteLine(separateXonlySongs.Checked ? "True" : "False");
+            sw.WriteLine(sortByAuthor.Checked ? "True" : "False");
+            sw.WriteLine(deleteOlderCopies.Checked ? "True" : "False");
+            sw.WriteLine(deleteExactCopiesONLY.Checked ? "True" : "False");
+            sw.Dispose();
+        }
+
+        private void LoadConfig()
+        {
+            var configFolder = Application.StartupPath + "\\bin\\config";
+            if (!Directory.Exists(configFolder)) return;            
+            var configFile = Path.Combine(configFolder, "renamer.config");
+            if (!File.Exists(configFile)) return;
+
+            var sr = new StreamReader(configFile);
+            try
+            {
+                renameFiles.Checked = sr.ReadLine().Contains("True");
+                renameInternalName.Checked = sr.ReadLine().Contains("True");
+                ezloDQMode.Checked = sr.ReadLine().Contains("True");
+                renameTheArtistSong.Checked = sr.ReadLine().Contains("True");
+                renameArtistTheSong.Checked = sr.ReadLine().Contains("True");
+                renameSongTheArtist.Checked = sr.ReadLine().Contains("True");
+                renameSongArtistThe.Checked = sr.ReadLine().Contains("True");
+                renameYearArtist.Checked = sr.ReadLine().Contains("True");
+                renameYearSong.Checked = sr.ReadLine().Contains("True");
+                normalizeFeaturedArtists.Checked = sr.ReadLine().Contains("True");
+                removeSpacesFromFileName.Checked = sr.ReadLine().Contains("True");
+                ignoreXboxFilesystemLimitations.Checked = sr.ReadLine().Contains("True");
+                fullNameNoAccents.Checked = sr.ReadLine().Contains("True");
+                tryToSortFiles.Checked = sr.ReadLine().Contains("True");
+                tryDetailedSubsorting.Checked = sr.ReadLine().Contains("True");
+                separateXonlySongs.Checked = sr.ReadLine().Contains("True");
+                sortByAuthor.Checked = sr.ReadLine().Contains("True");
+                deleteOlderCopies.Checked = sr.ReadLine().Contains("True");
+                deleteExactCopiesONLY.Checked = sr.ReadLine().Contains("True");
+            }
+            catch
+            {
+                sr.Dispose();
+                File.Delete(configFile);
+                return;
+            }            
+            sr.Dispose();
+        }
+
         private void btnFolder_Click(object sender, EventArgs e)
         {
             //if user selects new folder, assign that value
@@ -746,6 +816,7 @@ namespace Nautilus
             Log("Drag and drop the CON / LIVE file(s) here");
             Log("Or click 'Change Input Folder' to select the files");
             Log("Ready to begin");
+            LoadConfig();
         }
         
         private void EnableDisable(bool enabled)
@@ -761,6 +832,7 @@ namespace Nautilus
 
         private void BatchRenamer_FormClosing(object sender, FormClosingEventArgs e)
         {
+            SaveConfig();
             if (!picWorking.Visible) return;
             MessageBox.Show("Please wait until the current process finishes", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             e.Cancel = true;
