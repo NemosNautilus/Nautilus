@@ -35,6 +35,8 @@
             this.btnRefresh = new System.Windows.Forms.Button();
             this.btnBegin = new System.Windows.Forms.Button();
             this.lstLog = new System.Windows.Forms.ListBox();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.exportLogFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.picWorking = new System.Windows.Forms.PictureBox();
             this.picPin = new System.Windows.Forms.PictureBox();
             this.grpFormat = new System.Windows.Forms.GroupBox();
@@ -42,12 +44,10 @@
             this.radioWAV = new System.Windows.Forms.RadioButton();
             this.radioMP3 = new System.Windows.Forms.RadioButton();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.exportLogFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picWorking)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picPin)).BeginInit();
             this.grpFormat.SuspendLayout();
-            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnReset
@@ -142,6 +142,23 @@
             this.lstLog.DragDrop += new System.Windows.Forms.DragEventHandler(this.lstLog_DragDrop);
             this.lstLog.DragEnter += new System.Windows.Forms.DragEventHandler(this.lstLog_DragEnter);
             // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportLogFileToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.ShowImageMargin = false;
+            this.contextMenuStrip1.Size = new System.Drawing.Size(122, 26);
+            // 
+            // exportLogFileToolStripMenuItem
+            // 
+            this.exportLogFileToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.exportLogFileToolStripMenuItem.Name = "exportLogFileToolStripMenuItem";
+            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
+            this.exportLogFileToolStripMenuItem.Text = "Export log file";
+            this.exportLogFileToolStripMenuItem.Click += new System.EventHandler(this.exportLogFileToolStripMenuItem_Click);
+            // 
             // picWorking
             // 
             this.picWorking.Image = global::Nautilus.Properties.Resources.working;
@@ -222,23 +239,6 @@
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
             this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
             // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportLogFileToolStripMenuItem});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(156, 48);
-            // 
-            // exportLogFileToolStripMenuItem
-            // 
-            this.exportLogFileToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.exportLogFileToolStripMenuItem.Name = "exportLogFileToolStripMenuItem";
-            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
-            this.exportLogFileToolStripMenuItem.Text = "Export log file";
-            this.exportLogFileToolStripMenuItem.Click += new System.EventHandler(this.exportLogFileToolStripMenuItem_Click);
-            // 
             // UltraStarConverter
             // 
             this.AllowDrop = true;
@@ -264,11 +264,11 @@
             this.Shown += new System.EventHandler(this.UltraStarConverter_Shown);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.lstLog_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.lstLog_DragEnter);
+            this.contextMenuStrip1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picWorking)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picPin)).EndInit();
             this.grpFormat.ResumeLayout(false);
             this.grpFormat.PerformLayout();
-            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

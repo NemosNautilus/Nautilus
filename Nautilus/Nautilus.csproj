@@ -63,10 +63,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>B7992A0F8E9D56C28999E4BE5191CC18558BFDDB</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>BCF70D1C78BE65729570C89AFB4C0A285D039EFE</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>Nautilus_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>Nautilus_2_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -722,6 +722,7 @@
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Nautilus_1_TemporaryKey.pfx" />
+    <None Include="Nautilus_2_TemporaryKey.pfx" />
     <None Include="Nautilus_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

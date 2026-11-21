@@ -302,9 +302,9 @@ namespace Nautilus
             }
         }
 
-        public bool SplitMogg(string CON_file, string output_folder, string StemsToSplit, MoggSplitFormat format, bool bypass = false)
+        public bool SplitMogg(string CON_file, string output_folder, string StemsToSplit, MoggSplitFormat format, bool IgnoreAttenuationValues = false)
         {
-            return ExtractDecryptMogg(CON_file) && DoSplitMogg(output_folder, StemsToSplit, format);
+            return ExtractDecryptMogg(CON_file) && DoSplitMogg(output_folder, StemsToSplit, format, IgnoreAttenuationValues);
         }
 
         public enum MoggSplitFormat
@@ -398,7 +398,7 @@ namespace Nautilus
             return channels;
         }
 
-        private bool DoSplitMogg(string folder, string StemsToSplit, MoggSplitFormat format)
+        private bool DoSplitMogg(string folder, string StemsToSplit, MoggSplitFormat format, bool IgnoreAttenuationValues = false)
         {
             int quality = 5;//just hard code it
             var ext = "ogg";
@@ -444,26 +444,26 @@ namespace Nautilus
                     switch (Parser.Songs[0].ChannelsDrums)
                     {
                         case 2:
-                            PrepareChannelsToSplit(0, ArrangedChannels, 2, GetStemVolume(0), drums, format, quality, false);
+                            PrepareChannelsToSplit(0, ArrangedChannels, 2, IgnoreAttenuationValues? 1.0f : GetStemVolume(0), drums, format, quality, false);
                             break;
                         case 3:
-                            PrepareChannelsToSplit(0, ArrangedChannels, 1, GetStemVolume(0), drums1, format, quality, false);
-                            PrepareChannelsToSplit(1, ArrangedChannels, 2, GetStemVolume(1), drums2, format, quality);
+                            PrepareChannelsToSplit(0, ArrangedChannels, 1, IgnoreAttenuationValues ? 1.0f : GetStemVolume(0), drums1, format, quality, false);
+                            PrepareChannelsToSplit(1, ArrangedChannels, 2, IgnoreAttenuationValues ? 1.0f : GetStemVolume(1), drums2, format, quality);
                             break;
                         case 4:
-                            PrepareChannelsToSplit(0, ArrangedChannels, 1, GetStemVolume(0), drums1, format, quality, false);
-                            PrepareChannelsToSplit(1, ArrangedChannels, 1, GetStemVolume(1), drums2, format, quality);
-                            PrepareChannelsToSplit(2, ArrangedChannels, 2, GetStemVolume(2), drums3, format, quality);
+                            PrepareChannelsToSplit(0, ArrangedChannels, 1, IgnoreAttenuationValues ? 1.0f : GetStemVolume(0), drums1, format, quality, false);
+                            PrepareChannelsToSplit(1, ArrangedChannels, 1, IgnoreAttenuationValues ? 1.0f : GetStemVolume(1), drums2, format, quality);
+                            PrepareChannelsToSplit(2, ArrangedChannels, 2, IgnoreAttenuationValues ? 1.0f : GetStemVolume(2), drums3, format, quality);
                             break;
                         case 5:
-                            PrepareChannelsToSplit(0, ArrangedChannels, 1, GetStemVolume(0), drums1, format, quality, false);
-                            PrepareChannelsToSplit(1, ArrangedChannels, 2, GetStemVolume(1), drums2, format, quality);
-                            PrepareChannelsToSplit(3, ArrangedChannels, 2, GetStemVolume(3), drums3, format, quality);
+                            PrepareChannelsToSplit(0, ArrangedChannels, 1, IgnoreAttenuationValues ? 1.0f : GetStemVolume(0), drums1, format, quality, false);
+                            PrepareChannelsToSplit(1, ArrangedChannels, 2, IgnoreAttenuationValues ? 1.0f : GetStemVolume(1), drums2, format, quality);
+                            PrepareChannelsToSplit(3, ArrangedChannels, 2, IgnoreAttenuationValues ? 1.0f : GetStemVolume(3), drums3, format, quality);
                             break;
                         case 6:
-                            PrepareChannelsToSplit(0, ArrangedChannels, 2, GetStemVolume(0), drums1, format, quality, false);
-                            PrepareChannelsToSplit(2, ArrangedChannels, 2, GetStemVolume(2), drums2, format, quality);
-                            PrepareChannelsToSplit(4, ArrangedChannels, 2, GetStemVolume(4), drums3, format, quality);
+                            PrepareChannelsToSplit(0, ArrangedChannels, 2, IgnoreAttenuationValues ? 1.0f : GetStemVolume(0), drums1, format, quality, false);
+                            PrepareChannelsToSplit(2, ArrangedChannels, 2, IgnoreAttenuationValues ? 1.0f : GetStemVolume(2), drums2, format, quality);
+                            PrepareChannelsToSplit(4, ArrangedChannels, 2, IgnoreAttenuationValues ? 1.0f : GetStemVolume(4), drums3, format, quality);
                             break;
                     }
                     isSlave = true;
@@ -471,31 +471,31 @@ namespace Nautilus
                 //var channel = Parser.Songs[0].ChannelsDrums;
                 if (Parser.Songs[0].ChannelsBass > 0 && (StemsToSplit.Contains("allstems") || StemsToSplit.Contains("bass") || StemsToSplit.Contains("rhythm")))
                 {
-                    PrepareChannelsToSplit(Parser.Songs[0].ChannelsBassStart, ArrangedChannels, Parser.Songs[0].ChannelsBass, GetStemVolume(Parser.Songs[0].ChannelsBassStart), StemsToSplit.Contains("rhythm") ? rhythm : bass, format, quality, isSlave);
+                    PrepareChannelsToSplit(Parser.Songs[0].ChannelsBassStart, ArrangedChannels, Parser.Songs[0].ChannelsBass, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsBassStart), StemsToSplit.Contains("rhythm") ? rhythm : bass, format, quality, isSlave);
                     isSlave = true;
                 }
                 //channel += Parser.Songs[0].ChannelsBass;
                 if (Parser.Songs[0].ChannelsGuitar > 0 && (StemsToSplit.Contains("allstems") || StemsToSplit.Contains("guitar")))
                 {
-                    PrepareChannelsToSplit(Parser.Songs[0].ChannelsGuitarStart, ArrangedChannels, Parser.Songs[0].ChannelsGuitar, GetStemVolume(Parser.Songs[0].ChannelsGuitarStart), guitar, format, quality, isSlave);
+                    PrepareChannelsToSplit(Parser.Songs[0].ChannelsGuitarStart, ArrangedChannels, Parser.Songs[0].ChannelsGuitar, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsGuitarStart), guitar, format, quality, isSlave);
                     isSlave = true;
                 }
                 //channel += Parser.Songs[0].ChannelsGuitar;
                 if (Parser.Songs[0].ChannelsVocals > 0 && (StemsToSplit.Contains("allstems") || StemsToSplit.Contains("vocals")))
                 {
-                    PrepareChannelsToSplit(Parser.Songs[0].ChannelsVocalsStart, ArrangedChannels, Parser.Songs[0].ChannelsVocals, GetStemVolume(Parser.Songs[0].ChannelsVocalsStart), vocals, format, quality, isSlave);
+                    PrepareChannelsToSplit(Parser.Songs[0].ChannelsVocalsStart, ArrangedChannels, Parser.Songs[0].ChannelsVocals, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsVocalsStart), vocals, format, quality, isSlave);
                     isSlave = true;
                 }
                 //channel += Parser.Songs[0].ChannelsVocals;
                 if (Parser.Songs[0].ChannelsKeys > 0 && (StemsToSplit.Contains("allstems") || StemsToSplit.Contains("keys")))
                 {
-                    PrepareChannelsToSplit(Parser.Songs[0].ChannelsKeysStart, ArrangedChannels, Parser.Songs[0].ChannelsKeys, GetStemVolume(Parser.Songs[0].ChannelsKeysStart), keys, format, quality, isSlave);
+                    PrepareChannelsToSplit(Parser.Songs[0].ChannelsKeysStart, ArrangedChannels, Parser.Songs[0].ChannelsKeys, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsKeysStart), keys, format, quality, isSlave);
                     isSlave = true;
                 }
                 //channel += Parser.Songs[0].ChannelsKeys;
                 if (Parser.Songs[0].ChannelsCrowd > 0 && (StemsToSplit.Contains("allstems") || StemsToSplit.Contains("crowd")))
                 {
-                    PrepareChannelsToSplit(Parser.Songs[0].ChannelsCrowdStart, ArrangedChannels, Parser.Songs[0].ChannelsCrowd, GetStemVolume(Parser.Songs[0].ChannelsCrowdStart), crowd, format, quality, isSlave);
+                    PrepareChannelsToSplit(Parser.Songs[0].ChannelsCrowdStart, ArrangedChannels, Parser.Songs[0].ChannelsCrowd, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsCrowdStart), crowd, format, quality, isSlave);
                 }
                 if ((StemsToSplit.Contains("allstems") || StemsToSplit.Contains("backing") || StemsToSplit.Contains("song")))
                 {
@@ -504,11 +504,11 @@ namespace Nautilus
                     {
                         if (Parser.Songs[0].ChannelsCrowdStart + Parser.Songs[0].ChannelsCrowd == Parser.Songs[0].ChannelsTotal) //crowd channels are last
                         {
-                            PrepareChannelsToSplit(Parser.Songs[0].ChannelsCrowdStart - back, ArrangedChannels, back, GetStemVolume(Parser.Songs[0].ChannelsCrowdStart - back), StemsToSplit.Contains("song") ? song : backing, format, quality, isSlave);
+                            PrepareChannelsToSplit(Parser.Songs[0].ChannelsCrowdStart - back, ArrangedChannels, back, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsCrowdStart - back), StemsToSplit.Contains("song") ? song : backing, format, quality, isSlave);
                         }
                         else //backing channels are last
                         {
-                            PrepareChannelsToSplit(Parser.Songs[0].ChannelsTotal - back, ArrangedChannels, back, GetStemVolume(Parser.Songs[0].ChannelsTotal - back), StemsToSplit.Contains("song") ? song : backing, format, quality, isSlave);
+                            PrepareChannelsToSplit(Parser.Songs[0].ChannelsTotal - back, ArrangedChannels, back, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsTotal - back), StemsToSplit.Contains("song") ? song : backing, format, quality, isSlave);
                         }
                         isSlave = true;
                     }

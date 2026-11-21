@@ -1,10 +1,11 @@
-﻿using NAudio.Midi;
-using Nautilus.Properties;
+﻿using Nautilus.Properties;
 using Nautilus.x360;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -102,6 +103,10 @@ namespace Nautilus
                             {
                                 inputFiles.Add(file);
                             }
+                            else if (Path.GetExtension(file).Equals(".mid"))
+                            {
+                                inputFiles.Add(file);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -112,15 +117,15 @@ namespace Nautilus
                     }
                     if (!inputFiles.Any())
                     {
-                        Log("Did not find any CON files ... try a different directory");
-                        Log("You can also drag and drop CON files here");
+                        Log("Did not find any CON or MIDI files ... try a different directory");
+                        Log("You can also drag and drop CON or MIDI files here");
                         Log("Ready");
                         btnBegin.Visible = false;
                         btnRefresh.Visible = true;
                     }
                     else
                     {
-                        Log("Found " + inputFiles.Count + " CON " + (inputFiles.Count > 1 ? "files" : "file"));
+                        Log("Found " + inputFiles.Count + " CON or MIDI " + (inputFiles.Count > 1 ? "files" : "file"));
                         Log("Ready to begin");
                         btnBegin.Visible = true;
                         btnRefresh.Visible = true;
@@ -254,120 +259,162 @@ namespace Nautilus
         {
             var counter = 0;
             var success = 0;
+            var isMidi = false;
+            var isCON = false;
             foreach (var file in inputFiles.Where(File.Exists).TakeWhile(file => !backgroundWorker1.CancellationPending))
             {
                 try
                 {
-                    if (VariousFunctions.ReadFileType(file) != XboxFileType.STFS) continue;
+                    isMidi = Path.GetExtension(file).Equals(".mid");
+                    isCON = VariousFunctions.ReadFileType(file) == XboxFileType.STFS;
+                    if (!isCON && !isMidi) continue;
                     Song.NewSong();
                     
                     try
-                    {
-                        if (!Directory.Exists(UltraStarFolder))
-                        {
-                            Directory.CreateDirectory(UltraStarFolder);
-                        }
+                    {                        
                         counter++;
-                        Parser.ExtractDTA(file);
-                        Parser.ReadDTA(Parser.DTA);
-                        if (Parser.Songs.Count > 1)
+                        if (isCON)
                         {
-                            Log("File " + Path.GetFileName(file) + " is a pack, try dePACKing first, skipping...");
-                            continue;
-                        }
-                        if (!Parser.Songs.Any())
-                        {
-                            Log("There was an error processing the songs.dta file");
-                            continue;
-                        }
-                                                
-                        Log("Loaded and processed songs.dta file for song #" + counter + " successfully");
-                        Log("Song #" + counter + " is " + Parser.Songs[0].Artist + " - " + Parser.Songs[0].Name);
-
-                        var songFolder = UltraStarFolder + Tools.CleanString(Parser.Songs[0].Artist, false).Replace("\"", "") + " - " + Tools.CleanString(Parser.Songs[0].Name, false).Replace("\"", "") + "\\";
-                        if (!Directory.Exists(songFolder))
-                        {
-                            Directory.CreateDirectory(songFolder);
-                        }
-                        var internalName = Parser.Songs[0].InternalName;
-
-                        var xPackage = new STFSPackage(file);
-                        if (!xPackage.ParseSuccess)
-                        {
-                            Log("Failed to parse '" + Path.GetFileName(file) + "'");
-                            Log("Skipping this file");
-                            continue;
-                        }
-                        var xArt = xPackage.GetFile("songs/" + internalName + "/gen/" + internalName + "_keep.png_xbox");
-                        if (xArt != null)
-                        {
-                            var newArt = songFolder + "album.png_xbox";
-                            if (xArt.ExtractToFile(newArt))
+                            Parser.ExtractDTA(file);
+                            Parser.ReadDTA(Parser.DTA);
+                            if (Parser.Songs.Count > 1)
                             {
-                                Log("Extracted album art file " + internalName + "_keep.png_xbox successfully");
-                                fromXbox(newArt);
+                                Log("File " + Path.GetFileName(file) + " is a pack, try dePACKing first, skipping...");
+                                continue;
                             }
-                            else
+                            if (!Parser.Songs.Any())
                             {
-                                Log("There was a problem extracting the album art file");
+                                Log("There was an error processing the songs.dta file");
+                                continue;
                             }
+
+                            Log("Loaded and processed songs.dta file for song #" + counter + " successfully");
+                            Log("Song #" + counter + " is " + Parser.Songs[0].Artist + " - " + Parser.Songs[0].Name);
                         }
                         else
                         {
-                            Log("WARNING: Did not find album art file in that CON file");
-                        }
-                        var newMIDI = songFolder + "notes.mid";
-                        var xMIDI = xPackage.GetFile("songs/" + internalName + "/" + internalName + ".mid");
-                        if (xMIDI != null)
-                        {                            
-                            if (xMIDI.ExtractToFile(newMIDI))
+                            Log("Processing MIDI file '" + Path.GetFileName(file) + "'");
+                        }                         
+                        if (isMidi)
+                        {
+                            var localFolder = Path.GetDirectoryName(file) + "\\";
+                            var ini = localFolder + "song.ini";
+                            if (File.Exists(ini))
                             {
-                                Log("Extracted MIDI file " + internalName + ".mid successfully");
-                                MIDITools.Initialize(true);
-                                MIDITools.ReadMIDIFile(newMIDI, Parser.Songs[0].HopoThreshold, true);
-                                if (MIDITools.MIDI_Chart.Vocals.ChartedNotes.Count() == 0)
+                                Parser.ReadINIFile(ini);
+                                Log("Loaded and processed song.ini file for song #" + counter + " successfully");
+                                Log("Song #" + counter + " is " + Parser.Songs[0].Artist + " - " + Parser.Songs[0].Name);
+                            }
+                            else
+                            {
+                                Log("No matching song.ini file found - can't proceed");
+                                continue;
+                            }
+                            MIDITools.Initialize(true);
+                            MIDITools.ReadMIDIFile(file, Parser.Songs[0].HopoThreshold, true);
+                            if (MIDITools.MIDI_Chart.Vocals.ChartedNotes.Count() == 0)
+                            {
+                                Log("This song does not appear to have vocals charted, can't proceed");
+                                continue;
+                            }
+                            var art = localFolder + "album.png";
+                            if (File.Exists(art))
+                            {
+                                Log("Found album art - converting to correct format");
+                                var jpgFile = localFolder + Parser.Songs[0].Artist.Replace("\"", "") + " - " + 
+                                    Parser.Songs[0].Name.Replace("\"", "") + " [CO].jpg";
+                                ConvertPngToJpg(art, jpgFile);
+                            }
+                            WriteTXTFile(localFolder, file, true);
+                        }
+                        else
+                        {
+                            if (!Directory.Exists(UltraStarFolder))
+                            {
+                                Directory.CreateDirectory(UltraStarFolder);
+                            }
+                            var songFolder = UltraStarFolder + Tools.CleanString(Parser.Songs[0].Artist, false).Replace("\"", "") + " - " + Tools.CleanString(Parser.Songs[0].Name, false).Replace("\"", "") + "\\";
+                            if (!Directory.Exists(songFolder))
+                            {
+                                Directory.CreateDirectory(songFolder);
+                            }
+                            var internalName = Parser.Songs[0].InternalName;
+                            var xPackage = new STFSPackage(file);
+                            if (!xPackage.ParseSuccess)
+                            {
+                                Log("Failed to parse '" + Path.GetFileName(file) + "'");
+                                Log("Skipping this file");
+                                continue;
+                            }
+                            var xArt = xPackage.GetFile("songs/" + internalName + "/gen/" + internalName + "_keep.png_xbox");
+                            if (xArt != null)
+                            {
+                                var newArt = songFolder + "album.png_xbox";
+                                if (xArt.ExtractToFile(newArt))
                                 {
-                                    Log("This song does not appear to have vocals charted, can't proceed");
+                                    Log("Extracted album art file " + internalName + "_keep.png_xbox successfully");
+                                    fromXbox(newArt);
+                                }
+                                else
+                                {
+                                    Log("There was a problem extracting the album art file");
+                                }
+                            }
+                            else
+                            {
+                                Log("WARNING: Did not find album art file in that CON file");
+                            }
+                            var newMIDI = songFolder + "notes.mid";
+                            var xMIDI = xPackage.GetFile("songs/" + internalName + "/" + internalName + ".mid");
+                            if (xMIDI != null)
+                            {
+                                if (xMIDI.ExtractToFile(newMIDI))
+                                {
+                                    Log("Extracted MIDI file " + internalName + ".mid successfully");
+                                    MIDITools.Initialize(true);
+                                    MIDITools.ReadMIDIFile(newMIDI, Parser.Songs[0].HopoThreshold, true);
+                                    if (MIDITools.MIDI_Chart.Vocals.ChartedNotes.Count() == 0)
+                                    {
+                                        Log("This song does not appear to have vocals charted, can't proceed");
+                                        xPackage.CloseIO();
+                                        continue;
+                                    }
+                                }
+                                else
+                                {
+                                    Log("There was a problem extracting the MIDI file");
+                                    Log("Skipping this song...");
                                     xPackage.CloseIO();
                                     continue;
                                 }
                             }
                             else
                             {
-                                Log("There was a problem extracting the MIDI file");
+                                Log("ERROR: Did not find a MIDI file in that CON file!");
                                 Log("Skipping this song...");
                                 xPackage.CloseIO();
                                 continue;
                             }
-                        }
-                        else
-                        {
-                            Log("ERROR: Did not find a MIDI file in that CON file!");
-                            Log("Skipping this song...");
-                            xPackage.CloseIO();
-                            continue;
-                        }
-                        var xMOGG = xPackage.GetFile("songs/" + internalName + "/" + internalName + ".mogg");
-                        if (xMOGG != null)
-                        {
-                            xPackage.CloseIO();
-                            DownMixAudio(file, songFolder, Parser.Songs[0].Artist + " - " + Parser.Songs[0].Name);
-                        }
-                        else
-                        {
-                            Log("ERROR: Did not find an audio file in that CON file!");
-                            Log("Skipping this song...");
-                            xPackage.CloseIO();
-                            continue;
-                        }
-
-                        if (!Directory.Exists(songFolder))
-                        {
-                            Directory.CreateDirectory(songFolder);
-                        }
-
-                        WriteTXTFile(songFolder, newMIDI);
-                        Tools.DeleteFile(newMIDI);
+                            var xMOGG = xPackage.GetFile("songs/" + internalName + "/" + internalName + ".mogg");
+                            if (xMOGG != null)
+                            {
+                                xPackage.CloseIO();
+                                DownMixAudio(file, songFolder, Parser.Songs[0].Artist + " - " + Parser.Songs[0].Name);
+                            }
+                            else
+                            {
+                                Log("ERROR: Did not find an audio file in that CON file!");
+                                Log("Skipping this song...");
+                                xPackage.CloseIO();
+                                continue;
+                            }
+                            if (!Directory.Exists(songFolder))
+                            {
+                                Directory.CreateDirectory(songFolder);
+                            }
+                            WriteTXTFile(songFolder, newMIDI, false);
+                            Tools.DeleteFile(newMIDI);
+                        }                        
                         success++;                        
                     }
                     catch (Exception ex)
@@ -404,12 +451,12 @@ namespace Nautilus
             public List<UltraStarNote> Notes { get; } = new List<UltraStarNote>();
         }
 
-        private void WriteTXTFile(string path, string midiPath)
+        private void WriteTXTFile(string path, string midiPath, bool isMidi)
         {            
             double ultraStarBpm = Math.Round(MIDITools.AverageBPM() * 4.0, 3);
             double beatMs = 15000.0 / ultraStarBpm;
 
-            var ext = radioMP3.Checked ? ".mp3" : (radioWAV.Checked ? ".wav" : ".ogg");
+            var ext = isMidi ? ".ogg" : (radioMP3.Checked ? ".mp3" : (radioWAV.Checked ? ".wav" : ".ogg"));
             var utf8NoBom = new UTF8Encoding(false);
 
             var phrases = new List<UltraStarPhrase>();
@@ -475,7 +522,14 @@ namespace Nautilus
                 sw.WriteLine("#VERSION:1.1.0");
                 sw.WriteLine("#TITLE:" + Parser.Songs[0].Name);
                 sw.WriteLine("#ARTIST:" + Parser.Songs[0].Artist);
-                sw.WriteLine("#AUDIO:" + artist + " - " + title + ext);
+                if (isMidi)
+                {
+                    sw.WriteLine("#AUDIO:song.ogg");
+                }
+                else
+                {
+                    sw.WriteLine("#AUDIO:" + artist + " - " + title + ext);
+                }
                 if (IsInstrumental)
                 {
                     sw.WriteLine("#VOCALS:" + artist + " - " + title + " [VOC]" + ext);
@@ -700,6 +754,14 @@ namespace Nautilus
             return microseconds / 1000.0;
         }
 
+        public static void ConvertPngToJpg(string pngPath, string jpgPath)
+        {
+            using (Image image = Image.FromFile(pngPath))
+            {
+                image.Save(jpgPath, ImageFormat.Jpeg);
+            }
+        }
+
         private void fromXbox(string image)
         {
             var jpgFile = UltraStarFolder + Parser.Songs[0].Artist.Replace("\"", "") + " - " + Parser.Songs[0].Name.Replace("\"", "") + "\\" + Parser.Songs[0].Artist.Replace("\"", "") + " - " + Parser.Songs[0].Name.Replace("\"", "") + " [CO].jpg";
@@ -803,11 +865,11 @@ namespace Nautilus
             {
                 btnReset.PerformClick();
             }
-            if (VariousFunctions.ReadFileType(files[0]) == XboxFileType.STFS)
+            if (VariousFunctions.ReadFileType(files[0]) == XboxFileType.STFS || Path.GetExtension(files[0]) == ".mid")
             {
                 txtFolder.Text = Path.GetDirectoryName(files[0]);
                 Tools.CurrentFolder = txtFolder.Text;
-            }
+            }            
             else
             {
                 MessageBox.Show("That's not a valid file to drop here", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -817,7 +879,7 @@ namespace Nautilus
         private void UltraStarConverter_Shown(object sender, EventArgs e)
         {
             Log("Welcome to " + Text);
-            Log("Drag and drop the Rock Band CON file(s) to be converted here");
+            Log("Drag and drop the Rock Band CON or MIDI file(s) to be converted here");
             Log("Or click 'Change Input Folder' to select the folder containing the files");
             Log("Ready to begin");
             txtFolder.Text = inputDir;

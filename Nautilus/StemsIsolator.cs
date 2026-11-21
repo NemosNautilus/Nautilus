@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 using Nautilus.Properties;
 using Nautilus.x360;
@@ -52,7 +50,6 @@ namespace Nautilus
             toolTip1.SetToolTip(btnBegin, "Click to begin process");
             toolTip1.SetToolTip(btnFile, "Click to select the source file");
             toolTip1.SetToolTip(txtFile, "This is the source file");
-            toolTip1.SetToolTip(txtTitle, "Enter a title for your pack (visible in the Xbox dashboard)");
             toolTip1.SetToolTip(lstLog, "This is the application log. Right click to export");
 
             var formButtons = new List<Button> { btnFile,btnReset,btnBegin };
@@ -77,152 +74,17 @@ namespace Nautilus
                 lstLog.Items.Add(message);
                 lstLog.SelectedIndex = lstLog.Items.Count - 1;
             }
-        }
-
-        private string getVOLS(string stem)
-        {
-            var drums = "";
-            var bass = "";
-            var guitar = "";
-            var keys = "";
-            var vocals = "";
-            var backing = "";
-            var crowd = "";
-            for (var i = 0; i < ChannelsDrums; i++)
-            {
-                drums = drums + " -999.99";
-            }
-            for (var i = 0; i < ChannelsBass; i++)
-            {
-                bass = bass + " -999.99";
-            }
-            for (var i = 0; i < ChannelsGuitar; i++)
-            {
-                guitar = guitar + " -999.99";
-            }
-            for (var i = 0; i < ChannelsVocals; i++)
-            {
-                vocals = vocals + " -999.99";
-            }
-            for (var i = 0; i < ChannelsKeys; i++)
-            {
-                keys = keys + " -999.99";
-            }
-            for (var i = 0; i < ChannelsBacking; i++)
-            {
-                backing = backing + " -999.99";
-            }
-            for (var i = 0; i < ChannelsCrowd; i++)
-            {
-                crowd = crowd + " -999.99";
-            }
-            if (stem == "drums")
-            {
-                drums = drums.Replace("-999.99", "0.0");
-            }
-            if (stem == "bass")
-            {
-                bass = bass.Replace("-999.99", "0.0");
-            }
-            if (stem == "guitar")
-            {
-                guitar = guitar.Replace("-999.99", "0.0");
-            }
-            if (stem == "keys")
-            {
-                keys = keys.Replace("-999.99", "0.0");
-            }
-            if (stem == "backing")
-            {
-                backing = backing.Replace("-999.99", "0.0");
-            }
-            if (stem == "crowd")
-            {
-                crowd = crowd.Replace("-999.99", "0.0");
-            }
-            if (stem == "vocals")
-            {
-                vocals = vocals.Replace("-999.99", "0.0");
-            }
-            var vols = drums + bass + guitar + vocals + keys + backing + crowd;
-            return vols;
-        }
-
-        private void addStem(string stem, int tracknumber)
-        {
-            var encoding = Parser.DetectEncoding(Application.StartupPath + "\\bin\\template.dta");
-            var sr = new StreamReader(Application.StartupPath + "\\bin\\template.dta", encoding);
-            var sw = new StreamWriter(Application.StartupPath + "\\bin\\songs.dta", true, new UTF8Encoding(false, false));
-            var brackets = 0;
-
-            while (sr.Peek() >= 0)
-            {
-                var line = sr.ReadLine();
-
-                if (line.Contains("("))
-                {
-                    brackets++;
-                }
-                if (line.Contains(")"))
-                {
-                    brackets--;
-                }
-                if (line.Contains("#SHORT_ID"))
-                {
-                    line = line.Replace("#SHORT_ID", stem.ToUpper());
-                }
-                if (line.Contains("#STEM_NAME"))
-                {
-                    line = line.Replace("#STEM_NAME", "(" + stem.ToUpper() + ")");
-                }
-                if (line.Contains("#SONG_ID"))
-                {
-                    line = line.Replace("#SONG_ID", stem.ToUpper());
-                }
-                if (line.Contains("#TRACK"))
-                {
-                    line = line.Replace("#TRACK", tracknumber.ToString(CultureInfo.InvariantCulture));
-                }
-                if (line.Contains("#VOLS"))
-                {
-                    line = line.Replace("#VOLS", getVOLS(stem));
-                }
-                
-                if (brackets == 0 && txtAppend.Text != "") // end of the DTA file
-                {
-                    if (line.Trim() == ")") //nicely formatted DTA files end with just ) as the last line
-                    {
-                        sw.Write(txtAppend.Text);
-                        sw.WriteLine("");
-                    }
-                    else if (line.TrimEnd().EndsWith(")", StringComparison.Ordinal))
-                    {
-                        //older or messy DTAs with the closing ) on a line of other stuff
-                        sw.WriteLine(line.Substring(0,line.TrimEnd().Length - 1));
-                        sw.Write(txtAppend.Text);
-                        sw.WriteLine("");
-                        line = ")";
-                    }
-                }
-                if (line != "")
-                {
-                    sw.WriteLine(line);
-                }
-            }
-            sr.Dispose();
-            sw.Dispose();
-        }
+        }                    
 
         private void EnableDisable(bool enabled)
         {
             picWorking.Visible = !enabled;
             btnBegin.Visible = enabled;
-            btnFile.Enabled = enabled;
-            txtTitle.Enabled = enabled && radioPrepare.Checked;
+            btnFile.Enabled = enabled;            
             btnReset.Visible = enabled;
             grpStems.Enabled = enabled;// && !radioDownmix.Checked;
             EnableDisableStems();
-            txtAppend.Enabled = enabled && radioPrepare.Checked;
+            chkIgnore.Enabled = radioSplit.Checked;
             txtFile.Enabled = enabled;
             menuStrip1.Enabled = enabled;
             grpMode.Enabled = enabled;
@@ -336,7 +198,7 @@ namespace Nautilus
             if (radioSplit.Checked)
             {
                 Log("Trying to separate mogg file into its component stems");
-                var split = Splitter.SplitMogg(txtFile.Text, folder, StemsToIsolate, AudioFormat);
+                var split = Splitter.SplitMogg(txtFile.Text, folder, StemsToIsolate, AudioFormat, chkIgnore.Checked);
                 foreach (var error in Splitter.ErrorLog)
                 {
                     Log(error);
@@ -354,110 +216,7 @@ namespace Nautilus
                 }
                 Log(downmixed ? "Process completed successfully!" : "Something went wrong along the way, sorry!");
                 return;
-            }
-
-            var dta = Application.StartupPath + "\\bin\\songs.dta";
-            var template = Application.StartupPath + "\\bin\\template.dta";
-            //this will create it if it's not there, overwrite with blank if already there
-            var sw = new StreamWriter(dta, false, new UTF8Encoding(false, false));
-            sw.Dispose();
-            //make a second copy of the file
-            var newpackage = Path.GetFileName(txtFile.Text).Replace(" ", "");
-            newpackage = newpackage.Replace("'", "");
-            newpackage = newpackage.Replace("-", "");
-            newpackage = newpackage + "_recording";
-            newpackage = Path.GetDirectoryName(txtFile.Text) + "\\" + newpackage;
-            try
-            {
-                File.Copy(txtFile.Text, newpackage);
-            }
-            catch (Exception ex)
-            {
-                Log("There was an error creating the recording pack");
-                Log("The error says: " + ex.Message);
-            }
-            if (!File.Exists(newpackage))
-            {
-                return;
-            }
-            Log("Created recording pack " + Path.GetFileName(newpackage));
-            if (chkDrums.Checked)
-            {
-                addStem("drums", 21);
-            }
-            if (chkBass.Checked)
-            {
-                addStem("bass", 22);
-            }
-            if (chkGuitar.Checked)
-            {
-                addStem("guitar", 23);
-            }
-            if (chkKeys.Checked)
-            {
-                addStem("keys", 24);
-            }
-            if (chkVocals.Checked)
-            {
-                addStem("vocals", 25);
-            }
-            if (chkBacking.Checked)
-            {
-                addStem("backing", 26);
-            }
-            if (chkCrowd.Checked)
-            {
-                addStem("crowd", 27);
-            }
-            var xPackage = new STFSPackage(newpackage);
-            var xent = xPackage.GetFile("/songs/songs.dta");
-            xent.Replace(dta);
-            xPackage.Header.Title_Display = txtTitle.Text;
-            xPackage.Header.ThisType = PackageType.SavedGame;
-            xPackage.Header.MakeAnonymous();
-            var success = false;
-            try
-            {
-                Log("Rebuilding CON file ... this might take a little while");
-                signature = new RSAParams(Application.StartupPath + "\\bin\\KV.bin");
-                xPackage.RebuildPackage(signature);
-                xPackage.FlushPackage(signature);
-                xPackage.CloseIO();
-                success = true;
-            }
-            catch (Exception ex)
-            {
-                Log("There was an error: " + ex.Message);
-                xPackage.CloseIO();
-            }
-            if (success)
-            {
-                Log("Trying to unlock CON file");
-                if (Tools.UnlockCON(newpackage))
-                {
-                    Log("Unlocked CON file successfully");
-                }
-                else
-                {
-                    Log("Error unlocking CON file");
-                    success = false;
-                }
-            }
-            if (success)
-            {
-                if (Tools.SignCON(newpackage))
-                {
-                    Log("CON file signed successfully");
-                }
-                else
-                {
-                    Log("Error signing CON file");
-                    success = false;
-                }
-            }
-            Log(success ? "Process completed successfully!" : "Something went wrong along the way, sorry!");
-            Tools.DeleteFile(dta);
-            Tools.DeleteFile(template);
+            }            
         }
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -496,11 +255,9 @@ namespace Nautilus
             chkKeys.Enabled = false;
             chkVocals.Enabled = false;
             chkCrowd.Enabled = false;
-            txtAppend.Text = "";
             if (!finished) return;
             var file = txtFile.Text;
             txtFile.Text = "Select source file (or drag/drop it here)";
-            txtTitle.Text = null;
             Log("Ready");
         }
 
@@ -508,18 +265,7 @@ namespace Nautilus
         {
             reset(true);
         }
-        
-        private void txtTitle_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Control & e.KeyCode == Keys.A)
-                txtTitle.SelectAll();
-        }
-
-        private void txtTitle_DoubleClick(object sender, EventArgs e)
-        {
-            txtTitle.SelectAll();
-        }
-        
+                
         private void ProcessFnFFile(string file)
         {
             if (!InitBass()) return;
@@ -861,8 +607,8 @@ namespace Nautilus
                     }
                     else if (line.Contains("(tracks"))
                     {
-                        sw.WriteLine(line);
-                        line = sr.ReadLine();
+                        //sw.WriteLine(line);
+                        //line = sr.ReadLine();
                         while (line != null && line.Trim() != ")")
                         {
                             if (line.ToLowerInvariant().Contains("bass"))
@@ -1015,7 +761,6 @@ namespace Nautilus
                 return;
             }
             txtFile.ForeColor = Color.Black;
-            txtTitle.Text = "(Stems Recording Pack) " + Path.GetFileName(txtFile.Text);
             if (txtFile.Text != "")
             {                
                 reset(false);
@@ -1025,7 +770,6 @@ namespace Nautilus
                     Log("File is a Fortnite Festival audio file");
                     btnBegin.Visible = true;
                     btnReset.Visible = true;
-                    radioPrepare.Enabled = false;
                     radioDownmix.Checked = true;
                     EnableDisableStems();
                     return;
@@ -1036,11 +780,7 @@ namespace Nautilus
                 {
                     Log("Failed to open '" + Path.GetFileName(txtFile.Text) + "'");
                     return;
-                }
-                if (xPackage.Header.Title_Display.Trim() != "")
-                {
-                    txtTitle.Text = "(Stems Recording Pack) " + xPackage.Header.Title_Display.Trim();
-                }
+                }                
                 xPackage.CloseIO();
                 if (Parser.ExtractDTA(txtFile.Text))
                 {
@@ -1065,23 +805,7 @@ namespace Nautilus
         private void exportLogFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Tools.ExportLog(Text, lstLog.Items);
-        }
-
-        private void txtAppend_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Control && e.KeyCode == Keys.A)
-            {
-                txtAppend.SelectAll();
-            }
-            if (e.Control && e.KeyCode == Keys.C)
-            {
-                Clipboard.SetText(txtAppend.Text);
-            }
-            if (e.Control && e.KeyCode == Keys.V)
-            {
-                txtAppend.Text = Clipboard.GetText();
-            }
-        }
+        }              
 
         private void stemsISO_Shown(object sender, EventArgs e)
         {
@@ -1100,9 +824,7 @@ namespace Nautilus
 
         private void radioSplit_CheckedChanged(object sender, EventArgs e)
         {
-            txtTitle.Enabled = radioPrepare.Checked;
-            txtAppend.Enabled = radioPrepare.Checked;
-            audioFormatToolStrip.Enabled = !radioPrepare.Checked;
+            chkIgnore.Enabled = radioSplit.Checked;
             EnableDisableStems();
         }
 

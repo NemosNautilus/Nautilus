@@ -235,6 +235,7 @@ namespace Nautilus
                 Song.Charter = Parser.Songs[0].ChartAuthor;
                 Song.RhythmOnBass = Parser.Songs[0].RhythmBass;
                 Song.RhythmOnKeys = Parser.Songs[0].RhythmKeys;
+                Song.VocalGender = Parser.Songs[0].Gender.ToLowerInvariant();
                 return true;
             }
             catch (Exception ex)
@@ -991,6 +992,7 @@ namespace Nautilus
         public int TrackNumber { get; set; }
         
         public string icon { get; set; }
+        public string VocalGender { get; set; }
 
 
         /// <summary>
@@ -1028,6 +1030,7 @@ namespace Nautilus
             HopoThreshold = -1;
             ReplaceGenreWithSub = false;
             TrackNumber = 0;
+            VocalGender = "";
         }
 
         /// <summary>
@@ -1174,6 +1177,10 @@ namespace Nautilus
                 sw.WriteLine("diff_keys_real_ps = -1");
                 sw.WriteLine("diff_dance = -1");
                 sw.WriteLine("video_start_time = ");
+                if (!string.IsNullOrEmpty(VocalGender))
+                {
+                    sw.WriteLine("vocal_gender = " + VocalGender);
+                }
                 sw.Dispose();
                 return true;
             }

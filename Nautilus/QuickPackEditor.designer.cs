@@ -67,6 +67,7 @@
             this.usePackThumbnail = new System.Windows.Forms.ToolStripMenuItem();
             this.useSongAlbumArt = new System.Windows.Forms.ToolStripMenuItem();
             this.openFolderAfterDePACK = new System.Windows.Forms.ToolStripMenuItem();
+            this.useArtistSongShortName = new System.Windows.Forms.ToolStripMenuItem();
             this.signingOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.signAsCON = new System.Windows.Forms.ToolStripMenuItem();
             this.signAsLIVE = new System.Windows.Forms.ToolStripMenuItem();
@@ -79,7 +80,6 @@
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker3 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker4 = new System.ComponentModel.BackgroundWorker();
-            this.useArtistSongShortName = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.contextMenuStrip2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PackageImage)).BeginInit();
@@ -115,13 +115,13 @@
             this.exportLogFileToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(123, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(122, 26);
             // 
             // exportLogFileToolStripMenuItem
             // 
             this.exportLogFileToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.exportLogFileToolStripMenuItem.Name = "exportLogFileToolStripMenuItem";
-            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.exportLogFileToolStripMenuItem.Text = "Export log file";
             this.exportLogFileToolStripMenuItem.Click += new System.EventHandler(this.exportLogFileToolStripMenuItem_Click);
             // 
@@ -481,7 +481,7 @@
             this.rockBand2ToolStripMenuItem,
             this.rockBand3ToolStripMenuItem});
             this.setGameIDToolStripMenuItem.Name = "setGameIDToolStripMenuItem";
-            this.setGameIDToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.setGameIDToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.setGameIDToolStripMenuItem.Text = "Change game ID";
             // 
             // rockBandToolStripMenuItem
@@ -519,7 +519,7 @@
             this.openFolderAfterDePACK,
             this.useArtistSongShortName});
             this.dePACKOptionsToolStripMenuItem.Name = "dePACKOptionsToolStripMenuItem";
-            this.dePACKOptionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.dePACKOptionsToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.dePACKOptionsToolStripMenuItem.Text = "dePACK options";
             // 
             // usePackThumbnail
@@ -552,6 +552,14 @@
             this.openFolderAfterDePACK.Size = new System.Drawing.Size(226, 22);
             this.openFolderAfterDePACK.Text = "Open folder after dePACKing";
             // 
+            // useArtistSongShortName
+            // 
+            this.useArtistSongShortName.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.useArtistSongShortName.CheckOnClick = true;
+            this.useArtistSongShortName.Name = "useArtistSongShortName";
+            this.useArtistSongShortName.Size = new System.Drawing.Size(226, 22);
+            this.useArtistSongShortName.Text = "Use ArtistSongShortName";
+            // 
             // signingOptionsToolStripMenuItem
             // 
             this.signingOptionsToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
@@ -559,7 +567,7 @@
             this.signAsCON,
             this.signAsLIVE});
             this.signingOptionsToolStripMenuItem.Name = "signingOptionsToolStripMenuItem";
-            this.signingOptionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.signingOptionsToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.signingOptionsToolStripMenuItem.Text = "Signing options";
             // 
             // signAsCON
@@ -568,7 +576,7 @@
             this.signAsCON.Checked = true;
             this.signAsCON.CheckState = System.Windows.Forms.CheckState.Checked;
             this.signAsCON.Name = "signAsCON";
-            this.signAsCON.Size = new System.Drawing.Size(180, 22);
+            this.signAsCON.Size = new System.Drawing.Size(140, 22);
             this.signAsCON.Text = "Sign as CON";
             this.signAsCON.Click += new System.EventHandler(this.signAsCON_Click);
             // 
@@ -576,7 +584,7 @@
             // 
             this.signAsLIVE.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.signAsLIVE.Name = "signAsLIVE";
-            this.signAsLIVE.Size = new System.Drawing.Size(180, 22);
+            this.signAsLIVE.Size = new System.Drawing.Size(140, 22);
             this.signAsLIVE.Text = "Sign as LIVE";
             this.signAsLIVE.Click += new System.EventHandler(this.signAsLIVE_Click);
             // 
@@ -642,14 +650,6 @@
             // backgroundWorker4
             // 
             this.backgroundWorker4.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker4_DoWork);
-            // 
-            // useArtistSongShortName
-            // 
-            this.useArtistSongShortName.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.useArtistSongShortName.CheckOnClick = true;
-            this.useArtistSongShortName.Name = "useArtistSongShortName";
-            this.useArtistSongShortName.Size = new System.Drawing.Size(226, 22);
-            this.useArtistSongShortName.Text = "Use ArtistSongShortName";
             // 
             // QuickPackEditor
             // 

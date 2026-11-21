@@ -2842,9 +2842,7 @@ namespace Nautilus
                     datFile = tempDAT;
                 }
 
-                const int BAND_OFFSET = 0x43A773;
                 const int BAND_LENGTH = 31; // Max string bytes
-                const int BAND_META_OFFSET = BAND_OFFSET - 4;
 
                 string bName = SaveFileBandName;
                 if (bName.Length > BAND_LENGTH)
@@ -2865,12 +2863,10 @@ namespace Nautilus
                 using (var bw3 = new BinaryWriter(File.Open(datFile, FileMode.Open, FileAccess.Write)))
                 {
                     // Write actual length
-                    //bw3.BaseStream.Seek((isPS3 ? BAND_META_OFFSET + PS3_OFFSET : BAND_META_OFFSET), SeekOrigin.Begin);
                     bw3.BaseStream.Seek(actualBandOffset - 4, SeekOrigin.Begin);
                     bw3.Write(BitConverter.GetBytes(bandNameBytes.Length));
 
                     // Write padded name with nulls instead of spaces
-                    //bw3.BaseStream.Seek((isPS3 ? BAND_OFFSET + PS3_OFFSET : BAND_OFFSET), SeekOrigin.Begin);
                     bw3.BaseStream.Seek(actualBandOffset, SeekOrigin.Begin);
                     bw3.Write(bandPaddedBytes);
                 }                
@@ -2908,66 +2904,9 @@ namespace Nautilus
                         // Move to next entry
                         NAME_OFFSET += NAME_LENGTH + NAME_SPACER;
                     }
-                    /*foreach (var name in SaveFileCharNames)
-                    {
-                        string charName = name.Length > NAME_LENGTH ? name.Substring(0, NAME_LENGTH) : name;
-                        byte[] nameBytes = Encoding.UTF8.GetBytes(charName);
+                }                
 
-                        // Build 24-byte null-padded buffer
-                        byte[] paddedBytes = new byte[NAME_LENGTH];
-                        Array.Clear(paddedBytes, 0, NAME_LENGTH);
-                        Array.Copy(nameBytes, 0, paddedBytes, 0, Math.Min(nameBytes.Length, NAME_LENGTH));
-
-                        // Compute write positions
-                        int offset = isPS3 ? NAME_OFFSET + PS3_OFFSET : NAME_OFFSET;
-                        int lengthOffset = offset - 4;                                             
-
-                        // Write name
-                        bw.BaseStream.Seek(offset, SeekOrigin.Begin);
-                        bw.Write(paddedBytes);
-
-                        // Write 4-byte length
-                        bw.BaseStream.Seek(lengthOffset, SeekOrigin.Begin);
-                        bw.Write((byte)nameBytes.Count());
-
-                        // Move to next entry
-                        NAME_OFFSET += NAME_LENGTH + NAME_SPACER;
-                    }*/
-                }
-
-                /*foreach (var name in SaveFileCharNames)
-                {
-                    // Truncate if needed
-                    string charName = name.Length > NAME_LENGTH ? name.Substring(0, NAME_LENGTH) : name;
-
-                    // Encode to UTF-8 bytes
-                    byte[] nameBytes = Encoding.UTF8.GetBytes(charName);
-
-                    // Create a null-padded byte array of fixed length
-                    byte[] paddedBytes = new byte[NAME_LENGTH];
-                    Array.Clear(paddedBytes, 0, NAME_LENGTH);
-                    Array.Copy(nameBytes, 0, paddedBytes, 0, Math.Min(nameBytes.Length, NAME_LENGTH));
-
-                    // Write length and padded name in one stream
-                    using (var bw4 = new BinaryWriter(File.Open(datFile, FileMode.Open, FileAccess.Write)))
-                    {
-                        // Write name length (in bytes, not characters!)
-                        bw4.BaseStream.Seek((isPS3 ? NAME_OFFSET + PS3_OFFSET : NAME_OFFSET) - 4, SeekOrigin.Begin);
-                        bw4.Write(BitConverter.GetBytes(nameBytes.Length));
-
-                        // Write null-padded name
-                        bw4.BaseStream.Seek(isPS3 ? NAME_OFFSET + PS3_OFFSET : NAME_OFFSET, SeekOrigin.Begin);
-                        bw4.Write(paddedBytes);
-                    }
-
-                    // Move to the next character name slot
-                    NAME_OFFSET += NAME_LENGTH + NAME_SPACER;
-                }*/
-
-                //write all art images
-                //Int32 ART_OFFSET = 0x19495B;
                 const Int32 ART_SIZE = 0x10020;
-                //const Int32 ART_SPACER = 0x214;
                 using (var bw1 = new BinaryWriter(File.Open(datFile, FileMode.Open, FileAccess.Write)))
                 {
                     for (var i = 0; i < 19; i++)
@@ -2980,20 +2919,9 @@ namespace Nautilus
                         }
                         bw1.BaseStream.Seek(art_offset_list[i], SeekOrigin.Begin);
                         bw1.Write(File.ReadAllBytes(file), 0, ART_SIZE);
-
-                        /* original code
-                        bw = new BinaryWriter(File.Open(datFile, FileMode.Open, FileAccess.Write));
-                        bw.BaseStream.Seek(isPS3 ? ART_OFFSET + PS3_OFFSET : ART_OFFSET, SeekOrigin.Begin);
-                        bw.Write(File.ReadAllBytes(file), 0, ART_SIZE);
-                        bw.Close();
-
-                        ART_OFFSET += ART_SIZE + ART_SPACER;*/
                     }
                 }
 
-                //write all character images
-                //Int32 CHAR_OFFSET = 0x4C07D;
-                //const Int32 CHAR_SPACER = 0xED6;
                 const Int32 CHAR_SIZE = 0x20020;
                 using (var bw2 = new BinaryWriter(File.Open(datFile, FileMode.Open, FileAccess.Write)))
                 {
@@ -3006,15 +2934,7 @@ namespace Nautilus
                             continue;
                         }
                         bw2.BaseStream.Seek(char_offset_list[i], SeekOrigin.Begin);
-                        bw2.Write(File.ReadAllBytes(file), 0, CHAR_SIZE);
-
-                        /*original code
-                        bw = new BinaryWriter(File.Open(datFile, FileMode.Open, FileAccess.Write));
-                        bw.BaseStream.Seek(isPS3 ? CHAR_OFFSET + PS3_OFFSET : CHAR_OFFSET, SeekOrigin.Begin);
-                        bw.Write(File.ReadAllBytes(file), 0, CHAR_SIZE);
-                        bw.Close();
-
-                        CHAR_OFFSET += CHAR_SIZE + CHAR_SPACER;*/
+                        bw2.Write(File.ReadAllBytes(file), 0, CHAR_SIZE);                        
                     }
                 }
 
@@ -3032,7 +2952,14 @@ namespace Nautilus
 
                 const Int32 VALID_FILE_SIZE = 0x89E000;
                 var validateSize = File.ReadAllBytes(saveFile);
-                return validateSize.Length == VALID_FILE_SIZE;
+                var match = validateSize.Length == VALID_FILE_SIZE;
+
+                if (!match)
+                {
+                    MessageBox.Show($"WARNING: Expected file size is {VALID_FILE_SIZE} but actual file size is {validateSize.Length}\nIf you're using RB3DX this may be fine," +
+                    $" but this may also mean your save game file was corrupted in the process\nA backup '.bak' file was created just in case", "Nemo Tools", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                return true;            
             }
             catch (Exception ex)
             {
