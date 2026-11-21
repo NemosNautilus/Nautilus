@@ -1,10 +1,38 @@
 Nautilus
-Developed by TrojanNemo
-© 2013-2026
+Developed by Nemo
+© Nemo's Nautilus, 2013-2026
 (with contributions from many!)
 -------------------
 
 FEATURES / CHANGE LOG:
+
+v5.6.5
+
+ULTRASTAR CONVERTER BETA (NEW FEATURE!)
+- One click converter to take your Rock Band files (official game files, official DLC, custom DLC, everything Rock Band that Nautilus can interface with) and convert it to UltraStar TXT + audio format following the latest game specifications
+
+ROCK BAND TO KARAOKE CONVERTER
+- Major rewrite of the conversion to MP4 code so now MP4 videos are created 10x faster (more or less) depending on your settings
+- Added countdown over loading bar inspired by KaraFun (MP4 mode only)
+- Added option to enable/disable the album art on the title card (MP4 mode only)
+- Added ability to drag and drop any image to the converter and use that image as the background for your MP4 karaoke video - also displays it live for you to see what it looks like (MP4 mode only)
+- Added ability to drag and drop any video to the converter and use that video as the background for your MP4 karaoke video - and it does a live preview for you as well (MP4 mode only)
+- Fixed highlighting indicator animation that was wonky until now (MP4 mode only)
+- Improved highlighting of lyrics to avoid some issues where sometimes it would step into the next syllable too early (MP4 only, it wasn't a problem with the CDG mode)
+- Improved highlighting of loading bar so now it's a smooth progression rather than a step progression (MP4 only, it wasn't a problem with the CDG mode)
+- Many other performance and user experience improvements including moving some options around and changing some of the default options now that it's so much faster (MP4 only)
+- Fixed issues with ^ character showing up on lyrics in songs in Spanish (Jose Jose song "Triste" for example)
+
+VISUALIZER
+- Fixed logic bug that would break passing of CON file from the Main Form or from a CLI argument so it would just open Visualizer but not load the passed file
+
+ADVANCED ART CONVERTER
+- Added option to remove _keep from output file names when converting to Xbox 360/PS3/Wii/PS4 formats
+
+DTA PARSER
+- Fixed broken parsing of Rock Band 3 official game songs DTA files when it came to audio channel count, panning and attenuation levels
+
+---
 
 v5.6.4
 
@@ -31,7 +59,7 @@ v5.6.3
 
 ROCK BAND TO KARAOKE CONVERTER
 - Fixed bug that would break compatibility with certain older RB1 era files (was assuming there would be album art in every file)
-- Added toggle option for Tempo being shown on in the intro/title card
+- Added toggle option for Tempo being shown on the intro/title card
 
 VISUALIZER
 - NOW accepts ALL understood file formats as arguments for command line launching (i.e. connecting to cPlayer and unannounced Clone Hero project)
@@ -602,7 +630,7 @@ ADVANCED ART CONVERTER
 - Improved converting from .png_ps4 format - certain files would not work and would throw an error, should be fixed now - thanks to Onyxite for the help
 
 OPEN SOURCE
-- It's finally happening - if you're reading this, I have posted the source code to Nautilus on Github with everything you need to edit it and compile it yourself - https://github.com/trojannemo/Nautilus
+- It's finally happening - if you're reading this, I have posted the source code to Nautilus on Github with everything you need to edit it and compile it yourself - https://github.com/NemosNautilus/Nautilus
 
 ----------
 

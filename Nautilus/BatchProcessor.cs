@@ -113,7 +113,7 @@ namespace Nautilus
                 btnBegin.Enabled = false;
                 return;
             }
-            if (!chkAuthor.Checked && !chkOrigin.Checked && !chkOverrideAuthor.Checked && !chkVocalGender.Checked && !chkSongID.Checked && !chkOverrideGameID.Checked && !chkAddYear.Checked && !chkDefAutID.Checked)
+            if (!chkAuthor.Checked && !chkOrigin.Checked && !chkOverrideAuthor.Checked && !chkVocalGender.Checked && !chkSongID.Checked && !chkOverrideGameID.Checked && !chkAddYear.Checked && !chkDefAutID.Checked && !chkFamilyFriendly.Checked)
             {
                 MessageBox.Show("No options selected, nothing to do", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 Log("No options selected, nothing to do");
@@ -188,6 +188,7 @@ namespace Nautilus
             chkOrigin.Enabled = enabled;
             chkOverrideAuthor.Enabled = enabled;
             chkVocalGender.Enabled = enabled;
+            chkFamilyFriendly.Enabled = enabled;
             chkRecursive.Enabled = enabled;
             menuStrip1.Enabled = enabled;
             chkSongID.Enabled = enabled;
@@ -210,7 +211,7 @@ namespace Nautilus
 
         private bool ModifyDTA()
         {
-            return chkAuthor.Checked || chkOrigin.Checked || chkOverrideAuthor.Checked || chkVocalGender.Checked || chkSongID.Checked || chkAddYear.Checked || chkDefAutID.Checked;
+            return chkAuthor.Checked || chkOrigin.Checked || chkOverrideAuthor.Checked || chkVocalGender.Checked || chkSongID.Checked || chkAddYear.Checked || chkDefAutID.Checked || chkFamilyFriendly.Checked;
         }
 
         private void FileProcessor_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
@@ -314,6 +315,12 @@ namespace Nautilus
                                                         origin = "'" + txtOrigin.Text + "'";
                                                     }
                                                     line = "   ('game_origin' " + origin + ")";
+                                                    sw.WriteLine(line);
+                                                    line = sr.ReadLine();
+                                                }
+                                                if (line.ToLowerInvariant().Contains("rating") && chkFamilyFriendly.Checked)
+                                                {
+                                                    line = "   ('rating' 1)";
                                                     sw.WriteLine(line);
                                                     line = sr.ReadLine();
                                                 }

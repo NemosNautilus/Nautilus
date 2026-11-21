@@ -9,7 +9,7 @@ Required runtime binaries are distributed separately via GitHub Releases.
 - .NET Desktop Development workload installed
 
 ## Step 1: Clone the Source
-git clone https://github.com/trojannemo/Nautilus.git
+git clone https://github.com/NemosNautilus/Nautilus.git
 or download ZIP from GitHub.
 
 ## Step 2: Download Runtime Binaries
