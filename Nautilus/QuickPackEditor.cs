@@ -10,6 +10,10 @@ using System.Text;
 using System.Windows.Forms;
 using Nautilus.Properties;
 using Nautilus.x360;
+using SCEllSharp.PKG;
+using SCEllSharp.SFO;
+using SCEllSharp.NPDRM;
+using System.ComponentModel.DataAnnotations;
 
 namespace Nautilus
 {
@@ -107,6 +111,7 @@ namespace Nautilus
                 }
                 else if (Path.GetExtension(file) == ".pkg")
                 {
+                    pack = file;
                     ExtractPKG(file);
                 }
                 else
@@ -242,8 +247,7 @@ namespace Nautilus
                 {
                     btnDePack.Visible = true;
                     btnDePack.Enabled = true;
-                }
-                
+                }                
             }
         }
 
@@ -267,6 +271,10 @@ namespace Nautilus
             var entries = 0;
             foreach (var entry in Songs)
             {
+                if (entry.Source.Equals("beatles"))
+                {
+                    entry.Artist = "The Beatles";
+                }
                 var id = entry.SongId == 0 || entry.SongId == 99999999 ? entry.ShortName : entry.SongId.ToString(CultureInfo.InvariantCulture);
                 entries++;
                 switch (sort_order)
@@ -950,12 +958,7 @@ namespace Nautilus
         }
 
         private void btnDePack_Click(object sender, EventArgs e)
-        {
-            if (isPKG)
-            {
-                MessageBox.Show("Not supported (yet) when working with PKG files", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
-            }
+        {            
             if (btnDePack.Text == "Cancel")
             {
                 Log("User cancelled process...stopping as soon as possible");
@@ -1030,11 +1033,38 @@ namespace Nautilus
             backgroundWorker1.RunWorkerAsync();
         }
 
+        private static void CopyDirectory(string sourceDir, string destinationDir)
+        {
+            Directory.CreateDirectory(destinationDir);
+
+            // Copy all files in the current directory
+            foreach (string file in Directory.GetFiles(sourceDir))
+            {
+                string destinationFile = Path.Combine(
+                    destinationDir,
+                    Path.GetFileName(file));
+
+                File.Copy(file, destinationFile, true);
+            }
+
+            // Recursively copy subdirectories
+            foreach (string directory in Directory.GetDirectories(sourceDir))
+            {
+                string destinationSubdirectory = Path.Combine(
+                    destinationDir,
+                    Path.GetFileName(directory));
+
+                CopyDirectory(directory, destinationSubdirectory);
+            }
+        }
+
         private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            var tempfolder = Application.StartupPath + "\\quickpackeditor\\";
-            var outputfolder = Path.GetDirectoryName(PackagesToUnpack[0]) + "\\dePACKed files\\";
+            var tempFolder = Application.StartupPath + "\\quickpackeditor\\";
+            var pkgFolder = tempFolder + "pkg";
+            var outputFolder = Path.GetDirectoryName(PackagesToUnpack[0]) + "\\dePACKed files\\";
             var counter = 0;
+            string songName = "";
 
             if (PackagesToUnpack.Count > 1)
             {
@@ -1042,6 +1072,228 @@ namespace Nautilus
             }
             foreach (var file in PackagesToUnpack.TakeWhile(file => !backgroundWorker1.CancellationPending))
             {
+                if (isPKG)
+                {
+                    Log("Extracting files from PKG pack '" + Path.GetFileName(file) + "'");                    
+                    var shortPath = Path.GetFileNameWithoutExtension(file).Replace(" ", "").Replace("-", "").Replace("_", "").Replace("'", "").Trim();                                       
+                    var success = Tools.ExtractPS3PKG(file, outputFolder + shortPath + "\\");
+                    if (success)
+                    {
+                        Log("Extracted PKG pack contents successfully");
+                    }
+                    else
+                    {
+                        Log("Error extracting files from input PKG pack");
+                    }
+                    var DTA = Directory.GetFiles(outputFolder + shortPath, "songs.dta", SearchOption.AllDirectories).FirstOrDefault();
+                    if (string.IsNullOrEmpty(DTA)) continue;
+                    ReadDTA(File.ReadAllBytes(DTA));                                       
+
+                    foreach (var song in Songs.TakeWhile(song => !backgroundWorker1.CancellationPending))
+                    {                      
+                        if (song.Source.Equals("beatles"))
+                        {
+                            song.Artist = "The Beatles";
+                        }
+                        songName = Tools.CleanString(song.Artist + " - " + song.Name, false);
+                        var fileName = songName;
+                        Tools.DeleteFolder(pkgFolder, true);
+
+                        if (useArtistSongShortName.Checked)
+                        {
+                            fileName = Tools.CleanString(song.Artist, false) + Tools.CleanString(song.Name, false) + song.InternalName;
+                        }
+                        if (File.Exists(outputFolder + fileName))
+                        {
+                            fileName += "(1)";
+                        }
+
+                        Log("Creating PKG file for '" + songName + "'");
+
+                        string contentFolder = Directory.GetParent(DTA).Parent.Name;
+
+                        var pkgInternalName = song.InternalName;
+
+                        var pkgSourceFolder = Path.Combine(
+                            Path.GetDirectoryName(DTA),
+                            pkgInternalName);
+
+                        var pkgSongsFolder = Path.Combine(
+                            pkgFolder,
+                            "USRDIR",
+                            contentFolder,
+                            "songs");
+
+                        var pkgDestinationFolder = Path.Combine(
+                            pkgSongsFolder,
+                            pkgInternalName);
+
+                        CopyDirectory(pkgSourceFolder, pkgDestinationFolder);
+                        Directory.Delete(pkgSourceFolder, true);
+
+                        var sw = new StreamWriter(Path.Combine(pkgSongsFolder, "songs.dta"), false, new UTF8Encoding(false, false));
+                        foreach (var line in song.DTALines)
+                        {
+                            if (line.Contains("#ifndef kControllerRealGuitar") || (line.Contains("#endif") && !line.Contains("CUSTOMSOURCE"))) continue;
+                            if (line.Contains("latin1"))
+                            {
+                                sw.WriteLine(line.Replace("latin1", "utf8"));
+                            }
+                            else
+                            {
+                                sw.WriteLine(line);
+                            }
+                        }
+                        sw.Dispose();
+
+                        string originalPkgRoot = Directory.GetParent(DTA).Parent.Parent.Parent.FullName;
+
+                        foreach (string filename in new[] { "ICON0.PNG", "PS3LOGO.DAT" })
+                        {
+                            string source = Path.Combine(originalPkgRoot, filename);
+                            string destination = Path.Combine(pkgFolder, filename);
+
+                            if (File.Exists(source))
+                            {
+                                File.Copy(source, destination, true);
+                            }
+                        }
+
+                        FileStream out_pkg;
+                        try
+                        {
+                            out_pkg = File.Create(outputFolder + fileName + ".pkg");
+                        }
+                        catch (Exception ex)
+                        {
+                            Log("Failed to create PKG file for + '" + songName + "'");
+                            continue;
+                        }
+
+                        // set the values to be used when building the pkg and PARAM.SFO
+                        string content_id = "UP8802-BLUS30463_00-NAUTILUS-BY-NEMO";
+                        string title_id = "BLUS30463";
+                        string title_version = "01.05";
+                        string title_name = "Rock Band 3";                       
+
+                        // build an SFO file
+                        ParamSFO sfo = new ParamSFO();
+                        sfo.AddValue("APP_VER", title_version, 0x8);
+                        sfo.AddValue("CATEGORY", "GD", 0x4); // Game Data
+                        sfo.AddValue("PARENTAL_LEVEL", 5); // PEGI 12
+                        sfo.AddValue("PS3_SYSTEM_VER", "03.6000", 0x8);
+                        sfo.AddValue("TITLE", title_name, 0x80);
+                        sfo.AddValue("TITLE_ID", title_id, 0x10);
+                        sfo.AddValue("VERSION", "01.00", 0x8);
+                        // write it out to a memory stream
+                        MemoryStream sfoStream = new MemoryStream();
+                        sfo.Write(sfoStream);
+                        // create a pkg file entry for it, to be added when building the pkg later
+                        /*PKGFile paramSfoFile = new PKGFile("PARAM.SFO", PKGFileFlags.Overwrites | PKGFileFlags.NPDRM |
+                                                   PKGFileFlags.EDAT, sfoStream);
+                        */
+                        PKGFile paramSfoFile = new PKGFile("PARAM.SFO", (PKGFileFlags)0x00000003, sfoStream);
+
+                        var openStreams = new List<FileStream>();
+
+                        PKGWriter pkg = new PKGWriter(content_id);
+                        pkg.SetDRMType(NPDRMType.Free);
+                        //pkg.SetContentType(PKGContentType.GameData);
+                        pkg.SetContentType((PKGContentType)5);
+                        pkg.SetFlags(PKGFlags.EBOOT | PKGFlags.CumulativePatch | PKGFlags.RenameDirectory |
+                                     PKGFlags.DiscBinded | PKGFlags.Unknown_0x8);                     
+                        
+                        // enumerate through all our input files
+                        foreach (string pkgFile in Directory.EnumerateFileSystemEntries(pkgFolder, "*", SearchOption.AllDirectories))
+                        {
+                            // hack to just remove the content folder name and swap path seperators
+                            string pkgFileName = pkgFile.Replace(pkgFolder, "").Replace('\\', '/');
+                            // hack to remove leading slash from filename
+                            if (pkgFileName[0] == '/')
+                                pkgFileName = pkgFileName.Substring(1);
+                            if (Directory.Exists(pkgFile))
+                            {                                
+                                PKGFile dir = new PKGFile(pkgFileName, PKGFileFlags.Directory | PKGFileFlags.Overwrites);
+                                pkg.AddFile(dir);
+                            }
+                            else if (File.Exists(pkgFile))
+                            {
+                                /*if (pkgFileName != "PARAM.SFO")
+                                {                                    
+                                    FileStream fs = File.Open(pkgFile, FileMode.Open, FileAccess.Read);
+                                    openStreams.Add(fs);
+                                    PKGFileFlags flags = PKGFileFlags.Overwrites | PKGFileFlags.NPDRM;
+                                    if (pkgFileName.EndsWith(".BIN") || pkgFileName.EndsWith(".self"))
+                                        flags |= PKGFileFlags.SELF;
+                                    else
+                                        flags |= PKGFileFlags.EDAT;
+                                    PKGFile file1 = new PKGFile(pkgFileName, flags, fs);
+                                    pkg.AddFile(file1);
+                                }*/
+
+                                if (pkgFileName != "PARAM.SFO")
+                                {
+                                    FileStream fs = File.Open(pkgFile, FileMode.Open, FileAccess.Read);
+                                    openStreams.Add(fs);
+
+                                    // Default: ordinary file with overwrite enabled
+                                    PKGFileFlags flags = (PKGFileFlags)0x80000003;
+
+                                    string name = Path.GetFileName(pkgFileName);
+
+                                    // Root-level package metadata
+                                    if (!pkgFileName.Contains("/") &&
+                                        (name.Equals("ICON0.PNG", StringComparison.OrdinalIgnoreCase) ||
+                                         name.Equals("PIC1.PNG", StringComparison.OrdinalIgnoreCase)))
+                                    {
+                                        flags = (PKGFileFlags)0x00000003;
+                                    }
+                                    // Only genuine EDAT files receive the EDAT flag
+                                    else if (name.EndsWith(".edat", StringComparison.OrdinalIgnoreCase)
+                                             && fs.Length >= 4)
+                                    {
+                                        byte[] magic = new byte[4];
+                                        fs.Read(magic, 0, 4);
+                                        fs.Position = 0;
+
+                                        if (magic[0] == 0x4E && // N
+                                            magic[1] == 0x50 && // P
+                                            magic[2] == 0x44 && // D
+                                            magic[3] == 0x00)
+                                        {
+                                            flags = (PKGFileFlags)0x80000002;
+                                        }
+                                    }
+
+                                    PKGFile file1 = new PKGFile(pkgFileName, flags, fs);
+                                    pkg.AddFile(file1);
+                                }
+
+                            }
+                        }
+                        pkg.AddFile(paramSfoFile);
+                        pkg.WritePKG(out_pkg);
+                        Tools.DeleteFolder(pkgFolder, true);
+                        foreach (var fs in openStreams)
+                        {
+                            fs.Dispose();
+                        }
+                        sfoStream.Dispose();
+                        out_pkg.Dispose();
+                        if (File.Exists(outputFolder + fileName + ".pkg"))
+                        {
+                            Log("Created PKG file successfully for '" + songName + "'");
+                            counter++;
+                        }
+                        else
+                        {
+                            Log("Failed to create PKG file for '" + songName + "'");
+                        }
+                    }
+                    Tools.DeleteFolder(outputFolder + shortPath + "\\", true);
+                    continue;
+                }
+                
                 //read and grab contents of DTA file
                 ReadContents(file);
 
@@ -1053,10 +1305,10 @@ namespace Nautilus
                     continue;
                 }
 
-                Directory.CreateDirectory(tempfolder);
+                Directory.CreateDirectory(tempFolder);
 
                 Log("Extracting files from pack '" + Path.GetFileName(file) + "'");
-                if (!xPackage.ExtractPayload(tempfolder, true, false))
+                if (!xPackage.ExtractPayload(tempFolder, true, false))
                 {
                     xPackage.CloseIO();
                     Log("Error extracting files from pack '" + Path.GetFileName(file) + "'");
@@ -1066,8 +1318,8 @@ namespace Nautilus
                 xPackage.CloseIO();
                 Log("Extracted pack contents successfully");
 
-                var songsfolder = tempfolder + "root\\songs\\";
-                var tempdta = tempfolder + "\\temp.dta";
+                var songsFolder = tempFolder + "root\\songs\\";
+                var tempdta = tempFolder + "\\temp.dta";
                 Tools.DeleteFile(tempdta);
 
                 try
@@ -1081,7 +1333,7 @@ namespace Nautilus
                         {
                             filename = Tools.CleanString(song.Artist, false) + Tools.CleanString(song.Name, false) + song.InternalName;                            
                         }
-                        if (File.Exists(outputfolder + filename))
+                        if (File.Exists(outputFolder + filename))
                         {
                             filename += "(1)";
                         }
@@ -1107,7 +1359,7 @@ namespace Nautilus
 
                         repackaged.AddFile(tempdta, "songs/songs.dta");
 
-                        var path = songsfolder + song.InternalName + "\\";
+                        var path = songsFolder + song.InternalName + "\\";
                         if (!Directory.Exists(path))
                         {
                             Log("Can't find the folder of files for " + song.Artist + " - " + song.Name);
@@ -1126,11 +1378,11 @@ namespace Nautilus
                             }
                         }
 
-                        if (Directory.Exists(songsfolder + song.InternalName + "\\gen\\"))
+                        if (Directory.Exists(songsFolder + song.InternalName + "\\gen\\"))
                         {
                             //add all items at the gen level (mostly png_xbox and milo_xbox files)
                             repackaged.AddFolder("songs/" + song.InternalName + "/gen");
-                            var subContents = Directory.GetFiles(songsfolder + song.InternalName + "\\gen\\");
+                            var subContents = Directory.GetFiles(songsFolder + song.InternalName + "\\gen\\");
                             if (subContents.Any())
                             {
                                 foreach (var contents in subContents)
@@ -1145,16 +1397,16 @@ namespace Nautilus
                             Log("No album art will be added!");
                         }
 
-                        var thumbnail = tempfolder + "temp.png";
+                        var thumbnail = tempFolder + "temp.png";
                         Tools.DeleteFile(thumbnail);
-                        var albumart = songsfolder + song.InternalName + "\\gen\\" + song.InternalName + "_keep.png_xbox";
-                        if (useSongAlbumArt.Checked && File.Exists(albumart))
+                        var albumArt = songsFolder + song.InternalName + "\\gen\\" + song.InternalName + "_keep.png_xbox";
+                        if (useSongAlbumArt.Checked && File.Exists(albumArt))
                         {
-                            thumbnail = Tools.ConvertRBImage(albumart, thumbnail, "png") ? thumbnail : "";
+                            thumbnail = Tools.ConvertRBImage(albumArt, thumbnail, "png") ? thumbnail : "";
                             thumbnail = Tools.ResizeImage(thumbnail, 64, "png") ? thumbnail : "";
                         }
 
-                        if (FinishRepackage(song.Artist + " - " + song.Name, "dePACKed with Nautilus from pack '" + title + "'", true, thumbnail, outputfolder + filename))
+                        if (FinishRepackage(song.Artist + " - " + song.Name, "dePACKed with Nautilus from pack '" + title + "'", true, thumbnail, outputFolder + filename))
                         {
                             Log("Created CON file successfully for '" + songname + "'");
                             counter++;
@@ -1172,14 +1424,14 @@ namespace Nautilus
                 }
             }
 
-            Tools.DeleteFolder(tempfolder, true);
+            Tools.DeleteFolder(tempFolder, true);
 
             if (counter > 0)
             {
                 Log("Successfully dePACKaged " + counter + (counter > 1 ? " files" : " file"));
                 if (openFolderAfterDePACK.Checked)
                 {
-                    Process.Start(outputfolder);
+                    Process.Start(outputFolder);
                 }
             }
             else
@@ -1675,22 +1927,11 @@ namespace Nautilus
             {
                 Directory.CreateDirectory(folder);
             }
-
-            var outFolder = folder + Path.GetFileNameWithoutExtension(file).Replace(" ", "").Replace("-", "").Replace("_", "").Trim() + "_ex";
-            Tools.DeleteFolder(outFolder, true);
-            string klic;
-            if (!Tools.ExtractPKG(file, outFolder, out klic))
+            byte[] dtaBytes = Tools.ReadSongsDTAFromPKG(file);
+            if (dtaBytes != null)
             {
-                Log("Failed to process that PKG file");
-                return;
-            }
-            var DTA = Directory.GetFiles(outFolder, "songs.dta", SearchOption.AllDirectories);
-            if (DTA.Count() == 0)
-            {
-                Log("No songs.dta file found, can't process");
-                return;
-            }
-            ReadDTA(File.ReadAllBytes(DTA[0]));
+                ReadDTA(dtaBytes);
+            }        
             isPKG = true;
         }
 

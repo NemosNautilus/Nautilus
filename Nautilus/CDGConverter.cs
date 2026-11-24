@@ -727,14 +727,14 @@ namespace Nautilus
             {
                 message = "This is a pack, dePACK first then try again, stopping";
                 Log(message);
-                MessageBox.Show(message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             if (!Parser.Songs.Any())
             {
                 message = "Couldn't find any songs in that file, stopping";
                 Log(message);
-                MessageBox.Show(message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             if (Parser.Songs[0].VocalParts == 0)
@@ -745,6 +745,10 @@ namespace Nautilus
                 return;
             }
 
+            if (Parser.Songs[0].Source.Equals("beatles"))
+            {
+                Parser.Songs[0].Artist = "The Beatles";
+            }
             var title = CleanString(Parser.Songs[0].Artist).Replace("feat.", "ft.").Replace("featuring", "ft.") + " - " + CleanString(Parser.Songs[0].Name).Replace("feat.", "ft.").Replace("featuring", "ft.");
             Log("Song " + fileCounter + " is '" + title + "'");
 
@@ -4436,7 +4440,7 @@ namespace Nautilus
                 i = extended ? j : i + 1;
             }
 
-            return string.Join(" ", words).Replace("‿", " ");
+            return string.Join(" ", words).Replace("‿", " ").Replace("/", "");// / observed in at least one Beatles song
         }
 
         private void DrawTextWithStroke(Graphics g, string text, Font font, Point pos, Color fill, Color stroke, int strokeWidth)

@@ -70,6 +70,7 @@
             this.setDTAEncodingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aNSIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uTF8ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.hidePackFromRB3 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btnReset = new System.Windows.Forms.Button();
@@ -84,7 +85,6 @@
             this.btnRB1 = new System.Windows.Forms.Button();
             this.btnRB2 = new System.Windows.Forms.Button();
             this.btnRB3 = new System.Windows.Forms.Button();
-            this.hidePackFromRB3 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumb10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.thumb9)).BeginInit();
@@ -177,13 +177,13 @@
             this.exportLogFileToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(123, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(122, 26);
             // 
             // exportLogFileToolStripMenuItem
             // 
             this.exportLogFileToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.exportLogFileToolStripMenuItem.Name = "exportLogFileToolStripMenuItem";
-            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.exportLogFileToolStripMenuItem.Text = "Export log file";
             this.exportLogFileToolStripMenuItem.Click += new System.EventHandler(this.exportLogFileToolStripMenuItem_Click);
             // 
@@ -537,7 +537,7 @@
             // 
             this.useExistingFolderStructureToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.useExistingFolderStructureToolStripMenuItem.Name = "useExistingFolderStructureToolStripMenuItem";
-            this.useExistingFolderStructureToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.useExistingFolderStructureToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.useExistingFolderStructureToolStripMenuItem.Text = "Use e&xisting folder structure";
             this.useExistingFolderStructureToolStripMenuItem.Click += new System.EventHandler(this.useExistingFolderStructureToolStripMenuItem_Click);
             // 
@@ -548,14 +548,14 @@
             this.useRecursiveSearching.CheckOnClick = true;
             this.useRecursiveSearching.CheckState = System.Windows.Forms.CheckState.Checked;
             this.useRecursiveSearching.Name = "useRecursiveSearching";
-            this.useRecursiveSearching.Size = new System.Drawing.Size(221, 22);
+            this.useRecursiveSearching.Size = new System.Drawing.Size(220, 22);
             this.useRecursiveSearching.Text = "Use recursive searching";
             this.useRecursiveSearching.Click += new System.EventHandler(this.useRecursiveSearching_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(218, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(217, 6);
             // 
             // setGameIDToolStripMenuItem
             // 
@@ -565,7 +565,7 @@
             this.rockBand2ToolStripMenuItem,
             this.rockBand3ToolStripMenuItem});
             this.setGameIDToolStripMenuItem.Name = "setGameIDToolStripMenuItem";
-            this.setGameIDToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.setGameIDToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.setGameIDToolStripMenuItem.Text = "Set game ID";
             // 
             // rockBandToolStripMenuItem
@@ -601,14 +601,14 @@
             this.aNSIToolStripMenuItem,
             this.uTF8ToolStripMenuItem});
             this.setDTAEncodingToolStripMenuItem.Name = "setDTAEncodingToolStripMenuItem";
-            this.setDTAEncodingToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.setDTAEncodingToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.setDTAEncodingToolStripMenuItem.Text = "Set DTA encoding";
             // 
             // aNSIToolStripMenuItem
             // 
             this.aNSIToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.aNSIToolStripMenuItem.Name = "aNSIToolStripMenuItem";
-            this.aNSIToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.aNSIToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
             this.aNSIToolStripMenuItem.Text = "ANSI";
             this.aNSIToolStripMenuItem.Click += new System.EventHandler(this.aNSIToolStripMenuItem_Click);
             // 
@@ -618,9 +618,17 @@
             this.uTF8ToolStripMenuItem.Checked = true;
             this.uTF8ToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.uTF8ToolStripMenuItem.Name = "uTF8ToolStripMenuItem";
-            this.uTF8ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.uTF8ToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
             this.uTF8ToolStripMenuItem.Text = "UTF8";
             this.uTF8ToolStripMenuItem.Click += new System.EventHandler(this.uTF8ToolStripMenuItem_Click);
+            // 
+            // hidePackFromRB3
+            // 
+            this.hidePackFromRB3.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.hidePackFromRB3.CheckOnClick = true;
+            this.hidePackFromRB3.Name = "hidePackFromRB3";
+            this.hidePackFromRB3.Size = new System.Drawing.Size(220, 22);
+            this.hidePackFromRB3.Text = "Hide pack from RB3";
             // 
             // helpToolStripMenuItem1
             // 
@@ -813,14 +821,6 @@
             this.btnRB3.Text = "RB3";
             this.btnRB3.UseVisualStyleBackColor = true;
             this.btnRB3.Click += new System.EventHandler(this.btnRB3_Click);
-            // 
-            // hidePackFromRB3
-            // 
-            this.hidePackFromRB3.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.hidePackFromRB3.CheckOnClick = true;
-            this.hidePackFromRB3.Name = "hidePackFromRB3";
-            this.hidePackFromRB3.Size = new System.Drawing.Size(221, 22);
-            this.hidePackFromRB3.Text = "Hide pack from RB3";
             // 
             // PackCreator
             // 

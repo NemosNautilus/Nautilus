@@ -14,6 +14,7 @@ namespace Nautilus
     {
         private NemoTools Tools;
         public List<SongData> Songs;
+
         private int Diff1;
         private int Diff2;
         private int Diff3;
@@ -1060,8 +1061,28 @@ namespace Nautilus
                             }
                             else if ((line.Contains("(preview") || line.Contains("('preview")) && !line.Trim().StartsWith(";", StringComparison.Ordinal))
                             {
-                                song.PreviewStart = (int)GetPreviewTimes(line, 0);
-                                song.PreviewEnd = (int)GetPreviewTimes(line, 1);
+                                if (line.Contains("(") && line.Contains(")")) //most songs
+                                {
+                                    song.PreviewStart = (int)GetPreviewTimes(line, 0);
+                                    song.PreviewEnd = (int)GetPreviewTimes(line, 1);
+                                }
+                                else
+                                {
+                                    try //this is mostly for Beatles Rock Band songs that have the preview times on the next two lines
+                                    {
+                                        z++;
+                                        line = entry[z];
+                                        song.PreviewStart = Convert.ToInt32(line.Replace("\t", ""));
+                                        z++;
+                                        line = entry[z];
+                                        song.PreviewEnd = Convert.ToInt32(line.Replace("\t", "").Replace(")", ""));
+                                    }
+                                    catch
+                                    {
+                                        song.PreviewStart = 0;
+                                        song.PreviewEnd = 30000;
+                                    }
+                                }
                             }
                             else if (line.Contains("song_length"))
                             {
@@ -1144,13 +1165,13 @@ namespace Nautilus
                             {
                                 song.Gender = line.ToLowerInvariant().Contains("female") ? "Female" : "Male";
                             }
-                            else if (line.Contains("(year_released") || line.Contains("('year_released"))
+                            else if (line.Contains("(year_released") || line.Contains("('year_released") || line.Contains("date_released"))
                             {
                                 song.YearReleased = GetYear(line);
                             }
-                            else if (line.Contains("(year_recorded") || line.Contains("('year_recorded"))
+                            else if (line.Contains("(year_recorded") || line.Contains("('year_recorded") || line.Contains("date_recorded"))
                             {
-                                song.YearRecorded = GetYear(line);
+                                song.YearRecorded = GetYear(line);                            
                             }
                             else if (line.Contains("(author") || line.Contains("'author"))
                             {

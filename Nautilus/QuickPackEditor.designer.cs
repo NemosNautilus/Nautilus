@@ -104,7 +104,6 @@
             this.lstLog.Name = "lstLog";
             this.lstLog.Size = new System.Drawing.Size(563, 158);
             this.lstLog.TabIndex = 12;
-            this.toolTip1.SetToolTip(this.lstLog, "This is the application log. Right click to export");
             this.lstLog.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleDragDrop);
             this.lstLog.DragEnter += new System.Windows.Forms.DragEventHandler(this.HandleDragEnter);
             // 

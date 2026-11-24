@@ -3304,7 +3304,8 @@ namespace LibForge.Midi
             r.Format = Int();
             if (r.Format != RBMid.FORMAT_RB4 && r.Format != RBMid.FORMAT_RBVR)
             {
-                throw new Exception($"Invalid magic number (expected 10 or 2f, got {r.Format:X}");
+                //throw new Exception($"Invalid magic number (expected 10 or 2f, got {r.Format:X}");
+                return null; //skip the MIDI for now
             }
             r.Lyrics = Arr(ReadLyrics, MaxInstTracks);
             var numTracks = (uint)r.Lyrics.Length;

@@ -19,7 +19,6 @@ namespace Nautilus
 {
     public partial class StemsIsolator : Form
     {
-        private RSAParams signature;
         private int ChannelsTotal;
         private int ChannelsDrums;
         private int ChannelsBass;
@@ -524,21 +523,9 @@ namespace Nautilus
                 txtFile.Text = tFile;
             }
         }
-        
-        private static int getChannels(string line, string remove)
-        {
-            if (line.Contains("()")) return 0; //old GHtoRB3 songs have empty entries
-            var channels = line.Replace("(", "");
-            channels = channels.Replace(remove, "");
-            channels = channels.Replace(")", "");
-            channels = channels.Replace("'", "").Trim();
-            var number = channels.Contains(" ") ? channels.Split(new char[0], StringSplitOptions.RemoveEmptyEntries).Length : 1;
-            return number;
-        }
     
         private bool readDTA(byte[] xDTA)
         {
-            var shortid = false;
             try
             {
                 if (!Parser.ReadDTA(xDTA))
@@ -550,170 +537,28 @@ namespace Nautilus
                     Log("Can't work with packs for now ... please try a single song");
                     return false;
                 }
-                var encoding = Parser.DetectEncoding(xDTA);
-                var sr = new StreamReader(new MemoryStream(xDTA), encoding);
-                var sw = new StreamWriter(Application.StartupPath + "\\bin\\template.dta", false, encoding);
-                while (sr.Peek() > 0)
+                if (Parser.Songs[0].Source.Equals("beatles"))
                 {
-                    var line = sr.ReadLine();
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-                    if (line == "(" && !shortid)
-                    {
-                        sw.WriteLine(line);
-                        line = sr.ReadLine();
-                        if (line != null)
-                        {
-                            line = line.Trim().Replace("'", "");
-                        }
-                        line = "      '" + line + "#SHORT_ID" + "'";
-                        shortid = true;
-                    }
-                    else if (line.Substring(0, 1) == "(" && !line.Contains(")") && !shortid)
-                    {
-                        var id = line;
-                        id = id.Replace("(", "");
-                        id = id.Replace("'", "").Trim();
-                        if (line.Contains("'"))
-                        {
-                            line = "('" + id + "#SHORT_ID'";
-                        }
-                        else
-                        {
-                            line = "(" + id + "#SHORT_ID";
-                        }
-                        shortid = true;
-                    }
-                    else if (line.Contains("song_id"))
-                    {
-                        line = line.Replace(")", "#SONG_ID)");
-                    }
-                    else if (line.Contains("album_track_number"))
-                    {
-                        line = "   ('album_track_number' #TRACK)";
-                    }
-                    else if (line.ToLowerInvariant().Contains("(name") && !(line.ToLowerInvariant().Contains(("songs/"))))
-                    {
-                        line = line.Replace("\")", " #STEM_NAME\")");
-                    }
-                    else if (line.ToLowerInvariant().Contains("'name'") && !line.Contains("songs/"))
-                    {
-                        sw.WriteLine(line);
-                        line = sr.ReadLine();
-                        if (line != null && !(line.ToLowerInvariant().Contains("songs/")))
-                        {
-                            line = line.Trim().Replace("\"", "");
-                            line = "      \"" + line + " #STEM_NAME\"";
-                        }
-                    }
-                    else if (line.Contains("(tracks"))
-                    {
-                        //sw.WriteLine(line);
-                        //line = sr.ReadLine();
-                        while (line != null && line.Trim() != ")")
-                        {
-                            if (line.ToLowerInvariant().Contains("bass"))
-                            {
-                                ChannelsBass = getChannels(line, "bass");
-                                chkBass.Enabled = true;                                
-                            }
-                            else if (line.ToLowerInvariant().Contains("guitar"))
-                            {
-                                ChannelsGuitar = getChannels(line, "guitar");
-                                chkGuitar.Enabled = true;
-                            }
-                            else if (line.ToLowerInvariant().Contains("keys"))
-                            {
-                                ChannelsKeys = getChannels(line, "keys");
-                                chkKeys.Enabled = true;
-                            }
-                            else if (line.ToLowerInvariant().Contains("vocals"))
-                            {
-                                ChannelsVocals = getChannels(line, "vocals");
-                                chkVocals.Enabled = true;
-                            }
-                            else if (line.ToLowerInvariant().Contains("drum"))
-                            {
-                                ChannelsDrums = getChannels(line, "drum");
-                                chkDrums.Enabled = true;
-                            }
-                            sw.WriteLine(line);
-                            line = sr.ReadLine();
-                        }
-                    }
-                    else if (line.Contains("'tracks'"))
-                    {
-                        sw.WriteLine(line);
-                        line = sr.ReadLine();
-                        while (line != null && !line.ToLowerInvariant().Contains("pans"))
-                        {
-                            if (line.ToLowerInvariant().Contains("bass"))
-                            {
-                                sw.WriteLine(line);
-                                line = sr.ReadLine();
-                                ChannelsBass = getChannels(line, "bass");
-                                chkBass.Enabled = true;
-                            }
-                            else if (line != null && line.ToLowerInvariant().Contains("guitar"))
-                            {
-                                sw.WriteLine(line);
-                                line = sr.ReadLine();
-                                ChannelsGuitar = getChannels(line, "guitar");
-                                chkGuitar.Enabled = true;
-                            }
-                            else if (line != null && line.ToLowerInvariant().Contains("keys"))
-                            {
-                                sw.WriteLine(line);
-                                line = sr.ReadLine();
-                                ChannelsKeys = getChannels(line, "keys");
-                                chkKeys.Enabled = true;
-                            }
-                            else if (line != null && line.ToLowerInvariant().Contains("vocals"))
-                            {
-                                sw.WriteLine(line);
-                                line = sr.ReadLine();
-                                ChannelsVocals = getChannels(line, "vocals");
-                                chkVocals.Enabled = true;
-                            }
-                            else if (line != null && line.ToLowerInvariant().Contains("drum"))
-                            {
-                                sw.WriteLine(line);
-                                line = sr.ReadLine();
-                                ChannelsDrums = getChannels(line, "drum");
-                                chkDrums.Enabled = true;
-                            }
-                            sw.WriteLine(line);
-                            line = sr.ReadLine();
-                        }
-                    }
-                    else if (line.Contains("crowd_channels"))
-                    {
-                        ChannelsCrowd = getChannels(line, "crowd_channels");
-                        chkCrowd.Enabled = true;
-                    }
-                    else if (line.Contains("'vols'"))
-                    {
-                        sw.WriteLine(line);
-                        sr.ReadLine();
-                        line = "         (#VOLS)";
-                    }
-                    else if (line.Contains("(vols"))
-                    {
-                        line = "     (vols        (#VOLS))";
-                    }
-                    else if (line.Contains("(cores"))
-                    {
-                        ChannelsTotal = Parser.GetAudioChannels(line);
-                    }
-                    else if (line.Contains("'cores'"))
-                    {
-                        sw.WriteLine(line);
-                        line = sr.ReadLine();
-                        ChannelsTotal = Parser.GetAudioChannels(line);
-                    }
-                    sw.WriteLine(line);
+                    Parser.Songs[0].Artist = "The Beatles";
+                }                
+                ChannelsTotal = Parser.Songs[0].ChannelsTotal;                
+                ChannelsBass = Parser.Songs[0].ChannelsBass;
+                chkBass.Enabled = ChannelsBass > 0;
+                ChannelsDrums = Parser.Songs[0].ChannelsDrums;
+                chkDrums.Enabled = ChannelsDrums > 0;
+                ChannelsGuitar = Parser.Songs[0].ChannelsGuitar;
+                chkGuitar.Enabled = ChannelsGuitar > 0;
+                ChannelsKeys = Parser.Songs[0].ChannelsKeys;
+                chkKeys.Enabled = ChannelsKeys > 0; 
+                ChannelsVocals = Parser.Songs[0].ChannelsVocals;
+                chkVocals.Enabled = ChannelsVocals > 0;
+                ChannelsCrowd = Parser.Songs[0].ChannelsCrowd;
+                chkCrowd.Enabled = ChannelsCrowd > 0;
+
+                if (Parser.Songs[0].Source.Equals("beatles"))
+                {
+                    ChannelsTotal = ChannelsBass + ChannelsDrums + ChannelsGuitar + ChannelsKeys + ChannelsVocals + ChannelsCrowd + 2;
                 }
-                sr.Dispose();
-                sw.Dispose();
                 if (ChannelsTotal > (ChannelsBass + ChannelsDrums + ChannelsGuitar + ChannelsKeys + ChannelsVocals + ChannelsCrowd))
                 {
                     ChannelsBacking = ChannelsTotal - ChannelsBass - ChannelsDrums - ChannelsGuitar - ChannelsKeys - ChannelsVocals - ChannelsCrowd;

@@ -116,8 +116,9 @@
             this.enableCDGStrokeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.enableMP4StrokeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
-            this.enableMP4TitleCardShadows = new System.Windows.Forms.ToolStripMenuItem();
+            this.displayAlbumArtOnTitleCard = new System.Windows.Forms.ToolStripMenuItem();
             this.displayTempoOnTitleCard = new System.Windows.Forms.ToolStripMenuItem();
+            this.enableMP4TitleCardShadows = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
             this.showRenderingPreview = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -135,7 +136,6 @@
             this.lblStrokeQuestion = new System.Windows.Forms.Label();
             this.colorPicker = new System.Windows.Forms.ColorDialog();
             this.lblBackgroundQuestion = new System.Windows.Forms.Label();
-            this.displayAlbumArtOnTitleCard = new System.Windows.Forms.ToolStripMenuItem();
             this.grpAudioOptions.SuspendLayout();
             this.grpHarm1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picBackground1)).BeginInit();
@@ -1173,13 +1173,15 @@
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
             this.toolStripMenuItem4.Size = new System.Drawing.Size(276, 6);
             // 
-            // enableMP4TitleCardShadows
+            // displayAlbumArtOnTitleCard
             // 
-            this.enableMP4TitleCardShadows.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.enableMP4TitleCardShadows.CheckOnClick = true;
-            this.enableMP4TitleCardShadows.Name = "enableMP4TitleCardShadows";
-            this.enableMP4TitleCardShadows.Size = new System.Drawing.Size(279, 22);
-            this.enableMP4TitleCardShadows.Text = "Enable MP4 title card shadows (slower)";
+            this.displayAlbumArtOnTitleCard.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.displayAlbumArtOnTitleCard.Checked = true;
+            this.displayAlbumArtOnTitleCard.CheckOnClick = true;
+            this.displayAlbumArtOnTitleCard.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.displayAlbumArtOnTitleCard.Name = "displayAlbumArtOnTitleCard";
+            this.displayAlbumArtOnTitleCard.Size = new System.Drawing.Size(279, 22);
+            this.displayAlbumArtOnTitleCard.Text = "Display album art on title card";
             // 
             // displayTempoOnTitleCard
             // 
@@ -1190,6 +1192,14 @@
             this.displayTempoOnTitleCard.Name = "displayTempoOnTitleCard";
             this.displayTempoOnTitleCard.Size = new System.Drawing.Size(279, 22);
             this.displayTempoOnTitleCard.Text = "Display tempo on title card";
+            // 
+            // enableMP4TitleCardShadows
+            // 
+            this.enableMP4TitleCardShadows.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.enableMP4TitleCardShadows.CheckOnClick = true;
+            this.enableMP4TitleCardShadows.Name = "enableMP4TitleCardShadows";
+            this.enableMP4TitleCardShadows.Size = new System.Drawing.Size(279, 22);
+            this.enableMP4TitleCardShadows.Text = "Enable MP4 title card shadows (slower)";
             // 
             // toolStripMenuItem6
             // 
@@ -1217,7 +1227,7 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -1365,16 +1375,6 @@
             this.lblBackgroundQuestion.TabIndex = 91;
             this.lblBackgroundQuestion.Text = "?";
             this.lblBackgroundQuestion.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lblBackgroundQuestion_MouseClick);
-            // 
-            // displayAlbumArtOnTitleCard
-            // 
-            this.displayAlbumArtOnTitleCard.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.displayAlbumArtOnTitleCard.Checked = true;
-            this.displayAlbumArtOnTitleCard.CheckOnClick = true;
-            this.displayAlbumArtOnTitleCard.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.displayAlbumArtOnTitleCard.Name = "displayAlbumArtOnTitleCard";
-            this.displayAlbumArtOnTitleCard.Size = new System.Drawing.Size(279, 22);
-            this.displayAlbumArtOnTitleCard.Text = "Display album art on title card";
             // 
             // CDGConverter
             // 

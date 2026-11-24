@@ -19,32 +19,10 @@ using NautilusFREE;
 using static Nautilus.YARGSongFileStream;
 using Nautilus.Sng;
 using System.Threading.Tasks;
-
+using SCEllSharp.PKG;
 
 namespace Nautilus
-{
-    public static unsafe partial class TheMethod3
-    {
-        private const string __DllName = "themethod3.dll";
-
-        static TheMethod3()
-        {
-            // Get the full path of the /bin/ directory
-            string binPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin");
-
-            // Add the /bin/ directory to the DLL search path
-            SetDllDirectory(binPath);
-        }
-
-        [DllImport(__DllName, EntryPoint = "decrypt_mogg", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool decrypt_mogg(byte* data, uint len);
-
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool SetDllDirectory(string lpPathName);
-    }
-
+{   
     public class NemoTools
     {
         #region Wii Stuff
@@ -470,28 +448,52 @@ namespace Nautilus
         // // // // // // // // // // // // // // // 
         //WII STUFF WII STUFF WII STUFF WII STUFF // 
         // // // // // // // // // // // // // // // 
-        #endregion             
-
-        public bool isV17(string mogg)
+        #endregion          
+              
+        public bool BeatlesDecrypt(string mogg, nTools nautilus3, bool deleteOriginal, string output = "")
         {
-            return isV17(File.ReadAllBytes(mogg));
-        }
+            var tbrb_crypt = Application.StartupPath + "\\bin\\tbrb-crypto.exe";
+            if (!File.Exists(tbrb_crypt)) return false;
+           
+            var moggv10 = string.IsNullOrEmpty(output) ? Path.Combine(Path.GetTempPath(), "tempv10.mogg") : output;
+            var arguments = "to-v10 \"" + mogg + "\" \"" + moggv10 + "\"";
 
-        public bool isV17(byte[] mogg_data)
-        {
-            try
+            var startInfo = new ProcessStartInfo
             {
-                using (var stream = new MemoryStream(mogg_data))
-                using (var reader = new BinaryReader(stream))
-                {
-                    byte version = reader.ReadByte();
-                    return version == 0x11;
-                }
-            }
-            catch
+                FileName = tbrb_crypt,
+                Arguments = arguments,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            using (var process = Process.Start(startInfo))
             {
-                return false;
+                var outputTask = process.StandardOutput.ReadToEndAsync();
+                var errorTask = process.StandardError.ReadToEndAsync();
+
+                process.WaitForExit();
+
+                string outputStream = outputTask.GetAwaiter().GetResult();
+                string errorStream = errorTask.GetAwaiter().GetResult();
+
+                int exitCode = process.ExitCode;
             }
+
+            if (deleteOriginal)
+            {
+                File.Delete(mogg);
+            }
+            if (!File.Exists(moggv10)) return false;            
+
+            var bytes = File.ReadAllBytes(moggv10);
+            if (string.IsNullOrEmpty(output))
+            {
+                File.Delete(moggv10);
+            }
+            if (!nautilus3.RemoveMHeader(bytes, false, DecryptMode.ToMemory, "")) return false;            
+            return true;
         }
 
         public bool ConvertBandFuse(string argument, string input, string output)
@@ -3527,56 +3529,83 @@ namespace Nautilus
                 Clipboard.SetText(error);
                 MessageBox.Show(error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }       
+        }
 
-        public bool ExtractPKG(string pkg, string folder, out string klic)
+        public byte[] ReadSongsDTAFromPKG(string pkgPath)
         {
-            var path = Application.StartupPath + "\\bin\\";
-            if (!File.Exists(path + "pkgripper.exe"))
+            using (FileStream fs = File.OpenRead(pkgPath))
             {
-                MessageBox.Show("pkgripper.exe is missing from the bin directory and I can't continue without it", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                klic = "";
-                return false;
+                PKGReader pkg = new PKGReader(fs);
+
+                PKGFile dta = pkg.Files.FirstOrDefault(f =>
+                    !f.IsDirectory &&
+                    f.Filename.Replace('\\', '/')
+                        .EndsWith("/songs.dta",
+                            StringComparison.OrdinalIgnoreCase));
+
+                if (dta == null)
+                    return null;
+
+                byte[] data = new byte[dta.FileSize];
+
+                int totalRead = 0;
+
+                while (totalRead < data.Length)
+                {
+                    int read = dta.ReadData(
+                        data,
+                        totalRead,
+                        data.Length - totalRead);
+
+                    if (read <= 0)
+                        throw new EndOfStreamException("Unexpected end of songs.dta");
+
+                    totalRead += read;
+                }
+                return data;
             }
+        }
+
+        public bool ExtractPS3PKG(string pkgPath, string outputFolder)
+        {
             try
             {
-                var arg = " -o \"" + folder + "\" \"" + pkg + "\"";
-                var app = new ProcessStartInfo
+                Directory.CreateDirectory(outputFolder);
+
+                using (FileStream fs = File.OpenRead(pkgPath))
                 {
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = false,
-                    RedirectStandardError = false,
-                    RedirectStandardInput = false,
-                    UseShellExecute = false,
-                    FileName = path + "pkgripper.exe",
-                    Arguments = arg,
-                    WorkingDirectory = path
-                };
-                var process = Process.Start(app);
-                do
-                {
-                    //
-                } while (!process.HasExited);
-                process.Dispose();
+                    PKGReader pkg = new PKGReader(fs);
+
+                    foreach (PKGFile file in pkg.Files)
+                    {
+                        string destination = Path.Combine(
+                            outputFolder, file.Filename);
+
+                        if (file.IsDirectory)
+                        {
+                            Directory.CreateDirectory(destination);
+                        }
+                        else
+                        {
+                            string parent = Path.GetDirectoryName(destination);
+
+                            if (!string.IsNullOrEmpty(parent))
+                                Directory.CreateDirectory(parent);
+
+                            file.ExtractToFile(destination);
+                        }
+                    }
+                }
+
+                return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error extracting package:\n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                klic = "";
+                MessageBox.Show("Failed to extract PS3 PKG:\n" + ex.Message,
+                    "Nautilus", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 return false;
             }
-
-            var success = false;
-            if (Directory.Exists(folder))
-            {
-                var dta = Directory.GetFiles(folder, "*.dta", SearchOption.AllDirectories);
-                success = dta.Count() > 0;
-            }
-
-            folder += "\\USRDIR\\";
-            var int_folder = Directory.GetDirectories(folder);
-            klic = GetKLIC(int_folder[0]);
-            return success;
         }
 
         public string GetKLIC(string folder)
@@ -3598,7 +3627,45 @@ namespace Nautilus
             }
         }
 
-        public bool DecryptEdat(string edat, string midi, string klic = "")
+        public bool DecryptRetailEdat(string edat, string midi, string rap)
+        {
+            var path = Application.StartupPath + "\\bin\\";
+            if (!File.Exists(path + "make_npdata.exe"))
+            {
+                MessageBox.Show("make_npdata.exe is missing from the bin directory and I can't continue without it", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            
+            try
+            {
+                var arg = " -d \"" + edat + "\" \"" + midi + "\" 0 \"" + rap + "\"";
+                var app = new ProcessStartInfo
+                {
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    RedirectStandardInput = true,
+                    UseShellExecute = false,
+                    FileName = path + "make_npdata.exe",
+                    Arguments = arg,
+                    WorkingDirectory = path
+                };
+                var process = Process.Start(app);
+                do
+                {
+                    //
+                } while (!process.HasExited);
+                process.Dispose();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error decrypting EDAT file:\n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            return File.Exists(midi);
+        }
+
+        public bool DecryptCustomEdat(string edat, string midi, string klic = "")
         {
             var path = Application.StartupPath + "\\bin\\";
             if (!File.Exists(path + "edattool.exe"))

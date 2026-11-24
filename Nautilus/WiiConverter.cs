@@ -779,12 +779,7 @@ namespace Nautilus
 
                                     wasAlreadyEncrypted = nautilus3.MoggIsEncrypted(File.ReadAllBytes(newMogg));
                                     
-                                    Log("Reading mogg file to attempt to auto downmix");
-                                    if (Tools.isV17(newMogg))
-                                    {
-                                        MessageBox.Show("I recognize this encryption scheme as v17 (Rock Band 4) but it was not implemented in this Tool", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                                        continue;
-                                    }
+                                    Log("Reading mogg file to attempt to auto downmix");                                    
                                     var dec = nautilus3.DecM(File.ReadAllBytes(newMogg), false, false, DecryptMode.ToMemory);
                                     if (!dec)
                                     {

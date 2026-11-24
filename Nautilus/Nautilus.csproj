@@ -107,12 +107,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\debug\bin\Bass.Net.dll</HintPath>
     </Reference>
+    <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
+      <HintPath>..\packages\BouncyCastle.Cryptography.2.7.0\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
+    </Reference>
     <Reference Include="DevComponents.DotNetBar2">
       <HintPath>.\DevComponents.DotNetBar2.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DocumentFormat.OpenXml">
       <HintPath>bin\Debug\bin\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="Dorssel.Security.Cryptography.AesExtra, Version=2.0.0.0, Culture=neutral, PublicKeyToken=6187875b560a1a69, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dorssel.Security.Cryptography.AesExtra.2.0.0\lib\netstandard2.0\Dorssel.Security.Cryptography.AesExtra.dll</HintPath>
     </Reference>
     <Reference Include="IPAddressControlLib">
       <HintPath>bin\Debug\bin\IPAddressControlLib.dll</HintPath>
@@ -122,6 +128,12 @@
     </Reference>
     <Reference Include="LibVLCSharp.WinForms, Version=3.9.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LibVLCSharp.WinForms.3.9.2\lib\net40\LibVLCSharp.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.1\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.Memory, Version=9.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Memory.9.0.1\lib\net462\Microsoft.Bcl.Memory.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -136,8 +148,9 @@
     <Reference Include="NAudio.Midi">
       <HintPath>bin\debug\bin\NAudio.Midi.dll</HintPath>
     </Reference>
-    <Reference Include="NautilusFREE">
-      <HintPath>bin\Debug\bin\NautilusFREE.dll</HintPath>
+    <Reference Include="nautilusFREE, Version=3.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\bin\nautilusFREE.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -156,7 +169,9 @@
     <Reference Include="SharpMp4Parser">
       <HintPath>bin\debug\bin\SharpMp4Parser.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
+    <Reference Include="System">
+      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.dll</HintPath>
+    </Reference>
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\_Tools\_Nautilus\bin\System.Buffers.dll</HintPath>
@@ -222,6 +237,12 @@
       <HintPath>..\packages\System.Text.RegularExpressions.4.3.1\lib\net463\System.Text.RegularExpressions.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
@@ -890,6 +911,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\Debug\bin\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="E:\Downloads\SCEllSharp-main\SCEllSharp-main\SCEllSharp\SCEllSharp.csproj">
+      <Project>{a31edec4-d4fe-5432-a30e-73efed04c6fb}</Project>
+      <Name>SCEllSharp</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

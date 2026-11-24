@@ -318,7 +318,6 @@ namespace Nautilus
             this.chkTrack.Name = "chkTrack";
             this.chkTrack.Size = new System.Drawing.Size(15, 14);
             this.chkTrack.TabIndex = 55;
-            this.toolTip1.SetToolTip(this.chkTrack, "Click here to display track number");
             this.chkTrack.UseVisualStyleBackColor = true;
             this.chkTrack.CheckedChanged += new System.EventHandler(this.ControlChanged);
             // 
@@ -332,7 +331,6 @@ namespace Nautilus
             this.yearJoystick.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.yearJoystick.TabIndex = 54;
             this.yearJoystick.TabStop = false;
-            this.toolTip1.SetToolTip(this.yearJoystick, "Click here to adjust the position of the year");
             this.yearJoystick.MouseClick += new System.Windows.Forms.MouseEventHandler(this.yearJoystick_MouseClick);
             this.yearJoystick.MouseMove += new System.Windows.Forms.MouseEventHandler(this.yearJoystick_MouseMove);
             // 
@@ -353,7 +351,6 @@ namespace Nautilus
             this.txtTrack.Size = new System.Drawing.Size(42, 20);
             this.txtTrack.TabIndex = 52;
             this.txtTrack.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.toolTip1.SetToolTip(this.txtTrack, "Enter year of release here");
             this.txtTrack.TextChanged += new System.EventHandler(this.txtTrack_TextChanged);
             // 
             // chkRating
@@ -379,7 +376,6 @@ namespace Nautilus
             this.lblRating.TabIndex = 50;
             this.lblRating.Text = "Rating";
             this.lblRating.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.toolTip1.SetToolTip(this.lblRating, "Click here to display the song rating");
             this.lblRating.Click += new System.EventHandler(this.lblRating_Click);
             // 
             // cboRating
@@ -394,7 +390,6 @@ namespace Nautilus
             this.cboRating.Name = "cboRating";
             this.cboRating.Size = new System.Drawing.Size(55, 21);
             this.cboRating.TabIndex = 15;
-            this.toolTip1.SetToolTip(this.cboRating, "Click here to select the song rating");
             this.cboRating.SelectedIndexChanged += new System.EventHandler(this.cboRating_SelectedIndexChanged);
             // 
             // picGenreDown
@@ -407,7 +402,6 @@ namespace Nautilus
             this.picGenreDown.Size = new System.Drawing.Size(26, 13);
             this.picGenreDown.TabIndex = 48;
             this.picGenreDown.TabStop = false;
-            this.toolTip1.SetToolTip(this.picGenreDown, "Click here to move the Genre down");
             this.picGenreDown.MouseClick += new System.Windows.Forms.MouseEventHandler(this.picGenreDown_MouseClick);
             // 
             // picGenreUp
@@ -420,7 +414,6 @@ namespace Nautilus
             this.picGenreUp.Size = new System.Drawing.Size(26, 13);
             this.picGenreUp.TabIndex = 47;
             this.picGenreUp.TabStop = false;
-            this.toolTip1.SetToolTip(this.picGenreUp, "Click here to move the Genre up");
             this.picGenreUp.MouseClick += new System.Windows.Forms.MouseEventHandler(this.picGenreUp_MouseClick);
             // 
             // label9
@@ -441,7 +434,6 @@ namespace Nautilus
             this.txtYear2.Size = new System.Drawing.Size(49, 20);
             this.txtYear2.TabIndex = 11;
             this.txtYear2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.toolTip1.SetToolTip(this.txtYear2, "Enter year of re-recording here");
             this.txtYear2.TextChanged += new System.EventHandler(this.txtYear2_TextChanged);
             this.txtYear2.DoubleClick += new System.EventHandler(this.TextBoxSelectAll);
             // 
@@ -453,7 +445,6 @@ namespace Nautilus
             this.chkSubGenre.Name = "chkSubGenre";
             this.chkSubGenre.Size = new System.Drawing.Size(15, 14);
             this.chkSubGenre.TabIndex = 44;
-            this.toolTip1.SetToolTip(this.chkSubGenre, "Click here to display subgenre");
             this.chkSubGenre.UseVisualStyleBackColor = true;
             this.chkSubGenre.CheckedChanged += new System.EventHandler(this.ControlChanged);
             // 
@@ -467,7 +458,6 @@ namespace Nautilus
             this.chkGenre.Name = "chkGenre";
             this.chkGenre.Size = new System.Drawing.Size(15, 14);
             this.chkGenre.TabIndex = 43;
-            this.toolTip1.SetToolTip(this.chkGenre, "Click here to display genre");
             this.chkGenre.UseVisualStyleBackColor = true;
             this.chkGenre.CheckedChanged += new System.EventHandler(this.ControlChanged);
             this.chkGenre.TextChanged += new System.EventHandler(this.ControlChanged);
@@ -483,7 +473,6 @@ namespace Nautilus
             this.SplitJoinArtist.Size = new System.Drawing.Size(39, 15);
             this.SplitJoinArtist.TabIndex = 37;
             this.SplitJoinArtist.Text = "SPLIT";
-            this.toolTip1.SetToolTip(this.SplitJoinArtist, "Click here to split the name of the artist into two lines");
             this.SplitJoinArtist.TextChanged += new System.EventHandler(this.SplitJoinArtist_TextChanged);
             this.SplitJoinArtist.Click += new System.EventHandler(this.SplitJoinArtist_Click);
             // 
@@ -498,7 +487,6 @@ namespace Nautilus
             this.SplitJoinSong.Size = new System.Drawing.Size(39, 15);
             this.SplitJoinSong.TabIndex = 36;
             this.SplitJoinSong.Text = "SPLIT";
-            this.toolTip1.SetToolTip(this.SplitJoinSong, "Click here to split the name of the song into two lines");
             this.SplitJoinSong.TextChanged += new System.EventHandler(this.SplitJoinSong_TextChanged);
             this.SplitJoinSong.Click += new System.EventHandler(this.SplitJoinSong_Click);
             // 
@@ -508,7 +496,6 @@ namespace Nautilus
             this.txtArtist2.Name = "txtArtist2";
             this.txtArtist2.Size = new System.Drawing.Size(137, 20);
             this.txtArtist2.TabIndex = 8;
-            this.toolTip1.SetToolTip(this.txtArtist2, "Enter name of artist or band here");
             this.txtArtist2.Visible = false;
             this.txtArtist2.TextChanged += new System.EventHandler(this.txtArtist2_TextChanged);
             this.txtArtist2.DoubleClick += new System.EventHandler(this.TextBoxSelectAll);
@@ -519,7 +506,6 @@ namespace Nautilus
             this.txtArtist1.Name = "txtArtist1";
             this.txtArtist1.Size = new System.Drawing.Size(137, 20);
             this.txtArtist1.TabIndex = 7;
-            this.toolTip1.SetToolTip(this.txtArtist1, "Enter name of artist or band here");
             this.txtArtist1.Visible = false;
             this.txtArtist1.TextChanged += new System.EventHandler(this.txtArtist1_TextChanged);
             this.txtArtist1.DoubleClick += new System.EventHandler(this.TextBoxSelectAll);
@@ -531,7 +517,6 @@ namespace Nautilus
             this.txtSong2.Name = "txtSong2";
             this.txtSong2.Size = new System.Drawing.Size(137, 20);
             this.txtSong2.TabIndex = 2;
-            this.toolTip1.SetToolTip(this.txtSong2, "Enter song name here");
             this.txtSong2.Visible = false;
             this.txtSong2.TextChanged += new System.EventHandler(this.txtSong2_TextChanged);
             this.txtSong2.DoubleClick += new System.EventHandler(this.TextBoxSelectAll);
@@ -542,7 +527,6 @@ namespace Nautilus
             this.txtSong1.Name = "txtSong1";
             this.txtSong1.Size = new System.Drawing.Size(137, 20);
             this.txtSong1.TabIndex = 1;
-            this.toolTip1.SetToolTip(this.txtSong1, "Enter song name here");
             this.txtSong1.Visible = false;
             this.txtSong1.TextChanged += new System.EventHandler(this.txtSong1_TextChanged);
             this.txtSong1.DoubleClick += new System.EventHandler(this.TextBoxSelectAll);
@@ -557,7 +541,6 @@ namespace Nautilus
             this.artistJoystick.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.artistJoystick.TabIndex = 31;
             this.artistJoystick.TabStop = false;
-            this.toolTip1.SetToolTip(this.artistJoystick, "Click here to adjust the position of the artist name");
             this.artistJoystick.MouseClick += new System.Windows.Forms.MouseEventHandler(this.artistJoystick_MouseClick);
             this.artistJoystick.MouseMove += new System.Windows.Forms.MouseEventHandler(this.artistJoystick_MouseMove);
             // 
@@ -571,7 +554,6 @@ namespace Nautilus
             this.songJoystick.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.songJoystick.TabIndex = 30;
             this.songJoystick.TabStop = false;
-            this.toolTip1.SetToolTip(this.songJoystick, "Click here to adjust the position of the song title");
             this.songJoystick.MouseClick += new System.Windows.Forms.MouseEventHandler(this.songJoystick_MouseClick);
             this.songJoystick.MouseMove += new System.Windows.Forms.MouseEventHandler(this.songJoystick_MouseMove);
             // 
@@ -585,7 +567,6 @@ namespace Nautilus
             this.barGenre.Size = new System.Drawing.Size(27, 10);
             this.barGenre.TabIndex = 28;
             this.barGenre.TabStop = false;
-            this.toolTip1.SetToolTip(this.barGenre, "Click here to change the font color");
             this.barGenre.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ChangeColor);
             // 
             // barTime
@@ -598,7 +579,6 @@ namespace Nautilus
             this.barTime.Size = new System.Drawing.Size(16, 10);
             this.barTime.TabIndex = 25;
             this.barTime.TabStop = false;
-            this.toolTip1.SetToolTip(this.barTime, "Click here to change the font color");
             this.barTime.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ChangeColor);
             // 
             // barAlbum
@@ -611,7 +591,6 @@ namespace Nautilus
             this.barAlbum.Size = new System.Drawing.Size(141, 10);
             this.barAlbum.TabIndex = 27;
             this.barAlbum.TabStop = false;
-            this.toolTip1.SetToolTip(this.barAlbum, "Click here to change the font color");
             this.barAlbum.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ChangeColor);
             // 
             // barYear
@@ -624,7 +603,6 @@ namespace Nautilus
             this.barYear.Size = new System.Drawing.Size(21, 10);
             this.barYear.TabIndex = 26;
             this.barYear.TabStop = false;
-            this.toolTip1.SetToolTip(this.barYear, "Click here to change the font color");
             this.barYear.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ChangeColor);
             // 
             // barArtist
@@ -637,7 +615,6 @@ namespace Nautilus
             this.barArtist.Size = new System.Drawing.Size(167, 10);
             this.barArtist.TabIndex = 25;
             this.barArtist.TabStop = false;
-            this.toolTip1.SetToolTip(this.barArtist, "Click here to change the font color");
             this.barArtist.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ChangeColor);
             // 
             // barSong
@@ -650,7 +627,6 @@ namespace Nautilus
             this.barSong.Size = new System.Drawing.Size(167, 10);
             this.barSong.TabIndex = 24;
             this.barSong.TabStop = false;
-            this.toolTip1.SetToolTip(this.barSong, "Click here to change the font color");
             this.barSong.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ChangeColor);
             // 
             // label8
@@ -686,7 +662,6 @@ namespace Nautilus
             this.numFontTime.Size = new System.Drawing.Size(60, 20);
             this.numFontTime.TabIndex = 5;
             this.numFontTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.toolTip1.SetToolTip(this.numFontTime, "Click here to change the font size");
             this.numFontTime.Value = new decimal(new int[] {
             1800,
             0,
@@ -738,7 +713,6 @@ namespace Nautilus
             this.numFontArtist.Size = new System.Drawing.Size(60, 20);
             this.numFontArtist.TabIndex = 9;
             this.numFontArtist.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.toolTip1.SetToolTip(this.numFontArtist, "Click here to change the font size");
             this.numFontArtist.Value = new decimal(new int[] {
             2000,
             0,
@@ -770,7 +744,6 @@ namespace Nautilus
             this.numFontName.Size = new System.Drawing.Size(60, 20);
             this.numFontName.TabIndex = 3;
             this.numFontName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.toolTip1.SetToolTip(this.numFontName, "Click here to change the font size");
             this.numFontName.Value = new decimal(new int[] {
             2000,
             0,
@@ -788,7 +761,6 @@ namespace Nautilus
             this.lblSubGenre.TabIndex = 15;
             this.lblSubGenre.Text = "Sub-Genre";
             this.lblSubGenre.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.toolTip1.SetToolTip(this.lblSubGenre, "Click here to display subgenre");
             this.lblSubGenre.Click += new System.EventHandler(this.lblSubGenre_Click);
             // 
             // txtSubGenre
@@ -798,7 +770,6 @@ namespace Nautilus
             this.txtSubGenre.Size = new System.Drawing.Size(71, 20);
             this.txtSubGenre.TabIndex = 14;
             this.txtSubGenre.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.toolTip1.SetToolTip(this.txtSubGenre, "Enter subgenre here");
             this.txtSubGenre.TextChanged += new System.EventHandler(this.txtSubGenre_TextChanged);
             this.txtSubGenre.DoubleClick += new System.EventHandler(this.TextBoxSelectAll);
             // 
@@ -812,7 +783,6 @@ namespace Nautilus
             this.lblGenre.TabIndex = 13;
             this.lblGenre.Text = "Genre";
             this.lblGenre.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.toolTip1.SetToolTip(this.lblGenre, "Click here to display genre");
             this.lblGenre.Click += new System.EventHandler(this.lblGenre_Click);
             // 
             // label5
@@ -870,7 +840,6 @@ namespace Nautilus
             this.txtTime.Size = new System.Drawing.Size(61, 20);
             this.txtTime.TabIndex = 4;
             this.txtTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.toolTip1.SetToolTip(this.txtTime, "Enter song duration in as mm:ss - max is 99:59");
             this.txtTime.TextChanged += new System.EventHandler(this.ControlChanged);
             this.txtTime.DoubleClick += new System.EventHandler(this.TextBoxSelectAll);
             this.txtTime.Leave += new System.EventHandler(this.txtTime_Leave);
@@ -883,7 +852,6 @@ namespace Nautilus
             this.txtYear.Size = new System.Drawing.Size(49, 20);
             this.txtYear.TabIndex = 10;
             this.txtYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.toolTip1.SetToolTip(this.txtYear, "Enter year of release here");
             this.txtYear.TextChanged += new System.EventHandler(this.txtYear_TextChanged);
             this.txtYear.DoubleClick += new System.EventHandler(this.TextBoxSelectAll);
             // 
@@ -894,7 +862,6 @@ namespace Nautilus
             this.txtGenre.Size = new System.Drawing.Size(80, 20);
             this.txtGenre.TabIndex = 13;
             this.txtGenre.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.toolTip1.SetToolTip(this.txtGenre, "Enter genre here");
             this.txtGenre.TextChanged += new System.EventHandler(this.txtGenre_TextChanged);
             this.txtGenre.DoubleClick += new System.EventHandler(this.TextBoxSelectAll);
             // 
@@ -913,7 +880,6 @@ namespace Nautilus
             this.txtArtist.Name = "txtArtist";
             this.txtArtist.Size = new System.Drawing.Size(279, 20);
             this.txtArtist.TabIndex = 6;
-            this.toolTip1.SetToolTip(this.txtArtist, "Enter name of artist or band here");
             this.txtArtist.TextChanged += new System.EventHandler(this.txtArtist_TextChanged);
             this.txtArtist.DoubleClick += new System.EventHandler(this.TextBoxSelectAll);
             // 
@@ -923,7 +889,6 @@ namespace Nautilus
             this.txtSong.Name = "txtSong";
             this.txtSong.Size = new System.Drawing.Size(279, 20);
             this.txtSong.TabIndex = 0;
-            this.toolTip1.SetToolTip(this.txtSong, "Enter song name here");
             this.txtSong.TextChanged += new System.EventHandler(this.txtSong_TextChanged);
             this.txtSong.DoubleClick += new System.EventHandler(this.TextBoxSelectAll);
             // 
@@ -955,7 +920,6 @@ namespace Nautilus
             this.radioLocal.Size = new System.Drawing.Size(51, 17);
             this.radioLocal.TabIndex = 28;
             this.radioLocal.Text = "Local";
-            this.toolTip1.SetToolTip(this.radioLocal, "Save image locally");
             this.radioLocal.UseVisualStyleBackColor = false;
             // 
             // radioImgur
@@ -970,7 +934,6 @@ namespace Nautilus
             this.radioImgur.TabIndex = 27;
             this.radioImgur.TabStop = true;
             this.radioImgur.Text = "Imgur";
-            this.toolTip1.SetToolTip(this.radioImgur, "Upload image to Imgur");
             this.radioImgur.UseVisualStyleBackColor = false;
             // 
             // lblBottom
@@ -1005,7 +968,6 @@ namespace Nautilus
             this.picThemes.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picThemes.TabIndex = 24;
             this.picThemes.TabStop = false;
-            this.toolTip1.SetToolTip(this.picThemes, "Click here to select a custom theme");
             this.picThemes.MouseClick += new System.Windows.Forms.MouseEventHandler(this.picLock_MouseClick);
             // 
             // picShowTheme
@@ -1017,7 +979,6 @@ namespace Nautilus
             this.picShowTheme.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.picShowTheme.TabIndex = 23;
             this.picShowTheme.TabStop = false;
-            this.toolTip1.SetToolTip(this.picShowTheme, "Click here to display or hide the custom theme");
             this.picShowTheme.Visible = false;
             this.picShowTheme.MouseClick += new System.Windows.Forms.MouseEventHandler(this.picSpecial_MouseClick);
             // 
@@ -1033,7 +994,6 @@ namespace Nautilus
             this.btnLoad.Size = new System.Drawing.Size(86, 24);
             this.btnLoad.TabIndex = 16;
             this.btnLoad.Text = "&Load File";
-            this.toolTip1.SetToolTip(this.btnLoad, "Click here to select a song file (or just drag and drop it here)");
             this.btnLoad.UseVisualStyleBackColor = false;
             this.btnLoad.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -1049,7 +1009,6 @@ namespace Nautilus
             this.btnSave.Size = new System.Drawing.Size(86, 24);
             this.btnSave.TabIndex = 21;
             this.btnSave.Text = "&Save Image";
-            this.toolTip1.SetToolTip(this.btnSave, "Click here to save your image");
             this.btnSave.UseVisualStyleBackColor = false;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -1065,7 +1024,6 @@ namespace Nautilus
             this.btnClear.Size = new System.Drawing.Size(86, 24);
             this.btnClear.TabIndex = 18;
             this.btnClear.Text = "&Clear All";
-            this.toolTip1.SetToolTip(this.btnClear, "Click here to clear everything and start from scratch");
             this.btnClear.UseVisualStyleBackColor = false;
             this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
             // 
@@ -1094,7 +1052,6 @@ namespace Nautilus
             this.picUnpitched.Size = new System.Drawing.Size(64, 54);
             this.picUnpitched.TabIndex = 22;
             this.picUnpitched.TabStop = false;
-            this.toolTip1.SetToolTip(this.picUnpitched, "Click here if the song only has unpitched vocals charted");
             this.picUnpitched.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sendImage);
             // 
             // picPartial
@@ -1106,7 +1063,6 @@ namespace Nautilus
             this.picPartial.Size = new System.Drawing.Size(64, 54);
             this.picPartial.TabIndex = 21;
             this.picPartial.TabStop = false;
-            this.toolTip1.SetToolTip(this.picPartial, "Click here if the song has partial multitrack audio\r\n");
             this.picPartial.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sendImage);
             // 
             // picDIYStems
@@ -1118,8 +1074,6 @@ namespace Nautilus
             this.picDIYStems.Size = new System.Drawing.Size(64, 54);
             this.picDIYStems.TabIndex = 20;
             this.picDIYStems.TabStop = false;
-            this.toolTip1.SetToolTip(this.picDIYStems, "Click here if the song has stems created manually or by an AI program such as Dem" +
-        "ucs");
             this.picDIYStems.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sendImage);
             // 
             // picRBass
@@ -1131,7 +1085,6 @@ namespace Nautilus
             this.picRBass.Size = new System.Drawing.Size(64, 54);
             this.picRBass.TabIndex = 17;
             this.picRBass.TabStop = false;
-            this.toolTip1.SetToolTip(this.picRBass, "Click here if the song has rhythm guitar charted on the Bass track");
             this.picRBass.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sendImage);
             // 
             // picRKeys
@@ -1143,7 +1096,6 @@ namespace Nautilus
             this.picRKeys.Size = new System.Drawing.Size(64, 54);
             this.picRKeys.TabIndex = 16;
             this.picRKeys.TabStop = false;
-            this.toolTip1.SetToolTip(this.picRKeys, "Click here if the song has rhythm guitar charted on the Keys track");
             this.picRKeys.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sendImage);
             // 
             // picConvert1
@@ -1155,7 +1107,6 @@ namespace Nautilus
             this.picConvert1.Size = new System.Drawing.Size(64, 54);
             this.picConvert1.TabIndex = 14;
             this.picConvert1.TabStop = false;
-            this.toolTip1.SetToolTip(this.picConvert1, "Click here if this song is a conversion from another game");
             this.picConvert1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sendImage);
             // 
             // picKaraoke
@@ -1167,7 +1118,6 @@ namespace Nautilus
             this.picKaraoke.Size = new System.Drawing.Size(64, 54);
             this.picKaraoke.TabIndex = 13;
             this.picKaraoke.TabStop = false;
-            this.toolTip1.SetToolTip(this.picKaraoke, "Click here if the song has separate vocals and backing stems");
             this.picKaraoke.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sendImage);
             // 
             // picMulti
@@ -1179,7 +1129,6 @@ namespace Nautilus
             this.picMulti.Size = new System.Drawing.Size(64, 54);
             this.picMulti.TabIndex = 12;
             this.picMulti.TabStop = false;
-            this.toolTip1.SetToolTip(this.picMulti, "Click here if the song has separate audio stems");
             this.picMulti.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sendImage);
             // 
             // lblSongLength
@@ -1630,13 +1579,13 @@ namespace Nautilus
             this.contextMenuStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.exportAlbumArtFile});
             this.contextMenuStrip3.Name = "contextMenuStrip3";
-            this.contextMenuStrip3.Size = new System.Drawing.Size(191, 26);
+            this.contextMenuStrip3.Size = new System.Drawing.Size(190, 26);
             // 
             // exportAlbumArtFile
             // 
             this.exportAlbumArtFile.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.exportAlbumArtFile.Name = "exportAlbumArtFile";
-            this.exportAlbumArtFile.Size = new System.Drawing.Size(190, 22);
+            this.exportAlbumArtFile.Size = new System.Drawing.Size(189, 22);
             this.exportAlbumArtFile.Text = "Export album art file...";
             this.exportAlbumArtFile.Click += new System.EventHandler(this.exportAlbumArtFile_Click);
             // 
@@ -1689,7 +1638,7 @@ namespace Nautilus
             this.toolStripMenuItem4,
             this.exportFNFAudio});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
             // exportGHWTDEAudio

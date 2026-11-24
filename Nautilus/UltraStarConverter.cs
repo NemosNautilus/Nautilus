@@ -277,6 +277,10 @@ namespace Nautilus
                         {
                             Parser.ExtractDTA(file);
                             Parser.ReadDTA(Parser.DTA);
+                            if (string.IsNullOrEmpty(Parser.Songs[0].Artist) && (Parser.Songs[0].Source.Equals("beatles")))
+                            {
+                                Parser.Songs[0].Artist = "The Beatles";
+                            }
                             if (Parser.Songs.Count > 1)
                             {
                                 Log("File " + Path.GetFileName(file) + " is a pack, try dePACKing first, skipping...");

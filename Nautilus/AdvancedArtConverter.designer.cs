@@ -52,6 +52,7 @@
             this.btnToPS4 = new System.Windows.Forms.Button();
             this.btnFromPS4 = new System.Windows.Forms.Button();
             this.chkCleanUpPS4 = new System.Windows.Forms.CheckBox();
+            this.chkRemoveKeep = new System.Windows.Forms.CheckBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabXbox = new System.Windows.Forms.TabPage();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -91,7 +92,6 @@
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.picWorking = new System.Windows.Forms.PictureBox();
-            this.chkRemoveKeep = new System.Windows.Forms.CheckBox();
             this.contextMenuStrip2.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picPin)).BeginInit();
@@ -466,6 +466,21 @@
             this.toolTip1.SetToolTip(this.chkCleanUpPS4, "Select this option to delete the original png_xbox file(s)");
             this.chkCleanUpPS4.UseVisualStyleBackColor = true;
             // 
+            // chkRemoveKeep
+            // 
+            this.chkRemoveKeep.AllowDrop = true;
+            this.chkRemoveKeep.AutoSize = true;
+            this.chkRemoveKeep.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.chkRemoveKeep.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkRemoveKeep.ForeColor = System.Drawing.Color.Black;
+            this.chkRemoveKeep.Location = new System.Drawing.Point(6, 136);
+            this.chkRemoveKeep.Name = "chkRemoveKeep";
+            this.chkRemoveKeep.Size = new System.Drawing.Size(215, 23);
+            this.chkRemoveKeep.TabIndex = 22;
+            this.chkRemoveKeep.Text = "Remove _keep from file names";
+            this.toolTip1.SetToolTip(this.chkRemoveKeep, "Select this option to remove _keep from the resulting file names");
+            this.chkRemoveKeep.UseVisualStyleBackColor = true;
+            // 
             // tabControl1
             // 
             this.tabControl1.AllowDrop = true;
@@ -587,7 +602,7 @@
             this.tabWii.Location = new System.Drawing.Point(4, 29);
             this.tabWii.Name = "tabWii";
             this.tabWii.Padding = new System.Windows.Forms.Padding(3);
-            this.tabWii.Size = new System.Drawing.Size(253, 159);
+            this.tabWii.Size = new System.Drawing.Size(253, 193);
             this.tabWii.TabIndex = 2;
             this.tabWii.Text = "Wii";
             this.tabWii.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleDragDrop);
@@ -678,7 +693,7 @@
             this.tabPS3.Location = new System.Drawing.Point(4, 29);
             this.tabPS3.Name = "tabPS3";
             this.tabPS3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPS3.Size = new System.Drawing.Size(253, 159);
+            this.tabPS3.Size = new System.Drawing.Size(253, 193);
             this.tabPS3.TabIndex = 3;
             this.tabPS3.Text = "PS3";
             this.tabPS3.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleDragDrop);
@@ -768,7 +783,7 @@
             this.tabPS4.Location = new System.Drawing.Point(4, 29);
             this.tabPS4.Name = "tabPS4";
             this.tabPS4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPS4.Size = new System.Drawing.Size(253, 159);
+            this.tabPS4.Size = new System.Drawing.Size(253, 193);
             this.tabPS4.TabIndex = 4;
             this.tabPS4.Text = "PS4";
             // 
@@ -963,21 +978,6 @@
             this.picWorking.TabIndex = 67;
             this.picWorking.TabStop = false;
             this.picWorking.Visible = false;
-            // 
-            // chkRemoveKeep
-            // 
-            this.chkRemoveKeep.AllowDrop = true;
-            this.chkRemoveKeep.AutoSize = true;
-            this.chkRemoveKeep.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.chkRemoveKeep.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkRemoveKeep.ForeColor = System.Drawing.Color.Black;
-            this.chkRemoveKeep.Location = new System.Drawing.Point(6, 136);
-            this.chkRemoveKeep.Name = "chkRemoveKeep";
-            this.chkRemoveKeep.Size = new System.Drawing.Size(215, 23);
-            this.chkRemoveKeep.TabIndex = 22;
-            this.chkRemoveKeep.Text = "Remove _keep from file names";
-            this.toolTip1.SetToolTip(this.chkRemoveKeep, "Select this option to remove _keep from the resulting file names");
-            this.chkRemoveKeep.UseVisualStyleBackColor = true;
             // 
             // AdvancedArtConverter
             // 

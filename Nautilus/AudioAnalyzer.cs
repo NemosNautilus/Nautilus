@@ -112,28 +112,18 @@ namespace Nautilus
                     }
                 }
                 else if (Path.GetExtension(file).ToLowerInvariant() == ".mogg")
-                {
-                    if (Tools.isV17(file))
-                    {
-                        unsafe
-                        {
-                            var bytes = File.ReadAllBytes(file);
-                            fixed (byte* ptr = bytes)
-                            {
-                                if (!TheMethod3.decrypt_mogg(ptr, (uint)bytes.Length)) return;
-                                if (!nautilus3.RemoveMHeader(bytes, false, DecryptMode.ToMemory, "")) return;
-                                    
-                                InputFile = file;
-                                DrawWaveForm(0);
-                                return;
-                            }
-                        }                       
-                    }
+                {                    
                     if (nautilus3.DecM(File.ReadAllBytes(file), false, false, DecryptMode.ToMemory))
                     {
                         InputFile = file;
                         DrawWaveForm(0);
                         return;
+                    }
+                    if (Tools.BeatlesDecrypt(file, nautilus3, false))
+                    {
+                        InputFile = file;
+                        DrawWaveForm(0);
+                        return;                      
                     }
                     MessageBox.Show("Mogg file '" + file + "' is encrypted and I couldn't process it", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
@@ -361,6 +351,11 @@ namespace Nautilus
                         break;
                 }
             }
+            //a little hacky hack
+            if (Parser.Songs[0].Source.Equals("beatles"))
+            {
+                Parser.Songs[0].ChannelsTotal = Parser.Songs[0].ChannelsBass + Parser.Songs[0].ChannelsDrums + Parser.Songs[0].ChannelsGuitar + Parser.Songs[0].ChannelsKeys + Parser.Songs[0].ChannelsVocals + Parser.Songs[0].ChannelsCrowd + 2;
+            }
             var backing = Parser.Songs[0].ChannelsTotal - Parser.Songs[0].ChannelsDrums - Parser.Songs[0].ChannelsBass - Parser.Songs[0].ChannelsGuitar - Parser.Songs[0].ChannelsVocals - Parser.Songs[0].ChannelsKeys - Parser.Songs[0].ChannelsCrowd;
                 
             if (Parser.Songs[0].ChannelsCrowd == 0 && backing > 0)
@@ -423,7 +418,7 @@ namespace Nautilus
 
             try
             {
-                lblFileName.Invoke(new MethodInvoker(() => lblFileName.Text = "Analysis of audio file: " + (Parser.Songs.Count == 0 || Parser.Songs == null ? Path.GetFileNameWithoutExtension(InputFile) : Parser.Songs[0].InternalName + ".mogg")));
+                lblFileName.Invoke(new MethodInvoker(() => lblFileName.Text = "Analysis of audio file: " + (Parser.Songs == null || Parser.Songs.Count == 0 ? Path.GetFileNameWithoutExtension(InputFile) : Parser.Songs[0].InternalName + ".mogg")));
             }
             catch 
             {
@@ -810,10 +805,14 @@ namespace Nautilus
                 Directory.CreateDirectory(folder);
             }
 
-            var outFolder = folder + Path.GetFileNameWithoutExtension(file).Replace(" ", "").Replace("-", "").Replace("_", "").Trim() + "_ex";
+            var shortPath = Path.GetFileNameWithoutExtension(file).Replace(" ", "").Replace("-", "").Replace("_", "").Trim();
+            if (shortPath.Length > 10) //to avoid very lengthy PKG file names, which can cause issues with long paths on Windows
+            {
+                shortPath = shortPath.Substring(0, 10) + "_ex";
+            }
+            var outFolder = folder + shortPath;
             Tools.DeleteFolder(outFolder, true);
-            string klic;
-            if (!Tools.ExtractPKG(file, outFolder, out klic))
+            if (!Tools.ExtractPS3PKG(file, outFolder))
             {
                 MessageBox.Show("Failed to process that PKG file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -824,30 +823,16 @@ namespace Nautilus
                 MessageBox.Show("No songs.dta file found, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-
             Parser.ReadDTA(File.ReadAllBytes(DTA[0]));
             var internalName = Parser.Songs[0].InternalName;
-            var MOGG = Directory.GetFiles(outFolder, internalName + ".mogg", SearchOption.AllDirectories);
-            if (Tools.isV17(MOGG[0]))
-            {
-                unsafe
-                {
-                    var bytes = File.ReadAllBytes(MOGG[0]);
-                    fixed (byte* ptr = bytes)
-                    {
-                        if (!TheMethod3.decrypt_mogg(ptr, (uint)bytes.Length)) return;
-                        if (!nautilus3.RemoveMHeader(bytes, false, DecryptMode.ToMemory, "")) return;
-
-                        InputFile = MOGG[0];
-                        DrawWaveForm(0);
-                        return;    
-                    }
-                }               
-            }
+            var MOGG = Directory.GetFiles(outFolder, internalName + ".mogg", SearchOption.AllDirectories);            
             if (!nautilus3.DecM(File.ReadAllBytes(MOGG[0]), false, false, DecryptMode.ToMemory))
             {
-                MessageBox.Show("Failed to decrypt mogg file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (!Tools.BeatlesDecrypt(MOGG[0], nautilus3, false))
+                {
+                    MessageBox.Show("Failed to decrypt mogg file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
             }
             DrawWaveForm(0);
         }

@@ -657,6 +657,8 @@ namespace Nautilus
         
         private void HandleDragDrop(object sender, DragEventArgs e)
         {
+            MessageBox.Show("This converter is permanently disabled. Use Onyx.", "Deprecated", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
             if (picWorking.Visible) return;
             var files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (btnReset.Visible)
@@ -698,6 +700,8 @@ namespace Nautilus
         
         private void helpToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            MessageBox.Show("This converter is permanently disabled. Use Onyx.", "Deprecated", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
             var message = Tools.ReadHelpFile("ps3");
             var help = new HelpForm(Text + " - Help", message);
             help.ShowDialog();
@@ -1412,16 +1416,7 @@ namespace Nautilus
                     Log("Song has " + Parser.Songs[0].ChannelsDrums + " drum channels, will try to downmix");
                 }
 
-                Log("Reading mogg file...");
-                if (Tools.isV17(mogg))
-                {
-                    MessageBox.Show("I recognize this encryption scheme as v17 (Rock Band 4) but it was not implemented in this Tool", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    xCON.CloseIO();
-                    Tools.DeleteFile(dta);
-                    Tools.DeleteFile(mogg);
-                    Tools.DeleteFile(midi);
-                    return false;
-                }
+                Log("Reading mogg file...");                
                 var dec = nautilus3.DecM(File.ReadAllBytes(mogg), false, false, DecryptMode.ToMemory);
                 if (!dec)
                 {
@@ -1921,12 +1916,16 @@ namespace Nautilus
 
             foreach (var pkg in pkgFiles)
             {
-                var outFolder = folder + "\\" + Path.GetFileNameWithoutExtension(pkg).Replace(" ", "").Replace("-", "").Replace("_", "").Trim() + "_ex";
+                var shortPath = Path.GetFileNameWithoutExtension(pkg).Replace(" ", "").Replace("-", "").Replace("_", "").Trim();
+                if (shortPath.Length > 10) //to avoid very lengthy PKG file names, which can cause issues with long paths on Windows
+                {
+                    shortPath = shortPath.Substring(0, 10) + "_ex";
+                }
+                var outFolder = folder + shortPath;
                 Tools.DeleteFolder(outFolder, true);
                 Log("Extracting PKG file '" + Path.GetFileName(pkg) + "'");
                 counter++;
-                var klic = "";
-                if (!Tools.ExtractPKG(pkg, outFolder, out klic))
+                if (!Tools.ExtractPS3PKG(pkg, outFolder))
                 {
                     Log("Failed");
                     continue;
@@ -1934,7 +1933,6 @@ namespace Nautilus
                 Log("Success");
                 success++;
                 folders.Add(outFolder);
-                klics.Add(klic);
             }
             Log("Extracted " + success + " PKG files out of " + counter + " files attempted");
             ProcessPS3Folders(folders, klics, true, true);
@@ -2024,7 +2022,7 @@ namespace Nautilus
                     Log("Decrypting EDAT file");
                     if (isPKG)
                     {
-                        if (!Tools.DecryptEdat(EDAT[0], MIDI, klics[counter - 1]))
+                        if (!Tools.DecryptCustomEdat(EDAT[0], MIDI, klics[counter - 1]))
                         {
                             Log("Failed to decrypt EDAT file...skipping");
                             continue;
@@ -2032,7 +2030,7 @@ namespace Nautilus
                     }
                     else
                     {
-                        if (!Tools.DecryptEdat(EDAT[0], MIDI))
+                        if (!Tools.DecryptCustomEdat(EDAT[0], MIDI))
                         {
                             Log("Failed to decrypt EDAT file...skipping");
                             continue;

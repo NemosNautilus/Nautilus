@@ -410,6 +410,10 @@ namespace Nautilus
 
             ResetAll();
             ResetFormText();
+            if (Parser != null && Parser.Songs != null)
+            {
+                Parser.Songs[0] = null;
+            }
             runAnalysisAgain.Enabled = false;
             lstStats.Items.Clear();
             filesToProcess.Clear();
@@ -3481,7 +3485,7 @@ namespace Nautilus
             ProGuitar22H = 0;
             ProGuitar22M = 0;
             ProGuitar22E = 0;
-            ProGuitar22Misc = 0;
+            ProGuitar22Misc = 0;            
         }
 
         private void ResetFormText()
@@ -3764,11 +3768,15 @@ namespace Nautilus
                 {
                     break;
                 }
+                if (string.IsNullOrEmpty(InputFile))
+                {
+                    InputFile = file;
+                }
                 var mogg = Path.GetTempPath() + "m";
                 var isCON = VariousFunctions.ReadFileType(file) == XboxFileType.STFS;
                 mogg = isCON ? ExtractFile(file, mogg, FileType.MOGG) : file;               
                 if (string.IsNullOrWhiteSpace(mogg) || !File.Exists(mogg)) continue;
-                var name = isCON || Parser.Songs != null ? Parser.Songs[0].InternalName : Path.GetFileNameWithoutExtension(file);
+                var name = isCON || (Parser.Songs != null && Parser.Songs[0] != null) ? Parser.Songs[0].InternalName : Path.GetFileNameWithoutExtension(file);
                 counter++;
                 Log("");
                 if (doMoggBatch)
@@ -3848,37 +3856,21 @@ namespace Nautilus
                     }
                     else
                     {
-                        if (Tools.isV17(file))
+                        if (!nautilus3.DecM(File.ReadAllBytes(file), false, false, DecryptMode.ToMemory))
                         {
-                            unsafe
+                            //try as TBRB mogg as last attempt
+                            if (!Tools.BeatlesDecrypt(file, nautilus3, false))
                             {
-                                var bytes = File.ReadAllBytes(file);
-                                fixed (byte* ptr = bytes)
-                                {
-                                    if (!TheMethod3.decrypt_mogg(ptr, (uint)bytes.Length))
-                                    {
-                                        Log("Encrypted, can't get more information...");
-                                        continue;
-                                    }
-                                    if (!nautilus3.RemoveMHeader(bytes, false, DecryptMode.ToMemory, ""))
-                                    {
-                                        Log("Encrypted, can't get more information...");
-                                        continue;
-                                    }
-                                }
+                                Log("Encrypted, can't get more information...");
+                                continue;
                             }
-                        }
-                        else if (!nautilus3.DecM(File.ReadAllBytes(file), false, false, DecryptMode.ToMemory))
-                        {
-                            Log("Encrypted, can't get more information...");
-                            continue;
                         }
                     }
                 }
                 analyzed++;
 
                 var length = 0.0;
-                var channels = Parser.Songs == null ? 0 : Parser.Songs[0].ChannelsTotal;
+                var channels = Parser.Songs == null || Parser.Songs[0] == null ? 0 : Parser.Songs[0].ChannelsTotal;
                 var rate = 0;
                 try
                 {
@@ -3918,7 +3910,7 @@ namespace Nautilus
                 Bass.BASS_Free();
 
                 Log("Total Channels", channels.ToString(CultureInfo.InvariantCulture));
-                if (Parser.Songs != null)
+                if (Parser.Songs != null && Parser.Songs[0] != null)
                 {
                     Log("Drums Channels", Parser.Songs[0].ChannelsDrums.ToString(CultureInfo.InvariantCulture));
                     Log("Bass Channels", Parser.Songs[0].ChannelsBass.ToString(CultureInfo.InvariantCulture));
@@ -3926,7 +3918,8 @@ namespace Nautilus
                     Log("Vocals Channels", Parser.Songs[0].ChannelsVocals.ToString(CultureInfo.InvariantCulture));
                     Log("Keys Channels", Parser.Songs[0].ChannelsKeys.ToString(CultureInfo.InvariantCulture));
                     Log("Crowd Channels", Parser.Songs[0].ChannelsCrowd.ToString(CultureInfo.InvariantCulture));
-                    Log("Backing Channels", (Parser.Songs[0].ChannelsTotal - Parser.Songs[0].ChannelsDrums - Parser.Songs[0].ChannelsBass - Parser.Songs[0].ChannelsGuitar - Parser.Songs[0].ChannelsVocals - Parser.Songs[0].ChannelsKeys - Parser.Songs[0].ChannelsCrowd).ToString(CultureInfo.InvariantCulture));
+                    Log("Backing Channels", (channels - Parser.Songs[0].ChannelsDrums - Parser.Songs[0].ChannelsBass - 
+                        Parser.Songs[0].ChannelsGuitar - Parser.Songs[0].ChannelsVocals - Parser.Songs[0].ChannelsKeys - Parser.Songs[0].ChannelsCrowd).ToString(CultureInfo.InvariantCulture));
                 }
                 Log("Sample Rate", rate + " Hz");
                 var minutes = Parser.GetSongDuration((length * 1000).ToString(CultureInfo.InvariantCulture));
@@ -4672,10 +4665,14 @@ namespace Nautilus
                 Directory.CreateDirectory(folder);
             }
 
-            var outFolder = folder + Path.GetFileNameWithoutExtension(file).Replace(" ", "").Replace("-", "").Replace("_", "").Trim() + "_ex";
-            Tools.DeleteFolder(outFolder, true);
-            string klic;
-            if (!Tools.ExtractPKG(file, outFolder, out klic))
+            var shortPath = Path.GetFileNameWithoutExtension(file).Replace(" ", "").Replace("-", "").Replace("_", "").Trim();
+            if (shortPath.Length > 10) //to avoid very lengthy PKG file names, which can cause issues with long paths on Windows
+            {
+                shortPath = shortPath.Substring(0, 10) + "_ex";
+            }
+            var outFolder = folder + shortPath;
+            Tools.DeleteFolder(outFolder, true);            
+            if (!Tools.ExtractPS3PKG(file, outFolder))
             {
                 MessageBox.Show("Failed to process that PKG file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -4692,32 +4689,15 @@ namespace Nautilus
             var PNG_PS3 = Directory.GetFiles(outFolder, internalName + "_keep.png_ps3", SearchOption.AllDirectories);
             var EDAT = Directory.GetFiles(outFolder, internalName + ".mid.edat", SearchOption.AllDirectories);
             var MIDI = EDAT[0].Replace(".mid.edat", ".mid");
-            var decrypt = Tools.DecryptEdat(EDAT[0], MIDI, klic);
-            var MOGG = Directory.GetFiles(outFolder, internalName + ".mogg", SearchOption.AllDirectories);
-            if (Tools.isV17(MOGG[0]))
-            {
-                unsafe
-                {
-                    var bytes = File.ReadAllBytes(MOGG[0]);
-                    fixed (byte* ptr = bytes)
-                    {
-                        if (!TheMethod3.decrypt_mogg(ptr, (uint)bytes.Length))
-                        {
-                            MessageBox.Show("Failed to decrypt mogg file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            return;
-                        }
-                        if (!nautilus3.RemoveMHeader(bytes, false, DecryptMode.ToMemory, ""))
-                        {
-                            MessageBox.Show("Failed to decrypt mogg file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            return;
-                        }
-                    }
-                }
-            }
+            //var decrypt = Tools.DecryptEdat(EDAT[0], MIDI, klic);
+            var MOGG = Directory.GetFiles(outFolder, internalName + ".mogg", SearchOption.AllDirectories);            
             if (!nautilus3.DecM(File.ReadAllBytes(MOGG[0]), false, false, DecryptMode.ToMemory))
             {
-                MessageBox.Show("Failed to decrypt mogg file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (!Tools.BeatlesDecrypt(MOGG[0], nautilus3, false))
+                {
+                    MessageBox.Show("Failed to decrypt mogg file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
             }
             InputFile = file;
             AnalyzeMIDI(MIDI);

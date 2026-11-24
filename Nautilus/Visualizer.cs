@@ -35,6 +35,7 @@ using LibVLCSharp.Shared;
 using LibVLCSharp.WinForms;
 using LibForge.Midi;
 using MidiCS;
+using SCEllSharp.NPDRM;
 
 namespace Nautilus
 {
@@ -751,16 +752,14 @@ namespace Nautilus
                 isYARG = true;
             }
             else if (mogg.Count() > 0)
-            {
-                if (Tools.isV17(mogg[0]))
-                {
-                    MessageBox.Show("I recognize this encryption scheme as v17 (Rock Band 4) but it was not implemented in this Tool", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    return;
-                }
+            {                
                 if (!nautilus3.DecM(File.ReadAllBytes(mogg[0]), false, false, DecryptMode.ToMemory))
                 {
-                    MessageBox.Show("Failed to decrypt *.mogg file, can't play audio", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
+                    if (!Tools.BeatlesDecrypt(mogg[0], nautilus3, false))
+                    {
+                        MessageBox.Show("Failed to decrypt *.mogg file, can't play audio", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
                 }
             }
             else
@@ -770,10 +769,21 @@ namespace Nautilus
             var edat = Directory.GetFiles(folder, "*.edat", SearchOption.AllDirectories);
             if (edat.Any())
             {
-                if (!Tools.DecryptEdat(edat[0], edat[0].Replace(".edat", ""), Tools.GetKLIC(folder))) //might fail if it's a C3 folder???
+                var rap = GetRapPath(edat[0], Application.StartupPath + "\\bin\\raps\\");
+                if (!string.IsNullOrEmpty(rap)) //retail encryption
                 {
-                    //try again but with C3 fixed klic
-                    Tools.DecryptEdat(edat[0], edat[0].Replace(".edat", ""));
+                    if (!string.IsNullOrEmpty(rap)) //retail encryption
+                    {
+                        Tools.DecryptRetailEdat(edat[0], edat[0].Replace(".edat", ""), rap);
+                    }
+                }
+                else //Onyx and Nautilus encryption
+                {
+                    if (!Tools.DecryptCustomEdat(edat[0], edat[0].Replace(".edat", ""), Tools.GetKLIC(folder))) //might fail if it's a C3 folder???
+                    {
+                        //try again but with C3 fixed klic
+                        Tools.DecryptCustomEdat(edat[0], edat[0].Replace(".edat", ""));
+                    }
                 }
             }
             var midi = Directory.GetFiles(folder, "*.mid", SearchOption.AllDirectories);
@@ -784,7 +794,26 @@ namespace Nautilus
             //extract audio file for previewing
             Height = maxHeight;
             ProcessAudio();
-        } 
+        }
+
+        string GetRapPath(string edatPath, string rapFolder)
+        {
+            using (FileStream fs = File.OpenRead(edatPath))
+            {
+                NPD npd = NPD.ReadNew(fs);
+
+                if (npd.Magic != 0x4E504400)
+                    return null;
+
+                string contentId = npd.ContentID.TrimEnd('\0').Trim();
+
+                string rapPath = Path.Combine(
+                    rapFolder,
+                    contentId + ".rap");
+
+                return File.Exists(rapPath) ? rapPath : null;
+            }
+        }
 
         private void PlayFnFSong(string m4a)
         {
@@ -1599,12 +1628,19 @@ namespace Nautilus
                 using (var inStream = File.OpenRead(rb4midi))
                 {
                     var rb4mid = RBMidReader.ReadStream(inStream);
-                    var rb3mid = RBMidConverter.ToMid(rb4mid);
 
-                    using (var outStream = File.Create(rb3midi))
+                    if (rb4mid != null)
                     {
-                        MidiFileWriter.WriteSMF(rb3mid, outStream);
-                    }
+                        var rb3mid = RBMidConverter.ToMid(rb4mid);
+
+                        if (rb3mid != null)
+                        {
+                            using (var outStream = File.Create(rb3midi))
+                            {
+                                MidiFileWriter.WriteSMF(rb3mid, outStream);
+                            }
+                        }
+                    }                    
                 }
 
                 if (File.Exists(rb3midi))
@@ -1737,22 +1773,12 @@ namespace Nautilus
             }
             sr.Dispose();
 
-            unsafe
-            {
-                var bytes = File.ReadAllBytes(mogg);
-                fixed (byte* ptr = bytes)
-                {
-                    if (!TheMethod3.decrypt_mogg(ptr, (uint)bytes.Length)) return;
-                    nautilus3.ReleaseStreamHandle(false);
-                    if (!nautilus3.RemoveMHeader(bytes, false, DecryptMode.ToMemory, "")) return;
-                    Height = maxHeight;
-                    picPlayPause.Cursor = Cursors.Hand;
-                    picStop.Cursor = Cursors.Hand;
-                    updatePlaybackInstruments();
-                    StartPlayback();
-                    return;
-                }
-            }
+            if (!nautilus3.DecM(File.ReadAllBytes(mogg), false, false, DecryptMode.ToMemory)) return;
+            Height = maxHeight;
+            picPlayPause.Cursor = Cursors.Hand;
+            picStop.Cursor = Cursors.Hand;
+            updatePlaybackInstruments();
+            StartPlayback();
         }
 
         private void ExtractBandFuse(string file)
@@ -2083,7 +2109,10 @@ namespace Nautilus
                     MessageBox.Show("There was an error parsing that file\nTry again", Text,MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                isTBRBDLC = xPackage.Header.TitleID == 0x454108B1 || xPackage.Header.TitleID == (uint)4294838225;
+                isTBRBDLC = xPackage.Header.TitleID == 0x454108B1 || xPackage.Header.TitleID == (uint)4294838225 || xPackage.Header.Description.ToLowerInvariant().Contains("beatles") ||
+                xPackage.Header.Description.ToLowerInvariant().Contains("tbrb") || xPackage.Header.Title_Display.ToLowerInvariant().Contains("beatles") ||
+                xPackage.Header.Title_Display.ToLowerInvariant().Contains("tbrb") || xPackage.Header.Title_Package.ToLowerInvariant().Contains("beatles") ||
+                xPackage.Header.Title_Package.ToLowerInvariant().Contains("tbrb") || Parser.Songs[0].Source.Equals("beatles");
                 isGDRBDLC = xPackage.Header.TitleID == 0x454108E7;
                 if (isTBRBDLC && string.IsNullOrEmpty(Parser.Songs[0].Artist.Trim()))
                 {
@@ -2199,6 +2228,10 @@ namespace Nautilus
                     toolTip1.SetToolTip(lblBottom, $"Click here to search for more {lblBottom.Text} songs");
                 }
                 lblBottom.ForeColor = GetCloneHeroColor(author);
+            }
+            else if (Parser.Songs[0].Source.Equals("beatles"))
+            {
+                lblBottom.Text = "Harmonix"; //all TBRB game songs are attributable to Harmonix
             }
             else
             {
@@ -2707,7 +2740,7 @@ namespace Nautilus
                 loading = true;
                 txtSong.Text = string.IsNullOrWhiteSpace(Parser.Songs[0].OverrideName) ? Parser.Songs[0].Name : Parser.Songs[0].OverrideName;
                 var artist = Parser.Songs[0].Artist.Trim();
-                if (isTBRBDLC && string.IsNullOrEmpty(artist))
+                if (isTBRBDLC && string.IsNullOrEmpty(artist) || Parser.Songs[0].Source.Equals("beatles"))
                 {
                     artist = "The Beatles";
                 }
@@ -5620,45 +5653,56 @@ namespace Nautilus
                 Directory.CreateDirectory(folder);
             }
 
-            var outFolder = folder + Path.GetFileNameWithoutExtension(file).Replace(" ", "").Replace("-", "").Replace("_", "").Trim() + "_ex";
+            var outFolder = folder + "PKG";
             Tools.DeleteFolder(outFolder, true);
-            string klic;
-            if (!Tools.ExtractPKG(file, outFolder, out klic))
+            loadDefaults();
+
+            byte[] dtaBytes = Tools.ReadSongsDTAFromPKG(file);
+            if (dtaBytes != null)
+            {
+                Parser.ReadDTA(dtaBytes);
+            }
+            if (Parser.Songs.Count > 1)
+            {
+                MessageBox.Show("It looks like this is a pack...\nWhat were you expecting me to do with this?\nTry a single song, please",
+                        Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                Tools.DeleteFolder(outFolder, true);
+                return;
+            }
+            if (!Tools.ExtractPS3PKG(file, outFolder))
             {
                 MessageBox.Show("Failed to process that PKG file, can't Visualize", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-            var DTA = Directory.GetFiles(outFolder, "songs.dta", SearchOption.AllDirectories);
-            if (DTA.Count() == 0)
-            {
-                MessageBox.Show("No songs.dta file found, can't Visualize", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
-            }
-                                   
-            Parser.ReadDTA(File.ReadAllBytes(DTA[0]));
+            var DTA = Directory.GetFiles(outFolder, "songs.dta", SearchOption.AllDirectories);            
             var internalName = Parser.Songs[0].InternalName;
             var PNG_PS3 = Directory.GetFiles(outFolder, internalName + "_keep.png_ps3", SearchOption.AllDirectories);
-            var MOGG = Directory.GetFiles(outFolder, internalName + ".mogg", SearchOption.AllDirectories);
-            loadDefaults();
+            var MOGG = Directory.GetFiles(outFolder, internalName + ".mogg", SearchOption.AllDirectories);            
             loadDTA();
-            getImage(PNG_PS3[0]);
-            if (Tools.isV17(MOGG[0]))
-            {
-                MessageBox.Show("I recognize this encryption scheme as v17 (Rock Band 4) but it was not implemented in this Tool", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
-            }
+            getImage(PNG_PS3[0]);            
             if (!nautilus3.DecM(File.ReadAllBytes(MOGG[0]), false, false, DecryptMode.ToMemory))
             {
-                MessageBox.Show("Failed to decrypt mogg file, can't play audio", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (!Tools.BeatlesDecrypt(MOGG[0], nautilus3, false))
+                {
+                    MessageBox.Show("Failed to decrypt *.mogg file, can't play audio", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
             }
-            var edat = Directory.GetFiles(outFolder, "*.edat", SearchOption.AllDirectories);
+            var edat = Directory.GetFiles(outFolder, "*.edat", SearchOption.AllDirectories);           
             if (edat.Any())
             {
-                if (!Tools.DecryptEdat(edat[0], edat[0].Replace(".edat", ""), klic)) //might fail if it's a C3 folder???
+                var rap = GetRapPath(edat[0], Application.StartupPath + "\\bin\\raps\\");
+                if (!string.IsNullOrEmpty(rap)) //retail encryption
                 {
-                    //try again but with C3 fixed klic
-                    Tools.DecryptEdat(edat[0], edat[0].Replace(".edat", ""));
+                    Tools.DecryptRetailEdat(edat[0], edat[0].Replace(".edat", ""), rap);
+                }
+                else //Onyx and Nautilus encryption
+                {
+                    if (!Tools.DecryptCustomEdat(edat[0], edat[0].Replace(".edat", ""), Tools.GetKLIC(folder))) //might fail if it's a C3 folder???
+                    {
+                        //try again but with C3 fixed klic
+                        Tools.DecryptCustomEdat(edat[0], edat[0].Replace(".edat", ""));
+                    }
                 }
             }
             var midi = Directory.GetFiles(outFolder, "*.mid", SearchOption.AllDirectories);

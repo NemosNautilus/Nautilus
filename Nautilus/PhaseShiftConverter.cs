@@ -178,7 +178,7 @@ namespace Nautilus
             {
                 Song.Name = Parser.Songs[0].Name;
                 Song.Artist = Parser.Songs[0].Artist;
-                if (string.IsNullOrEmpty(Song.Artist) && (TitleID == 0x454108B1 || TitleID == (uint)4294838225)) //for TBRB customs
+                if (string.IsNullOrEmpty(Song.Artist) && (TitleID == 0x454108B1 || TitleID == (uint)4294838225) || Parser.Songs[0].Source.Equals("beatles")) //for TBRB customs
                 {
                     Song.Artist = "The Beatles";
                 }
@@ -232,10 +232,10 @@ namespace Nautilus
                 Song.SubGenre = Parser.Songs[0].SubGenre;
                 Song.BassTuning = Parser.Songs[0].ProBassTuning;
                 Song.GuitarTuning = Parser.Songs[0].ProGuitarTuning;
-                Song.Charter = Parser.Songs[0].ChartAuthor;
+                Song.Charter = Parser.Songs[0].Source.Equals("beatles") ? "Harmonix" : Parser.Songs[0].ChartAuthor;
                 Song.RhythmOnBass = Parser.Songs[0].RhythmBass;
                 Song.RhythmOnKeys = Parser.Songs[0].RhythmKeys;
-                Song.VocalGender = Parser.Songs[0].Gender.ToLowerInvariant();
+                Song.VocalGender = Parser.Songs[0].Source.Equals("beatles") ? "male" : Parser.Songs[0].Gender.ToLowerInvariant();
                 return true;
             }
             catch (Exception ex)

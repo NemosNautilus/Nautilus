@@ -121,13 +121,13 @@
             this.exportLogFileToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(123, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(122, 26);
             // 
             // exportLogFileToolStripMenuItem
             // 
             this.exportLogFileToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.exportLogFileToolStripMenuItem.Name = "exportLogFileToolStripMenuItem";
-            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.exportLogFileToolStripMenuItem.Text = "Export log file";
             this.exportLogFileToolStripMenuItem.Click += new System.EventHandler(this.exportLogFileToolStripMenuItem_Click);
             // 
@@ -176,24 +176,24 @@
             // radioEncrypt
             // 
             this.radioEncrypt.AutoSize = true;
-            this.radioEncrypt.Checked = true;
             this.radioEncrypt.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.radioEncrypt.Location = new System.Drawing.Point(12, 317);
+            this.radioEncrypt.Location = new System.Drawing.Point(91, 317);
             this.radioEncrypt.Name = "radioEncrypt";
             this.radioEncrypt.Size = new System.Drawing.Size(61, 17);
             this.radioEncrypt.TabIndex = 59;
-            this.radioEncrypt.TabStop = true;
             this.radioEncrypt.Text = "Encrypt";
             this.radioEncrypt.UseVisualStyleBackColor = true;
             // 
             // radioDecrypt
             // 
             this.radioDecrypt.AutoSize = true;
+            this.radioDecrypt.Checked = true;
             this.radioDecrypt.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.radioDecrypt.Location = new System.Drawing.Point(87, 317);
+            this.radioDecrypt.Location = new System.Drawing.Point(12, 317);
             this.radioDecrypt.Name = "radioDecrypt";
             this.radioDecrypt.Size = new System.Drawing.Size(62, 17);
             this.radioDecrypt.TabIndex = 60;
+            this.radioDecrypt.TabStop = true;
             this.radioDecrypt.Text = "Decrypt";
             this.radioDecrypt.UseVisualStyleBackColor = true;
             // 

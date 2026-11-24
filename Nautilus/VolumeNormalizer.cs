@@ -294,21 +294,7 @@ namespace Nautilus
             DebugLog($"Audio Hash: {audioHash}");
 
             // We need to attempt to decrypt the audio here, we can't work with the raw data.
-            bool decryptStatus = false;
-
-            if (Tools.isV17(moggData))
-            {
-                unsafe
-                {
-                    var bytes = moggData;
-                    fixed (byte* ptr = bytes)
-                    {
-                        if (!TheMethod3.decrypt_mogg(ptr, (uint)bytes.Length)) decryptStatus = false;
-                        if (!nautilus3.RemoveMHeader(bytes, false, DecryptMode.ToMemory, "")) decryptStatus = false;
-                        decryptStatus = true;
-                    }
-                }
-            }
+            bool decryptStatus = false;                       
 
             if (nautilus3.DecM(moggData, false, false, DecryptMode.ToMemory)) decryptStatus = true;
 

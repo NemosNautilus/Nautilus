@@ -111,13 +111,13 @@
             this.exportLogFileToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(123, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(122, 26);
             // 
             // exportLogFileToolStripMenuItem
             // 
             this.exportLogFileToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.exportLogFileToolStripMenuItem.Name = "exportLogFileToolStripMenuItem";
-            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.exportLogFileToolStripMenuItem.Text = "Export log file";
             this.exportLogFileToolStripMenuItem.Click += new System.EventHandler(this.exportLogFileToolStripMenuItem_Click);
             // 
@@ -174,7 +174,6 @@
             this.picPin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.picPin.BackColor = System.Drawing.Color.Transparent;
             this.picPin.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.picPin.Image = global::Nautilus.Properties.Resources.unpinned;
             this.picPin.Location = new System.Drawing.Point(567, 4);
             this.picPin.Name = "picPin";
             this.picPin.Size = new System.Drawing.Size(20, 20);
@@ -227,14 +226,14 @@
             this.mergeSongsToolStrip,
             this.managePackDTAFile});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
             // pS3Fixer
             // 
             this.pS3Fixer.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.pS3Fixer.Name = "pS3Fixer";
-            this.pS3Fixer.Size = new System.Drawing.Size(264, 22);
+            this.pS3Fixer.Size = new System.Drawing.Size(263, 22);
             this.pS3Fixer.Text = "One-Click Batch PS3 Fixer";
             this.pS3Fixer.Click += new System.EventHandler(this.pS3Fixer_Click);
             // 
@@ -242,21 +241,21 @@
             // 
             this.batchFixLoopingSongs.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.batchFixLoopingSongs.Name = "batchFixLoopingSongs";
-            this.batchFixLoopingSongs.Size = new System.Drawing.Size(264, 22);
+            this.batchFixLoopingSongs.Size = new System.Drawing.Size(263, 22);
             this.batchFixLoopingSongs.Text = "Batch fix looping songs";
             this.batchFixLoopingSongs.Click += new System.EventHandler(this.batchFixLoopingSongs_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(261, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(260, 6);
             this.toolStripMenuItem2.Paint += new System.Windows.Forms.PaintEventHandler(this.mnuToolStripSeparator_Custom_Paint);
             // 
             // downmixAndEncode
             // 
             this.downmixAndEncode.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.downmixAndEncode.Name = "downmixAndEncode";
-            this.downmixAndEncode.Size = new System.Drawing.Size(264, 22);
+            this.downmixAndEncode.Size = new System.Drawing.Size(263, 22);
             this.downmixAndEncode.Text = "Downmix and encode with quality 3";
             this.downmixAndEncode.Click += new System.EventHandler(this.downmixAndEncode_Click);
             // 
@@ -264,7 +263,7 @@
             // 
             this.patchMoggForPS3UseToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.patchMoggForPS3UseToolStripMenuItem.Name = "patchMoggForPS3UseToolStripMenuItem";
-            this.patchMoggForPS3UseToolStripMenuItem.Size = new System.Drawing.Size(264, 22);
+            this.patchMoggForPS3UseToolStripMenuItem.Size = new System.Drawing.Size(263, 22);
             this.patchMoggForPS3UseToolStripMenuItem.Text = "Patch mogg for PS3 use";
             this.patchMoggForPS3UseToolStripMenuItem.Click += new System.EventHandler(this.patchMoggForPS3UseToolStripMenuItem_Click);
             // 
@@ -272,14 +271,14 @@
             // 
             this.toolStripMenuItem1.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(261, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(260, 6);
             this.toolStripMenuItem1.Paint += new System.Windows.Forms.PaintEventHandler(this.mnuToolStripSeparator_Custom_Paint);
             // 
             // mergeSongsToolStrip
             // 
             this.mergeSongsToolStrip.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.mergeSongsToolStrip.Name = "mergeSongsToolStrip";
-            this.mergeSongsToolStrip.Size = new System.Drawing.Size(264, 22);
+            this.mergeSongsToolStrip.Size = new System.Drawing.Size(263, 22);
             this.mergeSongsToolStrip.Text = "Merge songs";
             this.mergeSongsToolStrip.Click += new System.EventHandler(this.mergeSongsToolStrip_Click);
             // 
@@ -287,7 +286,7 @@
             // 
             this.managePackDTAFile.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.managePackDTAFile.Name = "managePackDTAFile";
-            this.managePackDTAFile.Size = new System.Drawing.Size(264, 22);
+            this.managePackDTAFile.Size = new System.Drawing.Size(263, 22);
             this.managePackDTAFile.Text = "Manage pack DTA file";
             this.managePackDTAFile.Click += new System.EventHandler(this.managePackDTAFile_Click);
             // 
@@ -321,14 +320,14 @@
             this.numericIDOptionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.batchChangeIDsToNumeric});
             this.numericIDOptionsToolStripMenuItem.Name = "numericIDOptionsToolStripMenuItem";
-            this.numericIDOptionsToolStripMenuItem.Size = new System.Drawing.Size(124, 20);
+            this.numericIDOptionsToolStripMenuItem.Size = new System.Drawing.Size(105, 20);
             this.numericIDOptionsToolStripMenuItem.Text = "Song ID Options";
             // 
             // batchChangeIDsToNumeric
             // 
             this.batchChangeIDsToNumeric.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.batchChangeIDsToNumeric.Name = "batchChangeIDsToNumeric";
-            this.batchChangeIDsToNumeric.Size = new System.Drawing.Size(193, 22);
+            this.batchChangeIDsToNumeric.Size = new System.Drawing.Size(192, 22);
             this.batchChangeIDsToNumeric.Text = "Batch correct song IDs";
             this.batchChangeIDsToNumeric.Click += new System.EventHandler(this.batchChangeIDsToNumeric_Click);
             // 
@@ -341,6 +340,7 @@
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(121, 20);
             this.optionsToolStripMenuItem.Text = "Encryption Options";
+            this.optionsToolStripMenuItem.Visible = false;
             // 
             // mIDIToEDATEncryptionToolStripMenuItem
             // 
@@ -381,7 +381,7 @@
             this.wait2Seconds.Checked = true;
             this.wait2Seconds.CheckState = System.Windows.Forms.CheckState.Checked;
             this.wait2Seconds.Name = "wait2Seconds";
-            this.wait2Seconds.Size = new System.Drawing.Size(159, 22);
+            this.wait2Seconds.Size = new System.Drawing.Size(180, 22);
             this.wait2Seconds.Text = "Wait 2 seconds";
             this.wait2Seconds.Click += new System.EventHandler(this.wait2Seconds_Click);
             // 
@@ -389,7 +389,7 @@
             // 
             this.wait5Seconds.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.wait5Seconds.Name = "wait5Seconds";
-            this.wait5Seconds.Size = new System.Drawing.Size(159, 22);
+            this.wait5Seconds.Size = new System.Drawing.Size(180, 22);
             this.wait5Seconds.Text = "Wait 5 seconds";
             this.wait5Seconds.Click += new System.EventHandler(this.wait5Seconds_Click);
             // 
@@ -397,7 +397,7 @@
             // 
             this.wait10Seconds.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.wait10Seconds.Name = "wait10Seconds";
-            this.wait10Seconds.Size = new System.Drawing.Size(159, 22);
+            this.wait10Seconds.Size = new System.Drawing.Size(180, 22);
             this.wait10Seconds.Text = "Wait 10 seconds";
             this.wait10Seconds.Click += new System.EventHandler(this.wait10Seconds_Click);
             // 
@@ -433,6 +433,7 @@
             this.regionOptionsToolStripMenuItem.Name = "regionOptionsToolStripMenuItem";
             this.regionOptionsToolStripMenuItem.Size = new System.Drawing.Size(101, 20);
             this.regionOptionsToolStripMenuItem.Text = "Region Options";
+            this.regionOptionsToolStripMenuItem.Visible = false;
             // 
             // regionNTSC
             // 
@@ -440,7 +441,7 @@
             this.regionNTSC.Checked = true;
             this.regionNTSC.CheckState = System.Windows.Forms.CheckState.Checked;
             this.regionNTSC.Name = "regionNTSC";
-            this.regionNTSC.Size = new System.Drawing.Size(103, 22);
+            this.regionNTSC.Size = new System.Drawing.Size(104, 22);
             this.regionNTSC.Text = "NTSC";
             this.regionNTSC.Click += new System.EventHandler(this.regionNTSC_Click);
             // 
@@ -448,7 +449,7 @@
             // 
             this.regionPAL.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.regionPAL.Name = "regionPAL";
-            this.regionPAL.Size = new System.Drawing.Size(103, 22);
+            this.regionPAL.Size = new System.Drawing.Size(104, 22);
             this.regionPAL.Text = "PAL";
             this.regionPAL.Click += new System.EventHandler(this.regionPAL_Click);
             // 

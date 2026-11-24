@@ -58,9 +58,9 @@
             this.btnFile = new System.Windows.Forms.Button();
             this.picWorking = new System.Windows.Forms.PictureBox();
             this.grpMode = new System.Windows.Forms.GroupBox();
+            this.chkIgnore = new System.Windows.Forms.CheckBox();
             this.radioDownmix = new System.Windows.Forms.RadioButton();
             this.radioSplit = new System.Windows.Forms.RadioButton();
-            this.chkIgnore = new System.Windows.Forms.CheckBox();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picPin)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -171,7 +171,7 @@
             // 
             this.doFLAC.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.doFLAC.Name = "doFLAC";
-            this.doFLAC.Size = new System.Drawing.Size(180, 22);
+            this.doFLAC.Size = new System.Drawing.Size(104, 22);
             this.doFLAC.Text = "FLAC";
             this.doFLAC.Click += new System.EventHandler(this.doFLAC_Click);
             // 
@@ -179,7 +179,7 @@
             // 
             this.doMP3.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.doMP3.Name = "doMP3";
-            this.doMP3.Size = new System.Drawing.Size(180, 22);
+            this.doMP3.Size = new System.Drawing.Size(104, 22);
             this.doMP3.Text = "MP3";
             this.doMP3.Click += new System.EventHandler(this.doMP3_Click);
             // 
@@ -187,7 +187,7 @@
             // 
             this.doOGG.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.doOGG.Name = "doOGG";
-            this.doOGG.Size = new System.Drawing.Size(180, 22);
+            this.doOGG.Size = new System.Drawing.Size(104, 22);
             this.doOGG.Text = "OGG";
             this.doOGG.Click += new System.EventHandler(this.doOGG_Click);
             // 
@@ -195,7 +195,7 @@
             // 
             this.doOPUS.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.doOPUS.Name = "doOPUS";
-            this.doOPUS.Size = new System.Drawing.Size(180, 22);
+            this.doOPUS.Size = new System.Drawing.Size(104, 22);
             this.doOPUS.Text = "OPUS";
             this.doOPUS.Click += new System.EventHandler(this.doOPUS_Click);
             // 
@@ -205,7 +205,7 @@
             this.doWAV.Checked = true;
             this.doWAV.CheckState = System.Windows.Forms.CheckState.Checked;
             this.doWAV.Name = "doWAV";
-            this.doWAV.Size = new System.Drawing.Size(180, 22);
+            this.doWAV.Size = new System.Drawing.Size(104, 22);
             this.doWAV.Text = "WAV";
             this.doWAV.Click += new System.EventHandler(this.doWAV_Click);
             // 
@@ -415,6 +415,17 @@
             this.grpMode.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleDragDrop);
             this.grpMode.DragEnter += new System.Windows.Forms.DragEventHandler(this.HandleDragEnter);
             // 
+            // chkIgnore
+            // 
+            this.chkIgnore.AutoSize = true;
+            this.chkIgnore.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.chkIgnore.Location = new System.Drawing.Point(142, 19);
+            this.chkIgnore.Name = "chkIgnore";
+            this.chkIgnore.Size = new System.Drawing.Size(148, 17);
+            this.chkIgnore.TabIndex = 4;
+            this.chkIgnore.Text = "Ignore Attenuation Values";
+            this.chkIgnore.UseVisualStyleBackColor = true;
+            // 
             // radioDownmix
             // 
             this.radioDownmix.AllowDrop = true;
@@ -446,17 +457,6 @@
             this.radioSplit.CheckedChanged += new System.EventHandler(this.radioSplit_CheckedChanged);
             this.radioSplit.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleDragDrop);
             this.radioSplit.DragEnter += new System.Windows.Forms.DragEventHandler(this.HandleDragEnter);
-            // 
-            // chkIgnore
-            // 
-            this.chkIgnore.AutoSize = true;
-            this.chkIgnore.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.chkIgnore.Location = new System.Drawing.Point(142, 19);
-            this.chkIgnore.Name = "chkIgnore";
-            this.chkIgnore.Size = new System.Drawing.Size(148, 17);
-            this.chkIgnore.TabIndex = 4;
-            this.chkIgnore.Text = "Ignore Attenuation Values";
-            this.chkIgnore.UseVisualStyleBackColor = true;
             // 
             // StemsIsolator
             // 

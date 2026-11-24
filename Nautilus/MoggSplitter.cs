@@ -90,24 +90,15 @@ namespace Nautilus
                 return false;
             }
             LoadLibraries();
-            var Tools = new NemoTools();
-            if (Tools.isV17(mData))
-            {
-                unsafe
-                {
-                    var bytes = mData;
-                    fixed (byte* ptr = bytes)
-                    {
-                        if (!TheMethod3.decrypt_mogg(ptr, (uint)bytes.Length)) return false;
-                        if (!nautilus3.RemoveMHeader(bytes, false, DecryptMode.ToMemory, "")) return false;
-                        return true;
-                    }
-                }
-            }
+            var Tools = new NemoTools();                    
             if (nautilus3.DecM(mData, false, false, DecryptMode.ToMemory)) return true;
+            var temp = Path.Combine(Path.GetTempPath(), "temp.mogg");
+            File.WriteAllBytes(temp, mData);
+            //try to decrypt as TBRB mogg
+            if (Tools.BeatlesDecrypt(temp, nautilus3, true)) return true;                      
             ErrorLog.Add("Mogg file is encrypted and I could not decrypt it, can't split it");
             return false;
-        }
+        }        
 
         private static void UnloadLibraries()
         {
@@ -234,20 +225,7 @@ namespace Nautilus
         public bool ReEncodeMogg(SongData song, string mogg, int quality, bool encrypt = true)
         {
             var nautilus3 = new nTools();
-            var Tools = new NemoTools();
-
-            if (Tools.isV17(mogg))
-            {
-                unsafe
-                {
-                    var bytes = File.ReadAllBytes(mogg);
-                    fixed (byte* ptr = bytes)
-                    {
-                        if (!TheMethod3.decrypt_mogg(ptr, (uint)bytes.Length)) return false;
-                        if (!nautilus3.RemoveMHeader(bytes, false, DecryptMode.ToMemory, "")) return false;
-                    }
-                }
-            }
+            var Tools = new NemoTools();            
             if (!nautilus3.DecM(File.ReadAllBytes(mogg), false, false, DecryptMode.ToMemory)) return false;
             if (!InitBass()) return false;
 
@@ -468,37 +446,37 @@ namespace Nautilus
                     }
                     isSlave = true;
                 }
-                //var channel = Parser.Songs[0].ChannelsDrums;
                 if (Parser.Songs[0].ChannelsBass > 0 && (StemsToSplit.Contains("allstems") || StemsToSplit.Contains("bass") || StemsToSplit.Contains("rhythm")))
                 {
                     PrepareChannelsToSplit(Parser.Songs[0].ChannelsBassStart, ArrangedChannels, Parser.Songs[0].ChannelsBass, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsBassStart), StemsToSplit.Contains("rhythm") ? rhythm : bass, format, quality, isSlave);
                     isSlave = true;
                 }
-                //channel += Parser.Songs[0].ChannelsBass;
                 if (Parser.Songs[0].ChannelsGuitar > 0 && (StemsToSplit.Contains("allstems") || StemsToSplit.Contains("guitar")))
                 {
                     PrepareChannelsToSplit(Parser.Songs[0].ChannelsGuitarStart, ArrangedChannels, Parser.Songs[0].ChannelsGuitar, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsGuitarStart), guitar, format, quality, isSlave);
                     isSlave = true;
                 }
-                //channel += Parser.Songs[0].ChannelsGuitar;
                 if (Parser.Songs[0].ChannelsVocals > 0 && (StemsToSplit.Contains("allstems") || StemsToSplit.Contains("vocals")))
                 {
                     PrepareChannelsToSplit(Parser.Songs[0].ChannelsVocalsStart, ArrangedChannels, Parser.Songs[0].ChannelsVocals, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsVocalsStart), vocals, format, quality, isSlave);
                     isSlave = true;
                 }
-                //channel += Parser.Songs[0].ChannelsVocals;
                 if (Parser.Songs[0].ChannelsKeys > 0 && (StemsToSplit.Contains("allstems") || StemsToSplit.Contains("keys")))
                 {
                     PrepareChannelsToSplit(Parser.Songs[0].ChannelsKeysStart, ArrangedChannels, Parser.Songs[0].ChannelsKeys, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsKeysStart), keys, format, quality, isSlave);
                     isSlave = true;
-                }
-                //channel += Parser.Songs[0].ChannelsKeys;
+                }                
                 if (Parser.Songs[0].ChannelsCrowd > 0 && (StemsToSplit.Contains("allstems") || StemsToSplit.Contains("crowd")))
                 {
                     PrepareChannelsToSplit(Parser.Songs[0].ChannelsCrowdStart, ArrangedChannels, Parser.Songs[0].ChannelsCrowd, IgnoreAttenuationValues ? 1.0f : GetStemVolume(Parser.Songs[0].ChannelsCrowdStart), crowd, format, quality, isSlave);
                 }
                 if ((StemsToSplit.Contains("allstems") || StemsToSplit.Contains("backing") || StemsToSplit.Contains("song")))
                 {
+                    //a little hacky hack
+                    if (Parser.Songs[0].Source.Equals("beatles"))
+                    {
+                        Parser.Songs[0].ChannelsTotal = Parser.Songs[0].ChannelsBass + Parser.Songs[0].ChannelsDrums + Parser.Songs[0].ChannelsGuitar + Parser.Songs[0].ChannelsKeys + Parser.Songs[0].ChannelsVocals + Parser.Songs[0].ChannelsCrowd + 2;
+                    }
                     var back = Parser.Songs[0].ChannelsTotal - Parser.Songs[0].ChannelsBass - Parser.Songs[0].ChannelsDrums - Parser.Songs[0].ChannelsGuitar - Parser.Songs[0].ChannelsKeys - Parser.Songs[0].ChannelsVocals - Parser.Songs[0].ChannelsCrowd;
                     if (back > 0) //backing not required
                     {

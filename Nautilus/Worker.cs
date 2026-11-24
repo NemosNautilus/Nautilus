@@ -35,12 +35,7 @@ namespace Nautilus
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             var nautilus3 = new nTools();
-            var ogg = WorkingFile.Substring(0, WorkingFile.Length - 5) + ".ogg";
-            if (Tools.isV17(WorkingFile))
-            {
-                MessageBox.Show("I recognize this encryption scheme as v17 (Rock Band 4) but it was not implemented in this Tool", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
-            }
+            var ogg = WorkingFile.Substring(0, WorkingFile.Length - 5) + ".ogg";            
             WorkerSuccess = nautilus3.DecM(File.ReadAllBytes(WorkingFile), false, false, DecryptMode.ToFile, ogg);
         }
 

@@ -65,6 +65,9 @@
             this.proDrumsAnalysis = new System.Windows.Forms.ToolStripMenuItem();
             this.batchAnalyzeForMissingProDrums = new System.Windows.Forms.ToolStripMenuItem();
             this.separateFilesThatAreMissingProDrums = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+            this.batchAnalyzeForMissingTomMarkers = new System.Windows.Forms.ToolStripMenuItem();
+            this.separateFilesThatAreMissingTomMarkers = new System.Windows.Forms.ToolStripMenuItem();
             this.euroMixToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForNoDrumFills = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForNoOverdrive = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,9 +99,6 @@
             this.backgroundWorker5 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker6 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker7 = new System.ComponentModel.BackgroundWorker();
-            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
-            this.batchAnalyzeForMissingTomMarkers = new System.Windows.Forms.ToolStripMenuItem();
-            this.separateFilesThatAreMissingTomMarkers = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picloading)).BeginInit();
@@ -434,6 +434,29 @@
             this.separateFilesThatAreMissingProDrums.Size = new System.Drawing.Size(300, 22);
             this.separateFilesThatAreMissingProDrums.Text = "Separate files that are missing Pro Drums";
             // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(297, 6);
+            // 
+            // batchAnalyzeForMissingTomMarkers
+            // 
+            this.batchAnalyzeForMissingTomMarkers.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.batchAnalyzeForMissingTomMarkers.Name = "batchAnalyzeForMissingTomMarkers";
+            this.batchAnalyzeForMissingTomMarkers.Size = new System.Drawing.Size(300, 22);
+            this.batchAnalyzeForMissingTomMarkers.Text = "Batch analyze for missing tom markers";
+            this.batchAnalyzeForMissingTomMarkers.Click += new System.EventHandler(this.batchAnalyzeForMissingTomMarkers_Click);
+            // 
+            // separateFilesThatAreMissingTomMarkers
+            // 
+            this.separateFilesThatAreMissingTomMarkers.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.separateFilesThatAreMissingTomMarkers.Checked = true;
+            this.separateFilesThatAreMissingTomMarkers.CheckOnClick = true;
+            this.separateFilesThatAreMissingTomMarkers.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.separateFilesThatAreMissingTomMarkers.Name = "separateFilesThatAreMissingTomMarkers";
+            this.separateFilesThatAreMissingTomMarkers.Size = new System.Drawing.Size(300, 22);
+            this.separateFilesThatAreMissingTomMarkers.Text = "Separate files that are missing tom markers";
+            // 
             // euroMixToolStripMenuItem
             // 
             this.euroMixToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -756,29 +779,6 @@
             this.backgroundWorker7.WorkerSupportsCancellation = true;
             this.backgroundWorker7.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker7_DoWork);
             this.backgroundWorker7.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker7_RunWorkerCompleted);
-            // 
-            // toolStripMenuItem4
-            // 
-            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(297, 6);
-            // 
-            // batchAnalyzeForMissingTomMarkers
-            // 
-            this.batchAnalyzeForMissingTomMarkers.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.batchAnalyzeForMissingTomMarkers.Name = "batchAnalyzeForMissingTomMarkers";
-            this.batchAnalyzeForMissingTomMarkers.Size = new System.Drawing.Size(300, 22);
-            this.batchAnalyzeForMissingTomMarkers.Text = "Batch analyze for missing tom markers";
-            this.batchAnalyzeForMissingTomMarkers.Click += new System.EventHandler(this.batchAnalyzeForMissingTomMarkers_Click);
-            // 
-            // separateFilesThatAreMissingTomMarkers
-            // 
-            this.separateFilesThatAreMissingTomMarkers.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.separateFilesThatAreMissingTomMarkers.Checked = true;
-            this.separateFilesThatAreMissingTomMarkers.CheckOnClick = true;
-            this.separateFilesThatAreMissingTomMarkers.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.separateFilesThatAreMissingTomMarkers.Name = "separateFilesThatAreMissingTomMarkers";
-            this.separateFilesThatAreMissingTomMarkers.Size = new System.Drawing.Size(300, 22);
-            this.separateFilesThatAreMissingTomMarkers.Text = "Separate files that are missing tom markers";
             // 
             // SongAnalyzer
             // 

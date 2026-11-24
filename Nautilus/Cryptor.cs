@@ -262,25 +262,10 @@ namespace Nautilus
                         mData = nautilus3.DeObfM(mData);                        
                     }
                     var success = false;
-                    if (Tools.isV17(mData))
+                    success = nautilus3.DecM(mData, true, false, DecryptMode.ToFile, newMogg);
+                    if (!success) //try TBRB decryption
                     {
-                        unsafe
-                        {
-                            var bytes = mData;
-                            fixed (byte* ptr = bytes)
-                            {
-                                success = TheMethod3.decrypt_mogg(ptr, (uint)bytes.Length);
-                                if (success)
-                                {
-                                    nautilus3.WriteOutData(bytes, newMogg);
-                                    success = File.Exists(newMogg);
-                                }                                
-                            }                            
-                        }
-                    }
-                    else
-                    {
-                        success = nautilus3.DecM(mData, true, false, DecryptMode.ToFile, newMogg);
+                        success = Tools.BeatlesDecrypt(mogg, nautilus3, false, newMogg);
                     }
                     Log((success ? "Successfully decrypted" : "Failed to decrypt") + " mogg file " + Path.GetFileName(newMogg));
                     if (!success)
@@ -430,41 +415,20 @@ namespace Nautilus
                         Tools.DeleteFile(newMogg);
                         Tools.DeleteFile(newCON);
                         continue;
-                    }
-                    if (Tools.isV17(mData))
-                    {
-                        unsafe
-                        {
-                            var bytes = mData;
-                            fixed (byte* ptr = bytes)
-                            {
-                                if (!TheMethod3.decrypt_mogg(ptr, (uint)bytes.Length))
-                                {
-                                    Log("Failed to decrypt CON file " + Path.GetFileName(newCON) + " ... skipping");
-                                    xCON.CloseIO();
-                                    Tools.DeleteFile(newMogg);
-                                    Tools.DeleteFile(newCON);
-                                    continue;
-                                }
-                                nautilus3.WriteOutData(bytes, newMogg);
-                                if (!File.Exists(newMogg))
-                                {
-                                    Log("Failed to decrypt CON file " + Path.GetFileName(newCON) + " ... skipping");
-                                    xCON.CloseIO();
-                                    Tools.DeleteFile(newMogg);
-                                    Tools.DeleteFile(newCON);
-                                    continue;
-                                }
-                            }
-                        }
-                    }
+                    }                    
                     if (!nautilus3.DecM(mData, true, false, DecryptMode.ToFile, newMogg))
                     {
-                        Log("Failed to decrypt CON file " + Path.GetFileName(newCON) + " ... skipping");
-                        xCON.CloseIO();
-                        Tools.DeleteFile(newMogg);
-                        Tools.DeleteFile(newCON);
-                        continue;
+                        var temp = Path.Combine(Path.GetTempPath(), "temp.mogg");
+                        File.WriteAllBytes(temp, mData);
+                        if (!Tools.BeatlesDecrypt(temp, nautilus3, false, newMogg))
+                        {
+                            Log("Failed to decrypt CON file " + Path.GetFileName(newCON) + " ... skipping");
+                            xCON.CloseIO();
+                            Tools.DeleteFile(temp);
+                            Tools.DeleteFile(newMogg);
+                            Tools.DeleteFile(newCON);
+                            continue;
+                        }
                     }
                 }
                 if (backgroundWorker1.CancellationPending)
