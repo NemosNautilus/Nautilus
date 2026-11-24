@@ -265,6 +265,7 @@ namespace Nautilus
                     success = nautilus3.DecM(mData, true, false, DecryptMode.ToFile, newMogg);
                     if (!success) //try TBRB decryption
                     {
+                        Tools.DeleteFile(newMogg);
                         success = Tools.BeatlesDecrypt(mogg, nautilus3, false, newMogg);
                     }
                     Log((success ? "Successfully decrypted" : "Failed to decrypt") + " mogg file " + Path.GetFileName(newMogg));
