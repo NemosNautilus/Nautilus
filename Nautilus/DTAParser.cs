@@ -192,12 +192,12 @@ namespace Nautilus
                             catch { }
                         }
                     }
-                    catch (Exception ex) { }                        
+                    catch (Exception) { }                        
                 }
                 sr.Dispose();
                 Songs.Add(song);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -273,13 +273,13 @@ namespace Nautilus
                             }                            
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     { }
                 }
                 sr.Dispose();
                 Songs.Add(song);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

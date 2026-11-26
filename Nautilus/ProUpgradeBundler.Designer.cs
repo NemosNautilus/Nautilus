@@ -99,13 +99,13 @@
             this.exportLogFileToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(123, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(122, 26);
             // 
             // exportLogFileToolStripMenuItem
             // 
             this.exportLogFileToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.exportLogFileToolStripMenuItem.Name = "exportLogFileToolStripMenuItem";
-            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.exportLogFileToolStripMenuItem.Text = "Export log file";
             this.exportLogFileToolStripMenuItem.Click += new System.EventHandler(this.exportLogFileToolStripMenuItem_Click);
             // 
@@ -174,7 +174,7 @@
             this.overwriteExistingTrack.Checked = true;
             this.overwriteExistingTrack.CheckState = System.Windows.Forms.CheckState.Checked;
             this.overwriteExistingTrack.Name = "overwriteExistingTrack";
-            this.overwriteExistingTrack.Size = new System.Drawing.Size(323, 22);
+            this.overwriteExistingTrack.Size = new System.Drawing.Size(322, 22);
             this.overwriteExistingTrack.Text = "Ovewrite existing track if also found in upgrade";
             this.overwriteExistingTrack.Click += new System.EventHandler(this.overwriteExistingTrack_Click);
             // 
@@ -182,7 +182,7 @@
             // 
             this.onlyAddNewTracks.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.onlyAddNewTracks.Name = "onlyAddNewTracks";
-            this.onlyAddNewTracks.Size = new System.Drawing.Size(323, 22);
+            this.onlyAddNewTracks.Size = new System.Drawing.Size(322, 22);
             this.onlyAddNewTracks.Text = "Only add new tracks, don\'t overwrite existing";
             this.onlyAddNewTracks.Click += new System.EventHandler(this.onlyAddNewTracks_Click);
             // 

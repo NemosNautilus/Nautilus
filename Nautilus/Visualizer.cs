@@ -159,8 +159,7 @@ namespace Nautilus
         private bool isBandFuse;
         private bool isYARG;
         private bool isGHWTDE;
-        private bool isPowerGig;
-        private bool isDJHero;
+       
         private readonly MIDIStuff MIDITools;
         private double songLength;
         private readonly string tempFile;
@@ -411,8 +410,6 @@ namespace Nautilus
             isTBRBDLC = false;
             isGDRBDLC = false;
             isBandFuse = false;
-            isPowerGig = false;
-            isDJHero = false;
             isGHWTDE = false;
             isRS2014 = false;
             MIDITools.Initialize(false);
@@ -755,11 +752,8 @@ namespace Nautilus
             {                
                 if (!nautilus3.DecM(File.ReadAllBytes(mogg[0]), false, false, DecryptMode.ToMemory))
                 {
-                    if (!Tools.BeatlesDecrypt(mogg[0], nautilus3, false))
-                    {
-                        MessageBox.Show("Failed to decrypt *.mogg file, can't play audio", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return;
-                    }
+                    MessageBox.Show("Failed to decrypt *.mogg file, can't play audio", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
                 }
             }
             else
@@ -856,14 +850,14 @@ namespace Nautilus
             fnfWorker.RunWorkerAsync();
         }
 
-        private void Visualizer_DragDrop(object sender, DragEventArgs e)
+        private async void Visualizer_DragDrop(object sender, DragEventArgs e)
         {
             var files = (string[]) e.Data.GetData(DataFormats.FileDrop);
             Tools.CurrentFolder = Path.GetDirectoryName(files[0]);
-            HandleDragDrop(files[0]);
+            await HandleDragDrop(files[0]);
         }
 
-        private void HandleDragDrop(string file)
+        private async Task HandleDragDrop(string file)
         {
             if (string.IsNullOrEmpty(file)) return;
 
@@ -940,11 +934,11 @@ namespace Nautilus
                     }
                     else if (Path.GetExtension(file.ToLowerInvariant()) == ".sng")
                     {
-                        ExtractSNG(file);
+                        await ExtractSNG(file);
                     }
                     else if (Path.GetExtension(file.ToLowerInvariant()) == ".yargsong")
                     {
-                        ExtractYARG(file);
+                        await ExtractYARG(file);
                     }
                     else if (Path.GetExtension(file.ToLowerInvariant()) == ".psarc")
                     {
@@ -1313,7 +1307,6 @@ namespace Nautilus
                     Height = maxHeight;
                     picPlayPause.Cursor = Cursors.Hand;
                     picStop.Cursor = Cursors.Hand;
-                    isDJHero = true;
                     StartPlayback();
                 }
                 else
@@ -1353,7 +1346,6 @@ namespace Nautilus
             var img = path + "albumart.img";
             var fsb = path + "audio.fsb";
             var xmaPath = path + "\\audio\\";
-            string artPath;
             string dlcFolder = "";
             List<DJHeroTrack> tracks = new List<DJHeroTrack>();
             var album = xPackage.Header.Title_Display;
@@ -1426,28 +1418,6 @@ namespace Nautilus
                         .Where(item => item.IDTag != null && item.FolderLocation != null)
                         .ToList();
                 }
-
-                /*//extract album art IMG file
-                xFile = xPackage.GetFile(artPath + ".img");
-                if (xFile != null)
-                {
-                    if (!xFile.ExtractToFile(img))
-                    {
-                        MessageBox.Show("Error extracting the album art file", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    else
-                    {
-                        var djherotools = new DJHeroIMGTools();
-                        if (!djherotools.ImgToDDS(img))
-                        {
-                            MessageBox.Show("Error converting the album art file", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                        else
-                        {
-                            getImage(img.Replace(".img", ".dds"));
-                        }
-                    }
-                }*/
 
                 var selector = new DJHeroTrackSelector(tracks);
                 selector.ShowDialog();
@@ -1555,7 +1525,6 @@ namespace Nautilus
                     Height = maxHeight;
                     picPlayPause.Cursor = Cursors.Hand;
                     picStop.Cursor = Cursors.Hand;
-                    isDJHero = true;
                     StartPlayback();
                 }
                 else
@@ -1571,7 +1540,6 @@ namespace Nautilus
             }
             xPackage.CloseIO();
             picWorking.Visible = false;
-
         }
           
         private void loadPS4Files(string file)
@@ -2917,7 +2885,7 @@ namespace Nautilus
             picVisualizer.Invalidate();
         }
         
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             var openFileDialog1 = new OpenFileDialog
                 {
@@ -2977,11 +2945,11 @@ namespace Nautilus
                 }
                 else if (Path.GetExtension(file.ToLowerInvariant()) == ".sng")
                 {
-                    ExtractSNG(file);
+                    await ExtractSNG(file);
                 }
                 else if (Path.GetExtension(file.ToLowerInvariant()) == ".yargsong")
                 {
-                    ExtractYARG(file);
+                    await ExtractYARG(file);
                 }
                 else if (Path.GetExtension(file.ToLowerInvariant()) == ".xml")
                 {
@@ -3644,7 +3612,7 @@ namespace Nautilus
             sw.Dispose();
         }
 
-        private void Visualizer_Shown(object sender, EventArgs e)
+        private async void Visualizer_Shown(object sender, EventArgs e)
         {
             doImages();
             LoadConfig();
@@ -3653,7 +3621,7 @@ namespace Nautilus
 
             if (!string.IsNullOrEmpty(inputFile))
             {
-                HandleDragDrop(inputFile);
+                await HandleDragDrop(inputFile);
             }
 
             var themes_folder = Application.StartupPath + "\\res\\vis_themes\\";
@@ -5408,8 +5376,6 @@ namespace Nautilus
                         
             loadDefaults();
 
-            bool hasBass = false;
-            bool hasLead = false;
             bool hasRhythm = false;
             bool hasVocals = false;
 
@@ -5419,13 +5385,13 @@ namespace Nautilus
             }
             else if (ddsFiles.Count() > 0)
             {
-                for (var i = 0; i < ddsFiles.Count(); i++)
+                foreach (var file in ddsFiles)
                 {
-                    if (ddsFiles[i].Contains("256"))
+                    if (file.Contains("256"))
                     {
-                        getImage(ddsFiles[i]);
+                        getImage(file);
+                        break;
                     }
-                    break;
                 }
             }
 
@@ -5438,15 +5404,7 @@ namespace Nautilus
             {
                 foreach (var sng in sngFiles)
                 {
-                    if (sng.Contains("_bass.sng"))
-                    {
-                        hasBass = true;
-                    }
-                    else if (sng.Contains("_lead.sng"))
-                    {
-                        hasLead = true;
-                    }
-                    else if (sng.Contains("_rhythm.sng"))
+                    if (sng.Contains("_rhythm.sng"))
                     {
                         hasRhythm = true;
                     }
@@ -5682,11 +5640,8 @@ namespace Nautilus
             getImage(PNG_PS3[0]);            
             if (!nautilus3.DecM(File.ReadAllBytes(MOGG[0]), false, false, DecryptMode.ToMemory))
             {
-                if (!Tools.BeatlesDecrypt(MOGG[0], nautilus3, false))
-                {
-                    MessageBox.Show("Failed to decrypt *.mogg file, can't play audio", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
+                MessageBox.Show("Failed to decrypt *.mogg file, can't play audio", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
             var edat = Directory.GetFiles(outFolder, "*.edat", SearchOption.AllDirectories);           
             if (edat.Any())
@@ -6034,7 +5989,6 @@ namespace Nautilus
                 Height = maxHeight;
                 picPlayPause.Cursor = Cursors.Hand;
                 picStop.Cursor = Cursors.Hand;
-                isPowerGig = true;
                 StartPlayback();
             }
             else

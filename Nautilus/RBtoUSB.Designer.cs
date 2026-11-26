@@ -199,7 +199,7 @@
             this.findFileToolStripMenuItem.BackColor = System.Drawing.Color.WhiteSmoke;
             this.findFileToolStripMenuItem.Name = "findFileToolStripMenuItem";
             this.findFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.findFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.findFileToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.findFileToolStripMenuItem.Text = "Search...";
             this.findFileToolStripMenuItem.Click += new System.EventHandler(this.findFileToolStripMenuItem_Click);
             // 
@@ -207,7 +207,7 @@
             // 
             this.renameDrive.BackColor = System.Drawing.Color.WhiteSmoke;
             this.renameDrive.Name = "renameDrive";
-            this.renameDrive.Size = new System.Drawing.Size(180, 22);
+            this.renameDrive.Size = new System.Drawing.Size(169, 22);
             this.renameDrive.Text = "Rename drive";
             this.renameDrive.Click += new System.EventHandler(this.renameDrive_Click);
             // 
@@ -215,14 +215,14 @@
             // 
             this.copyTU4ToDrive.BackColor = System.Drawing.Color.WhiteSmoke;
             this.copyTU4ToDrive.Name = "copyTU4ToDrive";
-            this.copyTU4ToDrive.Size = new System.Drawing.Size(180, 22);
+            this.copyTU4ToDrive.Size = new System.Drawing.Size(169, 22);
             this.copyTU4ToDrive.Text = "Copy TU4 to drive";
             this.copyTU4ToDrive.Click += new System.EventHandler(this.copyTU4ToDrive_Click);
             // 
             // copyTU5ToDriveToolStripMenuItem
             // 
             this.copyTU5ToDriveToolStripMenuItem.Name = "copyTU5ToDriveToolStripMenuItem";
-            this.copyTU5ToDriveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.copyTU5ToDriveToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.copyTU5ToDriveToolStripMenuItem.Text = "Copy TU5 to drive";
             this.copyTU5ToDriveToolStripMenuItem.Click += new System.EventHandler(this.copyTU5ToDriveToolStripMenuItem_Click);
             // 

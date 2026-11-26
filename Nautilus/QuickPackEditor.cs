@@ -13,7 +13,6 @@ using Nautilus.x360;
 using SCEllSharp.PKG;
 using SCEllSharp.SFO;
 using SCEllSharp.NPDRM;
-using System.ComponentModel.DataAnnotations;
 
 namespace Nautilus
 {
@@ -32,7 +31,6 @@ namespace Nautilus
         private string DTAPath;
         private string incoming_pack;
         private readonly List<string> PackagesToUnpack;
-        private string songToDePack;
         public string fileToExtract;
         private bool isPKG;
         private bool isDTA;
@@ -1164,7 +1162,7 @@ namespace Nautilus
                         {
                             out_pkg = File.Create(outputFolder + fileName + ".pkg");
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             Log("Failed to create PKG file for + '" + songName + "'");
                             continue;

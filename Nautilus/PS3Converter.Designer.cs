@@ -381,7 +381,7 @@
             this.wait2Seconds.Checked = true;
             this.wait2Seconds.CheckState = System.Windows.Forms.CheckState.Checked;
             this.wait2Seconds.Name = "wait2Seconds";
-            this.wait2Seconds.Size = new System.Drawing.Size(180, 22);
+            this.wait2Seconds.Size = new System.Drawing.Size(159, 22);
             this.wait2Seconds.Text = "Wait 2 seconds";
             this.wait2Seconds.Click += new System.EventHandler(this.wait2Seconds_Click);
             // 
@@ -389,7 +389,7 @@
             // 
             this.wait5Seconds.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.wait5Seconds.Name = "wait5Seconds";
-            this.wait5Seconds.Size = new System.Drawing.Size(180, 22);
+            this.wait5Seconds.Size = new System.Drawing.Size(159, 22);
             this.wait5Seconds.Text = "Wait 5 seconds";
             this.wait5Seconds.Click += new System.EventHandler(this.wait5Seconds_Click);
             // 
@@ -397,7 +397,7 @@
             // 
             this.wait10Seconds.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.wait10Seconds.Name = "wait10Seconds";
-            this.wait10Seconds.Size = new System.Drawing.Size(180, 22);
+            this.wait10Seconds.Size = new System.Drawing.Size(159, 22);
             this.wait10Seconds.Text = "Wait 10 seconds";
             this.wait10Seconds.Click += new System.EventHandler(this.wait10Seconds_Click);
             // 

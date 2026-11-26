@@ -17,8 +17,6 @@ namespace Nautilus
 {
     public partial class UltraStarConverter : Form
     {
-
-        private static string inputDir;
         private static List<string> inputFiles;
         private DateTime endTime;
         private DateTime startTime;
@@ -886,7 +884,6 @@ namespace Nautilus
             Log("Drag and drop the Rock Band CON or MIDI file(s) to be converted here");
             Log("Or click 'Change Input Folder' to select the folder containing the files");
             Log("Ready to begin");
-            txtFolder.Text = inputDir;
         }
 
         private void exportLogFileToolStripMenuItem_Click(object sender, EventArgs e)

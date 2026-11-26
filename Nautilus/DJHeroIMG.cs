@@ -856,7 +856,7 @@ namespace Nautilus
             {
                 return File.Open(path, FileMode.Open, FileAccess.ReadWrite);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return File.OpenRead(path);
             }

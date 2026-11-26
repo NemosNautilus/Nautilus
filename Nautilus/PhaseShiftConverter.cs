@@ -10,7 +10,6 @@ using Un4seen.Bass;
 using SearchOption = System.IO.SearchOption;
 using System.Drawing;
 using Un4seen.Bass.AddOn.Opus;
-using NautilusFREE;
 using System.Threading.Tasks;
 
 namespace Nautilus
@@ -26,11 +25,7 @@ namespace Nautilus
         private readonly PhaseShiftSong Song;
         private readonly NemoTools Tools;
         private readonly DTAParser Parser;
-        private readonly nTools nautilus3;
-        private bool BASS_INIT;
-        private const int BassBuffer = 1000;
-        private int BassMixer;
-        private int BassStream;
+
         public PhaseShiftConverter(Color ButtonBackColor, Color ButtonTextColor)
         {
             InitializeComponent();
@@ -39,7 +34,6 @@ namespace Nautilus
             Song = new PhaseShiftSong();
             Tools = new NemoTools();
             Parser = new DTAParser();
-            nautilus3 = new nTools();
 
             inputFiles = new List<string>();
             inputDir = Application.StartupPath + "\\clonehero\\";
@@ -751,7 +745,7 @@ namespace Nautilus
             domainQuality.Enabled = radioSeparate.Checked || radioDownmix.Checked;
         }
 
-        private void decodeSNG_Click(object sender, EventArgs e)
+        private async void decodeSNG_Click(object sender, EventArgs e)
         {
             var convert = "";//opusToOgg.Checked ? "\n\nConvert .opus to .ogg enabled" : "";
             MessageBox.Show("This will batch extract Clone Hero \".sng\" files into song folders compatible with most PC rhythm games\n\nWILL NOT WORK WITH THE OFFICIAL CLONE HERO SETLIST SNG FILES, ONLY SNG FILES FROM ENCHOR.US OR THOSE MADE WITH CLONE HERO CONVERTER!" + convert, Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -769,7 +763,7 @@ namespace Nautilus
             {
                 sngFiles.Add(file);
             }
-            ExtractSNGFiles(sngFiles);
+            await ExtractSNGFiles(sngFiles);
         }
 
         private async Task ExtractSNGFiles(List<string> sngFiles)
@@ -827,7 +821,7 @@ namespace Nautilus
             txtCustomLabel.Enabled = markAsCustom.Checked;
         }
 
-        private void decodeYARG_Click(object sender, EventArgs e)
+        private async void decodeYARG_Click(object sender, EventArgs e)
         {            
             MessageBox.Show("This will batch extract YARG \".yargsong\" game files into folders usable by Clone Hero and similar games", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
             var ofd = new FolderPicker
@@ -844,7 +838,7 @@ namespace Nautilus
             {
                 yargFiles.Add(file);
             }
-            DecryptExtractYARG(yargFiles);
+            await DecryptExtractYARG(yargFiles);
         }
 
         private async Task DecryptExtractYARG(List<string> yargFiles)

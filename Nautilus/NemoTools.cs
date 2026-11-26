@@ -448,54 +448,8 @@ namespace Nautilus
         // // // // // // // // // // // // // // // 
         //WII STUFF WII STUFF WII STUFF WII STUFF // 
         // // // // // // // // // // // // // // // 
-        #endregion          
-              
-        public bool BeatlesDecrypt(string mogg, nTools nautilus3, bool deleteOriginal, string output = "")
-        {
-            var tbrb_crypt = Application.StartupPath + "\\bin\\tbrb-crypto.exe";
-            if (!File.Exists(tbrb_crypt)) return false;
-           
-            var moggv10 = string.IsNullOrEmpty(output) ? Path.Combine(Path.GetTempPath(), "tempv10.mogg") : output;
-            var arguments = "to-v10 \"" + mogg + "\" \"" + moggv10 + "\"";
-
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = tbrb_crypt,
-                Arguments = arguments,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-
-            using (var process = Process.Start(startInfo))
-            {
-                var outputTask = process.StandardOutput.ReadToEndAsync();
-                var errorTask = process.StandardError.ReadToEndAsync();
-
-                process.WaitForExit();
-
-                string outputStream = outputTask.GetAwaiter().GetResult();
-                string errorStream = errorTask.GetAwaiter().GetResult();
-
-                int exitCode = process.ExitCode;
-            }
-
-            if (deleteOriginal)
-            {
-                File.Delete(mogg);
-            }
-            if (!File.Exists(moggv10)) return false;            
-
-            var bytes = File.ReadAllBytes(moggv10);
-            if (string.IsNullOrEmpty(output))
-            {
-                File.Delete(moggv10);
-            }
-            if (!nautilus3.RemoveMHeader(bytes, false, DecryptMode.ToMemory, "")) return false;            
-            return true;
-        }
-
+        #endregion                     
+        
         public bool ConvertBandFuse(string argument, string input, string output)
         {
             var path = Application.StartupPath + "\\bin\\";

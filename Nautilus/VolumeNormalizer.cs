@@ -39,7 +39,6 @@ namespace Nautilus
         private int BassMixer;
         BASS_CHANNELINFO channel_info;
 
-        private bool hasOriginalValues = false;
         private bool originalAudioFound = false;
         private bool audioModified = false;
         private string audioHash = "";

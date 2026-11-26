@@ -659,7 +659,7 @@ namespace Nautilus
         {
             MessageBox.Show("This converter is permanently disabled. Use Onyx.", "Deprecated", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
-            if (picWorking.Visible) return;
+            /*if (picWorking.Visible) return;
             var files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (btnReset.Visible)
             {
@@ -695,16 +695,16 @@ namespace Nautilus
                 default:
                     MessageBox.Show("That's not a valid file to drop here", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     break;
-            }
+            }*/
         }
         
         private void helpToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             MessageBox.Show("This converter is permanently disabled. Use Onyx.", "Deprecated", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
-            var message = Tools.ReadHelpFile("ps3");
+            /*var message = Tools.ReadHelpFile("ps3");
             var help = new HelpForm(Text + " - Help", message);
-            help.ShowDialog();
+            help.ShowDialog();*/
         }
 
         private void exportLogFileToolStripMenuItem_Click(object sender, EventArgs e)

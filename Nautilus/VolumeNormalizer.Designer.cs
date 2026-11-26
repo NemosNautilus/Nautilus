@@ -95,13 +95,13 @@
             this.exportLogFileToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(123, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(122, 26);
             // 
             // exportLogFileToolStripMenuItem
             // 
             this.exportLogFileToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.exportLogFileToolStripMenuItem.Name = "exportLogFileToolStripMenuItem";
-            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.exportLogFileToolStripMenuItem.Text = "Export log file";
             this.exportLogFileToolStripMenuItem.Click += new System.EventHandler(this.exportLogFileToolStripMenuItem_Click);
             // 
@@ -146,7 +146,7 @@
             this.chkAlbumMode.Cursor = System.Windows.Forms.Cursors.Hand;
             this.chkAlbumMode.Location = new System.Drawing.Point(213, 34);
             this.chkAlbumMode.Name = "chkAlbumMode";
-            this.chkAlbumMode.Size = new System.Drawing.Size(394, 29);
+            this.chkAlbumMode.Size = new System.Drawing.Size(201, 17);
             this.chkAlbumMode.TabIndex = 73;
             this.chkAlbumMode.Text = "Adjust all CONs equally (album mode)";
             this.chkAlbumMode.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -437,7 +437,7 @@
             this.lblResetVolEnabled.ForeColor = System.Drawing.Color.Red;
             this.lblResetVolEnabled.Location = new System.Drawing.Point(213, 175);
             this.lblResetVolEnabled.Name = "lblResetVolEnabled";
-            this.lblResetVolEnabled.Size = new System.Drawing.Size(339, 25);
+            this.lblResetVolEnabled.Size = new System.Drawing.Size(166, 13);
             this.lblResetVolEnabled.TabIndex = 74;
             this.lblResetVolEnabled.Text = "Restore Original Volumes enabled";
             this.lblResetVolEnabled.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;

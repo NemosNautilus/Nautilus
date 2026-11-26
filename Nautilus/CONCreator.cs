@@ -21,7 +21,6 @@ namespace Nautilus
         private readonly CreateSTFS xSession;
         private string xOut;
         private RSAParams signature;
-        private bool dupFolder;
         private readonly NemoTools Tools;
         private string Description;
         private string Title;
@@ -71,8 +70,7 @@ namespace Nautilus
             if (xSession.GetFolder(folder) != null)
             {
                 MessageBox.Show("There is already a folder with the name '" + folder + "'\nYou can't have multiple folders with the same name,\ntry deleting the existing folder first",
-                    Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                dupFolder = true;
+                    Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);                
                 return;
             }
 
@@ -551,7 +549,7 @@ namespace Nautilus
         {
             MessageBox.Show("Drag and drop feature for folders has been disabled for being problematic", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
-            if (picWorking.Visible) return;
+            /*if (picWorking.Visible) return;
             var folder = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (!Directory.Exists(folder[0])) return;
             Tools.CurrentFolder = folder[0];
@@ -581,7 +579,7 @@ namespace Nautilus
             {
                 GetFiles(subfile, "songs/" + shortName + "/gen");
             }            
-            GetSelFiles((CFolderEntry)(folderTree.SelectedNode.Tag));
+            GetSelFiles((CFolderEntry)(folderTree.SelectedNode.Tag));*/
         }
 
         private void txtDisplay_KeyDown(object sender, KeyEventArgs e)

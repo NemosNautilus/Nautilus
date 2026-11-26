@@ -7,7 +7,6 @@ using System.Windows.Forms;
 using System.Drawing;
 using Nautilus.Properties;
 using Nautilus.x360;
-using DocumentFormat.OpenXml.Office2010.Drawing;
 
 namespace Nautilus
 {

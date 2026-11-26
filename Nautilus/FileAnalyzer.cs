@@ -3858,12 +3858,8 @@ namespace Nautilus
                     {
                         if (!nautilus3.DecM(File.ReadAllBytes(file), false, false, DecryptMode.ToMemory))
                         {
-                            //try as TBRB mogg as last attempt
-                            if (!Tools.BeatlesDecrypt(file, nautilus3, false))
-                            {
-                                Log("Encrypted, can't get more information...");
-                                continue;
-                            }
+                            Log("Encrypted, can't get more information...");
+                            continue;
                         }
                     }
                 }
@@ -4693,11 +4689,8 @@ namespace Nautilus
             var MOGG = Directory.GetFiles(outFolder, internalName + ".mogg", SearchOption.AllDirectories);            
             if (!nautilus3.DecM(File.ReadAllBytes(MOGG[0]), false, false, DecryptMode.ToMemory))
             {
-                if (!Tools.BeatlesDecrypt(MOGG[0], nautilus3, false))
-                {
-                    MessageBox.Show("Failed to decrypt mogg file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
+                MessageBox.Show("Failed to decrypt mogg file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
             InputFile = file;
             AnalyzeMIDI(MIDI);

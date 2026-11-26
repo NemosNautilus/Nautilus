@@ -1457,7 +1457,6 @@
         private System.Windows.Forms.GroupBox grpAudioOptions;
         private System.Windows.Forms.RadioButton radioKeep;
         private System.Windows.Forms.RadioButton radioRemove;
-        private System.Windows.Forms.CheckBox keepTOML;
         private System.Windows.Forms.GroupBox grpHarm1;
         private System.Windows.Forms.Label lblTextHighlight1;
         private System.Windows.Forms.Label lblTextColor1;

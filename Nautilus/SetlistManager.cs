@@ -157,7 +157,7 @@ namespace Nautilus
                 button.FlatAppearance.MouseOverBackColor = button.BackColor == Color.Transparent ? Color.FromArgb(127, Color.AliceBlue.R, Color.AliceBlue.G, Color.AliceBlue.B) : Tools.LightenColor(button.BackColor);
             }
 
-            DoubleBuffered(lstSongs, true);
+            SetDoubleBuffered(lstSongs, true);
             diffBoxes = new List<PictureBox> {diffGuitar, diffProGuitar, diffBass, diffProBass, diffDrums, diffKeys, diffProKeys, diffVocals, diffBand};
             loadImages();
         }
@@ -210,7 +210,7 @@ namespace Nautilus
             }
         }
 
-        public static void DoubleBuffered(Control control, bool enable)
+        public static void SetDoubleBuffered(Control control, bool enable)
         {
             var doubleBufferPropertyInfo = control.GetType().GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
             doubleBufferPropertyInfo.SetValue(control, enable, null);
@@ -222,7 +222,7 @@ namespace Nautilus
                 e.Effect = DragDropEffects.All;
         }
 
-        private void HandleDragDrop(object sender, DragEventArgs e)
+        private async void HandleDragDrop(object sender, DragEventArgs e)
         {
             if (isLocked) return;
             var files = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -273,7 +273,7 @@ namespace Nautilus
             }
             else
             {
-                ValidateFile(files, true);
+                await ValidateFile(files, true);
             }
         }
 
@@ -525,7 +525,7 @@ namespace Nautilus
                     break;
                 case ".config":
                     ActiveCacheFile = "";
-                    LoadOptions(files[0]);
+                    await LoadOptions(files[0]);
                     break;
                 case ".dta":
                     if (btnNew.Enabled)
@@ -1278,10 +1278,10 @@ namespace Nautilus
             FinalizeImport(Parser.Songs, true);
         }
 
-        private void SetlistManager_Shown(object sender, EventArgs e)
+        private async void SetlistManager_Shown(object sender, EventArgs e)
         {
             Application.DoEvents();
-            LoadOptions();
+            await LoadOptions();
             doUpdateGameMode();
             ResizeColumns();
         }
@@ -1386,7 +1386,7 @@ namespace Nautilus
             sw.Dispose();
         }
 
-        private void LoadOptions(string path = "")
+        private async Task LoadOptions(string path = "")
         {
             if (!File.Exists(config) && (string.IsNullOrWhiteSpace(path) || !File.Exists(path))) return;
 
@@ -1498,7 +1498,7 @@ namespace Nautilus
                     {
                         return;
                     }
-                    ValidateFile(new[]{arguments});
+                    await ValidateFile(new[]{arguments});
                 }
                 else
                 {
@@ -1519,7 +1519,7 @@ namespace Nautilus
             //LoadSongs();
         }
 
-        private void importRB3SongCacheToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void importRB3SongCacheToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (isLocked)
             {
@@ -1545,7 +1545,7 @@ namespace Nautilus
 
             if (ofd.FileName != "")
             {
-                ValidateFile(new[]{ofd.FileName});
+                await ValidateFile(new[]{ofd.FileName});
             }
         }
 
@@ -2332,7 +2332,7 @@ namespace Nautilus
             EnableDisableInfo(false);
             btnSave.Visible = false;
             btnDeleteSong.Enabled = false;
-            var counter = -1;
+            
             if (findFileConflict || findIDConflict || findShortnameConflict)
             {
                 FindConflicts();
@@ -3935,7 +3935,7 @@ namespace Nautilus
             InfoChanged(sender, e);
         }
 
-        private void importBlitzSongCacheToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void importBlitzSongCacheToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (isLocked)
             {
@@ -3959,7 +3959,7 @@ namespace Nautilus
             ofd.ShowDialog();
             if (string.IsNullOrWhiteSpace(ofd.FileName)) return;
             doBlitzImport = true;
-            ValidateFile(new[]{ofd.FileName});
+            await ValidateFile(new[]{ofd.FileName});
         }
 
         private void lockToolStrip_Click(object sender, EventArgs e)
@@ -4021,19 +4021,19 @@ namespace Nautilus
             LoadSongs();
         }
 
-        private void rB3ToolStrip_Click(object sender, EventArgs e)
+        private async void rB3ToolStrip_Click(object sender, EventArgs e)
         {
             doBlitzImport = false;
-            CreateBlankSetlist("Xbox 360", "rb3");
+            await CreateBlankSetlist("Xbox 360", "rb3");
         }
 
-        private void blitzToolStrip_Click(object sender, EventArgs e)
+        private async void blitzToolStrip_Click(object sender, EventArgs e)
         {
             doBlitzImport = true;
-            CreateBlankSetlist("Xbox 360", "blitz");
+            await CreateBlankSetlist("Xbox 360", "blitz");
         }
 
-        private void CreateBlankSetlist(string console, string cache)
+        private async Task CreateBlankSetlist(string console, string cache)
         {
             if (isLocked)
             {
@@ -4049,20 +4049,20 @@ namespace Nautilus
             sw.WriteLine("PackageCount=" + 0);
             sw.WriteLine("CacheFormat=" + (doBlitzImport ? "Blitz_5" : cache + "_5"));
             sw.Dispose();
-            ValidateFile(new[] { file });
+            await ValidateFile(new[] { file });
             SaveOptions();
         }
 
-        private void rB3PS3_Click(object sender, EventArgs e)
+        private async void rB3PS3_Click(object sender, EventArgs e)
         {
             doBlitzImport = false;
-            CreateBlankSetlist("PS3", "rb3");
+            await CreateBlankSetlist("PS3", "rb3");
         }
 
-        private void rB3Wii_Click(object sender, EventArgs e)
+        private async void rB3Wii_Click(object sender, EventArgs e)
         {
             doBlitzImport = false;
-            CreateBlankSetlist("Wii", "rb3");
+            await CreateBlankSetlist("Wii", "rb3");
         }
 
         private void scanPS3ToCreateSetlistToolStripMenuItem_Click(object sender, EventArgs e)
@@ -4328,16 +4328,16 @@ namespace Nautilus
             CorrectMetadata(false);
         }                
 
-        private void rB4XOne_Click(object sender, EventArgs e)
+        private async void rB4XOne_Click(object sender, EventArgs e)
         {
             doBlitzImport = false;
-            CreateBlankSetlist("Xbox One", "rbfour");
+            await CreateBlankSetlist("Xbox One", "rbfour");
         }
 
-        private void rB4PS4_Click(object sender, EventArgs e)
+        private async void rB4PS4_Click(object sender, EventArgs e)
         {
             doBlitzImport = false;
-            CreateBlankSetlist("PS4", "rbfour");
+            await CreateBlankSetlist("PS4", "rbfour");
         }
 
         private void deleteSelectedToolStrip_Click(object sender, EventArgs e)
@@ -4847,10 +4847,10 @@ namespace Nautilus
             ImportDLC(1);
         }
 
-        private void blitzPS3_Click(object sender, EventArgs e)
+        private async void blitzPS3_Click(object sender, EventArgs e)
         {
             doBlitzImport = true;
-            CreateBlankSetlist("PS3", "blitz");
+            await CreateBlankSetlist("PS3", "blitz");
         }
         
         private void radioArtist_CheckedChanged(object sender, EventArgs e)
@@ -5268,16 +5268,16 @@ namespace Nautilus
             findShortnameConflicts.Enabled = enabled && !modeRB4.Checked;
         }
 
-        private void yARGToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void yARGToolStripMenuItem_Click(object sender, EventArgs e)
         {
             doBlitzImport = false;
-            CreateBlankSetlist("YARG", "yarg");
+            await CreateBlankSetlist("YARG", "yarg");
         }
 
-        private void cloneHeroToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void cloneHeroToolStripMenuItem_Click(object sender, EventArgs e)
         {
             doBlitzImport = false;
-            CreateBlankSetlist("Clone Hero", "clonehero");
+            await CreateBlankSetlist("Clone Hero", "clonehero");
         }
 
         private void addTBRBOndiscSongsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -5379,7 +5379,7 @@ namespace Nautilus
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 YouTubeLink = "";
                 picYouTube.Visible = false;

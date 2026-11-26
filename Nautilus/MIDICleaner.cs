@@ -387,7 +387,7 @@ namespace Nautilus
                         toRemove = new List<MidiEvent>();
                         toAdd = new List<MidiEvent>();
                         var allowed_drums = new List<int> { 24, 25, 26, 27, 28, 29, 30, 31, 32, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 43, 44, 45, 46, 47, 48, 49, 50, 51, 60, 61, 62, 63, 64, 72, 73, 74, 75, 76, 84, 85, 86, 87, 88, 96, 97, 98, 99, 100, 103, 110, 111, 112, 116, 120, 121, 122, 123, 124, 126, 127 };
-                        var overdrive = false;
+                        
                         long odLength = 0;
                         var doublePedal = new List<MidiEvent>();
                         long greenCymbal = 0;
@@ -504,7 +504,6 @@ namespace Nautilus
                                             case 116:
                                                 if (note.Velocity > 0) //avoid running events causing null exceptions
                                                 {
-                                                    overdrive = true;
                                                     odLength = note.AbsoluteTime + note.NoteLength;
                                                 }
                                                 break;

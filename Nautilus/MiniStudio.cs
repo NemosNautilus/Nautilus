@@ -7,7 +7,6 @@ using System.IO;
 using System.Diagnostics;
 using Un4seen.Bass.Misc;
 using Un4seen.Bass.AddOn.Mix;
-using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Nautilus
 {
@@ -29,9 +28,6 @@ namespace Nautilus
         private bool SaveToFile;
         private bool wasPlaying;
         private int defaultVolume;
-        private int _yPos;
-        private int MouseY;
-        private bool _dragging;
         private float newVolume = 1.0f;
 
         public MiniStudio()

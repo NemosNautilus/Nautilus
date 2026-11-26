@@ -91,11 +91,7 @@ namespace Nautilus
             }
             LoadLibraries();
             var Tools = new NemoTools();                    
-            if (nautilus3.DecM(mData, false, false, DecryptMode.ToMemory)) return true;
-            var temp = Path.Combine(Path.GetTempPath(), "temp.mogg");
-            File.WriteAllBytes(temp, mData);
-            //try to decrypt as TBRB mogg
-            if (Tools.BeatlesDecrypt(temp, nautilus3, true)) return true;                      
+            if (nautilus3.DecM(mData, false, false, DecryptMode.ToMemory)) return true;                                 
             ErrorLog.Add("Mogg file is encrypted and I could not decrypt it, can't split it");
             return false;
         }        

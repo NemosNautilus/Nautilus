@@ -11,7 +11,6 @@ using Nautilus.x360;
 using NAudio.Midi;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Rocksmith2014PsarcLib.Psarc.Models.Sng;
 
 namespace Nautilus
 {
@@ -386,7 +385,6 @@ namespace Nautilus
                 var sr = new StreamReader(originalDTA, encoding);
                 var sw = new StreamWriter(newDTA, false, new UTF8Encoding(false, false));
                 
-                var doneFormat = false;
                 var formatLine = "";
                 while (sr.Peek() > 0)
                 {

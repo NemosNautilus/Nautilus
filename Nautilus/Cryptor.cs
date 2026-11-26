@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Nautilus.Properties;
+using Nautilus.x360;
+using NautilusFREE;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.Drawing;
-using Nautilus.Properties;
-using Nautilus.x360;
 using Application = System.Windows.Forms.Application;
 using Button = System.Windows.Forms.Button;
-using NautilusFREE;
 
 namespace Nautilus
 {
@@ -262,12 +262,7 @@ namespace Nautilus
                         mData = nautilus3.DeObfM(mData);                        
                     }
                     var success = false;
-                    success = nautilus3.DecM(mData, true, false, DecryptMode.ToFile, newMogg);
-                    if (!success) //try TBRB decryption
-                    {
-                        Tools.DeleteFile(newMogg);
-                        success = Tools.BeatlesDecrypt(mogg, nautilus3, false, newMogg);
-                    }
+                    success = nautilus3.DecM(mData, true, false, DecryptMode.ToFile, newMogg);                    
                     Log((success ? "Successfully decrypted" : "Failed to decrypt") + " mogg file " + Path.GetFileName(newMogg));
                     if (!success)
                     {
@@ -419,17 +414,11 @@ namespace Nautilus
                     }                    
                     if (!nautilus3.DecM(mData, true, false, DecryptMode.ToFile, newMogg))
                     {
-                        var temp = Path.Combine(Path.GetTempPath(), "temp.mogg");
-                        File.WriteAllBytes(temp, mData);
-                        if (!Tools.BeatlesDecrypt(temp, nautilus3, false, newMogg))
-                        {
-                            Log("Failed to decrypt CON file " + Path.GetFileName(newCON) + " ... skipping");
-                            xCON.CloseIO();
-                            Tools.DeleteFile(temp);
-                            Tools.DeleteFile(newMogg);
-                            Tools.DeleteFile(newCON);
-                            continue;
-                        }
+                        Log("Failed to decrypt CON file " + Path.GetFileName(newCON) + " ... skipping");
+                        xCON.CloseIO();
+                        Tools.DeleteFile(newMogg);
+                        Tools.DeleteFile(newCON);
+                        continue;
                     }
                 }
                 if (backgroundWorker1.CancellationPending)

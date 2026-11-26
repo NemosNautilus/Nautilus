@@ -1396,15 +1396,10 @@ namespace LibForge.Midi
             private List<RBMid.MAP[]> strumMaps;
             private List<RBMid.MARKUP_SOLO_NOTES> MarkupSoloNotes1, MarkupSoloNotes2, MarkupSoloNotes3;
             private List<RBMid.TWOTICKS> SoloLoops1, SoloLoops2;
-            private List<RBMid.MARKUPCHORD> MarkupChords1;
-            private List<RBMid.TEMPO> Tempos;
-            private List<RBMid.TIMESIG> TimeSigs;
-            private List<RBMid.BEAT> Beats;
-            private List<string> MidiTrackNames;
+            private List<RBMid.MARKUPCHORD> MarkupChords1;            
             private float PreviewStart;
             private float PreviewEnd;
             private uint LastMarkupTick;
-            private uint FinalTick;
             private int hopoThreshold;
 
             private List<uint> MeasureTicks = new List<uint>() { 0U };
@@ -2328,14 +2323,6 @@ namespace LibForge.Midi
 
             private void HandleRealKeysXTrk(MidiTrackProcessed track)
             {
-                foreach (var item in track.Items)
-                {
-                    switch (item)
-                    {
-
-                    }
-                }
-
                 Lyrics.Add(new RBMid.LYRICS
                 {
                     TrackName = track.Name,
@@ -2436,8 +2423,7 @@ namespace LibForge.Midi
                 var notes = new List<RBMid.VOCALTRACK.VOCAL_NOTE>();
                 var gen_phrases = new List<RBMid.VOCALTRACK.PHRASE_MARKER>();
                 var authored_phrases = new List<RBMid.VOCALTRACK.PHRASE_MARKER>();
-                var freestyle = new List<RBMid.VOCALTRACK.OD_REGION>();
-                int phrase_index = 0;
+                var freestyle = new List<RBMid.VOCALTRACK.OD_REGION>();                
                 bool pitched = false;
                 var trackVocalRange = new RBMid.VocalTrackRange
                 {
@@ -2944,13 +2930,7 @@ namespace LibForge.Midi
 
             private void HandleVenueTrk(MidiTrackProcessed track)
             {
-                foreach (var item in track.Items)
-                {
-                    switch (item)
-                    {
-
-                    }
-                }
+                // Venue track processing is not implemented.
             }
 
             // Converts the venue track from RBN2 to RBN1 so that RB4 can autogen animations

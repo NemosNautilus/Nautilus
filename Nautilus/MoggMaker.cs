@@ -13,7 +13,6 @@ using Un4seen.Bass.AddOn.Flac;
 using System.Globalization;
 using Nautilus.Properties;
 using NautilusFREE;
-using System.Linq;
 
 namespace Nautilus
 {

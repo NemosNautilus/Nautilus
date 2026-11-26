@@ -119,13 +119,7 @@ namespace Nautilus
                         DrawWaveForm(0);
                         return;
                     }
-                    if (Tools.BeatlesDecrypt(file, nautilus3, false))
-                    {
-                        InputFile = file;
-                        DrawWaveForm(0);
-                        return;                      
-                    }
-                    MessageBox.Show("Mogg file '" + file + "' is encrypted and I couldn't process it", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show("Mogg file '" + file + "' is encrypted with an encryption I don't understand, and I couldn't process it", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
                 else if (Path.GetExtension(file).ToLowerInvariant() == ".pkg")
                 {
@@ -828,11 +822,8 @@ namespace Nautilus
             var MOGG = Directory.GetFiles(outFolder, internalName + ".mogg", SearchOption.AllDirectories);            
             if (!nautilus3.DecM(File.ReadAllBytes(MOGG[0]), false, false, DecryptMode.ToMemory))
             {
-                if (!Tools.BeatlesDecrypt(MOGG[0], nautilus3, false))
-                {
-                    MessageBox.Show("Failed to decrypt mogg file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
+                MessageBox.Show("Failed to decrypt mogg file, can't analyze", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
             DrawWaveForm(0);
         }
