@@ -6,6 +6,27 @@ Developed by Nemo
 
 FEATURES / CHANGE LOG:
 
+v5.7.1
+
+VISUALIZER
+- Fixed broken playback of custom PS3 PKG files created with Onyx encryption.
+- Fixed broken playback of lyrics (reading mid.edat) from extracted PS3 PKG files in YARG folder structure that were created with Onyx encryption.
+
+QUICK PACK EDITOR
+- Added ability to extract PS3 PKG packages to folders (before could only dePACK).
+
+CLONE HERO CONVERTER
+- Fixed ability to batch create and batch unpack SNG files that had been broken at some point by some of the memory dependencies I had to introduce.
+
+CON CREATOR
+- Restored ability to drag/drop parent folder and have it auto-populate with all subfolders and files for a much faster CON creation process.
+
+GENERAL
+- Integrated The Beatles: Rock Band decryption code into my own nautilusFREE library so no longer need to ship or rely on third party CLI applications for this. Updated code throughout Nautilus to reflect this change.
+- Significant rework of the code to eliminate ALL compile warnings. Now compiles with zero errors and zero warnings.
+
+---
+
 v5.7.0 – THE BEATLES ARE HERE!
 
 We now have full audio decryption support for The Beatles: Rock Band songs!
