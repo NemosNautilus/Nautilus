@@ -19,7 +19,7 @@ See **BUILDING.md** for compile instructions.
 **Nautilus** is a multi-tool suite originally created to **create, edit, and work with Rock Band files**. Over time, it has grown to support files from **other rhythm games** as well.
 
 Development began in **2013** and continues to the present  
-(as of this edit, **July 29, 2026**).
+(as of this edit, **November 26, 2026**).
 
 Nautilus has accumulated a large number of tools over the years — explore the interface and see if it does what you need. Most features include Help documentation; however, not all of it has been kept fully up to date. Contributions to documentation are always welcome.
 
@@ -131,6 +131,9 @@ Credit where credit is due:
 
 - **Josiah Winslow** - base CDGMaker Python code  
 https://github.com/WinslowJosiah/cdgmaker
+
+- **InvoxiPlayGames** - SCEllSharp
+https://github.com/InvoxiPlayGames/SCEllSharp
 
 ---
 
