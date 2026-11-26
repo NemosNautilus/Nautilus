@@ -1,5 +1,18 @@
-﻿using System;
+﻿using LibForge.Midi;
+using LibVLCSharp.Shared;
+using LibVLCSharp.WinForms;
+using MidiCS;
+using Nautilus.LibForge.SongData;
+using Nautilus.Properties;
+using Nautilus.Texture;
+using Nautilus.x360;
+using NautilusFREE;
+using Newtonsoft.Json.Linq;
+using SCEllSharp.NPDRM;
+using SCEllSharp.PKG;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -7,35 +20,23 @@ using System.Drawing.Text;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using System.Diagnostics;
-using Nautilus.Properties;
-using Nautilus.x360;
-using Un4seen.Bass;
-using Un4seen.Bass.AddOn.Mix;
-using Un4seen.Bass.Misc;
-using Un4seen.Bass.AddOn.Enc;
-using Un4seen.Bass.AddOn.Opus;
-using Un4seen.Bass.AddOn.EncMp3;
-using Encoder = System.Drawing.Imaging.Encoder;
-using Un4seen.Bass.AddOn.EncOgg;
-using Un4seen.Bass.AddOn.EncOpus;
-using Un4seen.Bass.AddOn.EncFlac;
-using Nautilus.Texture;
-using NautilusFREE;
-using Nautilus.LibForge.SongData;
-using Newtonsoft.Json.Linq;
-using System.Net.Http;
 using System.Net;
-using System.Xml.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using LibVLCSharp.Shared;
-using LibVLCSharp.WinForms;
-using LibForge.Midi;
-using MidiCS;
-using SCEllSharp.NPDRM;
+using System.Windows.Forms;
+using System.Xml.Linq;
+using Un4seen.Bass;
+using Un4seen.Bass.AddOn.Enc;
+using Un4seen.Bass.AddOn.EncFlac;
+using Un4seen.Bass.AddOn.EncMp3;
+using Un4seen.Bass.AddOn.EncOgg;
+using Un4seen.Bass.AddOn.EncOpus;
+using Un4seen.Bass.AddOn.Mix;
+using Un4seen.Bass.AddOn.Opus;
+using Un4seen.Bass.Misc;
+using Encoder = System.Drawing.Imaging.Encoder;
 
 namespace Nautilus
 {
@@ -365,7 +366,7 @@ namespace Nautilus
             image.BackColor = Color.Transparent;
         }
 
-        private void doImages()
+        private async Task doImages()
         {
             //the following mess of code is necessary to get the transparency to show the image and not the form
             //separated here so I can just hide this whole bunch of crap
@@ -398,14 +399,15 @@ namespace Nautilus
             videoView.Top = 0;
             videoView.BringToFront();
 
-            loadDefaults();
+            await loadDefaults();
         }
 
-        private void loadDefaults()
+        private async Task loadDefaults()
         {
             reset = true;
+            StopPlayback();
             videoView.Visible = false;
-            _mediaPlayer.Stop();
+            await Task.Run(() => _mediaPlayer.Stop());
             _mediaPlayer.Media = null;
             isTBRBDLC = false;
             isGDRBDLC = false;
@@ -414,8 +416,7 @@ namespace Nautilus
             isRS2014 = false;
             MIDITools.Initialize(false);
             lblLyrics.Invalidate();
-            lblLyrics.Visible = false;
-            StopPlayback();            
+            lblLyrics.Visible = false;                        
             picPlayPause.Image = Tools.NemoLoadImage(Application.StartupPath + "\\res\\play\\play.png");
             picPlayPause.Tag = "play";
             Height = minHeight;
@@ -681,11 +682,11 @@ namespace Nautilus
             return RESOURCE_DIFF_NOPART;
         }
 
-        private void btnClear_Click(object sender, EventArgs e)
+        private async void btnClear_Click(object sender, EventArgs e)
         {
             Tools.DeleteFolder(Application.StartupPath + "\\visualizer\\", true);
             sCON = "";
-            loadDefaults();
+            await loadDefaults();
             txtSong.Focus();
             picVisualizer.Invalidate();
         }
@@ -696,7 +697,7 @@ namespace Nautilus
                 e.Effect = DragDropEffects.All;
         }
 
-        private void LoadYARGPS3Folder(string folder)
+        private async Task LoadYARGPS3Folder(string folder)
         {
             var dta = Directory.GetFiles(folder, "songs.dta", SearchOption.AllDirectories);
             var png = Directory.GetFiles(folder, "*.png_xbox", SearchOption.AllDirectories);
@@ -729,7 +730,7 @@ namespace Nautilus
                         Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-            loadDefaults();
+            await loadDefaults();
             if (png != null && png.Count() > 0)
             {
                 getImage(png[0]);
@@ -766,14 +767,14 @@ namespace Nautilus
                 var rap = GetRapPath(edat[0], Application.StartupPath + "\\bin\\raps\\");
                 if (!string.IsNullOrEmpty(rap)) //retail encryption
                 {
-                    if (!string.IsNullOrEmpty(rap)) //retail encryption
-                    {
-                        Tools.DecryptRetailEdat(edat[0], edat[0].Replace(".edat", ""), rap);
-                    }
+                    Tools.DecryptRetailEdat(edat[0], edat[0].Replace(".edat", ""), rap);
                 }
                 else //Onyx and Nautilus encryption
                 {
-                    if (!Tools.DecryptCustomEdat(edat[0], edat[0].Replace(".edat", ""), Tools.GetKLIC(folder))) //might fail if it's a C3 folder???
+                    var content_id = GetEDATContentID(edat[0]);
+                    var short_id = GetShortContentID(content_id);
+                    var klic = Tools.GetKLIC(short_id);
+                    if (!Tools.DecryptCustomEdat(edat[0], edat[0].Replace(".edat", ""), klic)) //might fail if it's a C3 folder???
                     {
                         //try again but with C3 fixed klic
                         Tools.DecryptCustomEdat(edat[0], edat[0].Replace(".edat", ""));
@@ -787,7 +788,7 @@ namespace Nautilus
             }
             //extract audio file for previewing
             Height = maxHeight;
-            ProcessAudio();
+            await ProcessAudio();
         }
 
         string GetRapPath(string edatPath, string rapFolder)
@@ -809,9 +810,45 @@ namespace Nautilus
             }
         }
 
-        private void PlayFnFSong(string m4a)
+        string GetPKGContentID(string pkg)
         {
-            loadDefaults();
+            using (FileStream fs = File.OpenRead(pkg))
+            {
+                PKGHeader header = new PKGHeader();
+                header.ReadHeader(fs);
+
+                if (header.PackageMagic != 0x7F504B47)
+                    return null;
+
+                return header.ContentID?.TrimEnd('\0').Trim();
+            }            
+        }
+
+        string GetEDATContentID(string edat)
+        {
+            using (FileStream fs = File.OpenRead(edat))
+            {
+                NPD npd = NPD.ReadNew(fs);
+
+                if (npd.Magic != 0x4E504400)
+                    return null;
+
+                return npd.ContentID.TrimEnd('\0').Trim();
+            }
+        }
+
+        private string GetShortContentID(string contentID)
+        {
+            if (string.IsNullOrWhiteSpace(contentID))
+                return null;
+
+            return contentID.Substring(contentID.LastIndexOf('-') + 1)
+                .TrimEnd('\0').Trim();
+        }
+
+        private async Task PlayFnFSong(string m4a)
+        {
+            await loadDefaults();
             picWorking.Visible = true;
             m4aFilePath = m4a;
 
@@ -854,6 +891,11 @@ namespace Nautilus
         {
             var files = (string[]) e.Data.GetData(DataFormats.FileDrop);
             Tools.CurrentFolder = Path.GetDirectoryName(files[0]);
+
+            /*BeginInvoke(new Action(async () =>
+            {
+                await HandleDragDrop(files[0]);
+            }));*/
             await HandleDragDrop(files[0]);
         }
 
@@ -870,14 +912,14 @@ namespace Nautilus
                 {
                     if (!Path.GetFileName(m4a).Equals("preview.m4a"))
                     {
-                        PlayFnFSong(m4a);
+                        await PlayFnFSong(m4a);
                         return;
                     }
                     MessageBox.Show("Assumed Fortnite Festival structure but did not find .m4a audio file, aborting.", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
                 //otherwise assume Yarg/PS3 folder structure
-                LoadYARGPS3Folder(file);
+                await LoadYARGPS3Folder(file);
                 return;
             }
 
@@ -900,37 +942,37 @@ namespace Nautilus
                         if (package.Header.TitleID == (uint)1514538961)
                         {
                             package.CloseIO();
-                            ExtractPowerGig(file);
+                            await ExtractPowerGig(file);
                             return;
                         }
                         else if (package.Header.TitleID == (uint)1296435155)
                         {
                             package.CloseIO();
-                            ExtractBandFuse(file);
+                            await ExtractBandFuse(file);
                             return;
                         }
                         else if (package.Header.TitleID == 0x41560844)
                         {
                             package.CloseIO();
-                            ExtractPlayDJHero(file, false);
+                            await ExtractPlayDJHero(file, false);
                             return;
                         }
                         else if (package.Header.TitleID == 0x4156087F)
                         {
                             package.CloseIO();
-                            ExtractPlayDJHero(file, true);
+                            await ExtractPlayDJHero(file, true);
                             return;
                         }
                         else //assume Harmonix game
                         {
                             package.CloseIO();
-                            loadDefaults();
-                            loadCON(file);
+                            await loadDefaults();
+                            await  loadCON(file);
                         }
                     }
                     else if (Path.GetExtension(file.ToLowerInvariant()) == ".pkg")
                     {
-                        ExtractPKG(file);
+                        await ExtractPKG(file);
                     }
                     else if (Path.GetExtension(file.ToLowerInvariant()) == ".sng")
                     {
@@ -942,23 +984,23 @@ namespace Nautilus
                     }
                     else if (Path.GetExtension(file.ToLowerInvariant()) == ".psarc")
                     {
-                        ExtractPsArc(file);
+                        await ExtractPsArc(file);
                     }
                     else if (Path.GetExtension(file.ToLowerInvariant()) == ".xml")
                     {
-                        ExtractXMA(file);
+                        await ExtractXMA(file);
                     }
                     else if (Path.GetExtension(file.ToLowerInvariant()) == ".fnf")
                     {
-                        PlayFNFFolder(file);
+                        await PlayFNFFolder(file);
                     }
                     else if (Path.GetExtension(file.ToLowerInvariant()) == ".m4a")
                     {
-                        PlayFnFSong(file);
+                        await PlayFnFSong(file);
                     }
                     else if (Path.GetExtension(file.ToLowerInvariant()) == ".songdta_ps4")
                     {
-                        loadPS4Files(file);
+                        await loadPS4Files(file);
                     }
                     else if (Path.GetFileName(file).ToLowerInvariant() == "song.ini")
                     {
@@ -966,11 +1008,11 @@ namespace Nautilus
                         if (Directory.Exists(Path.GetDirectoryName(file) + "\\Content\\"))
                         {
                             GHWTDE_INI_PATH = file;
-                            PlayGHWTDEFolder();
+                            await PlayGHWTDEFolder();
                         }
                         else
                         {
-                            PlayCHFolder(Path.GetDirectoryName(file));
+                            await PlayCHFolder(Path.GetDirectoryName(file));
                         }
                     }
                     else if (Path.GetFileName(file).ToLowerInvariant() == "songs.dta")
@@ -986,7 +1028,7 @@ namespace Nautilus
                                     Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                             return;
                         }
-                        loadDefaults();
+                        await loadDefaults();
                         loadDTA();
                     }
                     else
@@ -1001,9 +1043,9 @@ namespace Nautilus
             }
         }
 
-        private void ExtractPlayDJHero(string file, bool doDJHero2)
+        private async Task ExtractPlayDJHero(string file, bool doDJHero2)
         {
-            loadDefaults();
+            await loadDefaults();
             picWorking.Visible = true;
 
             var path = Application.StartupPath + "\\visualizer\\djhero\\";
@@ -1307,7 +1349,7 @@ namespace Nautilus
                     Height = maxHeight;
                     picPlayPause.Cursor = Cursors.Hand;
                     picStop.Cursor = Cursors.Hand;
-                    StartPlayback();
+                    await StartPlayback();
                 }
                 else
                 {
@@ -1324,9 +1366,9 @@ namespace Nautilus
             picWorking.Visible = false;
         }
 
-        private void ExtractPlayDJHero2(string file)
+        private async Task ExtractPlayDJHero2(string file)
         {
-            loadDefaults();
+            await loadDefaults();
             picWorking.Visible = true;
 
             var path = Application.StartupPath + "\\visualizer\\djhero\\";
@@ -1525,7 +1567,7 @@ namespace Nautilus
                     Height = maxHeight;
                     picPlayPause.Cursor = Cursors.Hand;
                     picStop.Cursor = Cursors.Hand;
-                    StartPlayback();
+                    await StartPlayback();
                 }
                 else
                 {
@@ -1542,9 +1584,9 @@ namespace Nautilus
             picWorking.Visible = false;
         }
           
-        private void loadPS4Files(string file)
+        private async Task loadPS4Files(string file)
         {
-            loadDefaults();
+            await loadDefaults();
 
             var dtaBytes = File.ReadAllBytes(file);
             using (MemoryStream ms = new MemoryStream(dtaBytes))
@@ -1746,12 +1788,12 @@ namespace Nautilus
             picPlayPause.Cursor = Cursors.Hand;
             picStop.Cursor = Cursors.Hand;
             updatePlaybackInstruments();
-            StartPlayback();
+            await StartPlayback();
         }
 
-        private void ExtractBandFuse(string file)
+        private async Task ExtractBandFuse(string file)
         {
-            loadDefaults();
+            await loadDefaults();
 
             var visualizer = Application.StartupPath + "\\visualizer\\";
             Tools.DeleteFolder(visualizer, true);//clean up before starting with new song
@@ -1818,9 +1860,9 @@ namespace Nautilus
             bandFuseWorker.RunWorkerAsync();
         }
 
-        private void PlayFNFFolder(string filename)
+        private async Task PlayFNFFolder(string filename)
         {
-            loadDefaults();
+            await loadDefaults();
             Parser.ReadFNFFile(filename);
             loadDTA();
 
@@ -1858,12 +1900,12 @@ namespace Nautilus
             Height = maxHeight;
             picPlayPause.Cursor = Cursors.Hand;
             picStop.Cursor = Cursors.Hand;
-            StartPlayback();
+            await StartPlayback();
         }
 
-        private void ExtractPowerGig(string file)
+        private async Task ExtractPowerGig(string file)
         {
-            loadDefaults();           
+            await loadDefaults();           
 
             var visualizer = Application.StartupPath + "\\visualizer\\";
             if (!Directory.Exists(visualizer))
@@ -1916,18 +1958,18 @@ namespace Nautilus
                 MessageBox.Show("Failed to decompress the XML file, can't play this song", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-            
-            ExtractXMA(XML);
+
+            await ExtractXMA(XML);
         }        
 
-        private void ExtractXMA(string xml)
+        private async Task ExtractXMA(string xml)
         {
 
             XML_PATH = xml;
             var XMAs = Directory.GetFiles(Path.GetDirectoryName(XML_PATH), "*.xma", SearchOption.TopDirectoryOnly);
             var ogXMA = XMAs[0];//XML_PATH.Replace(".xml", "_all.xma");
 
-            loadDefaults();
+            await loadDefaults();
             Parser.ReadXMLFile(XML_PATH);
             loadDTA();
 
@@ -1977,9 +2019,9 @@ namespace Nautilus
             powerGigWorker.RunWorkerAsync();
         }
 
-        private void PlayGHWTDEFolder()
+        private async Task PlayGHWTDEFolder()
         {
-            loadDefaults();
+            await loadDefaults();
             Parser.ReadGHWTDEFile(GHWTDE_INI_PATH);
             loadDTA();
             isGHWTDE = true;
@@ -2041,14 +2083,14 @@ namespace Nautilus
             }
         }
 
-        private void loadCON(string con)
+        private async Task loadCON(string con)
         {
             var albumart = "";
             var midi = "";
             Tools.DeleteFolder(Application.StartupPath + "\\visualizer", true);
             Directory.CreateDirectory(Application.StartupPath + "\\visualizer");
             sCON = con;
-            loadDefaults();
+            await loadDefaults();
             picWorking.Visible = true;
             if (con != "")
             {
@@ -2913,20 +2955,20 @@ namespace Nautilus
                     if (package.Header.TitleID == (uint)1514538961)
                     {
                         package.CloseIO();
-                        ExtractPowerGig(file);
+                        await ExtractPowerGig(file);
                         return;
                     }
                     else if (package.Header.TitleID == (uint)1296435155)
                     {
                         package.CloseIO();
-                        ExtractBandFuse(file);
+                        await ExtractBandFuse(file);
                         return;
                     }
                     else //assume Harmonix game
                     {
                         package.CloseIO();
-                        loadDefaults();
-                        loadCON(file);
+                        await loadDefaults();
+                        await loadCON(file);
                     }                   
                 }
                 else if (Path.GetFileName(file).ToLowerInvariant() == "songs.dta")
@@ -2936,12 +2978,12 @@ namespace Nautilus
                         MessageBox.Show("Something went wrong reading that songs.dta file", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
-                    loadDefaults();
+                    await loadDefaults();
                     loadDTA();
                 }
                 else if (Path.GetExtension(file.ToLowerInvariant()) == ".pkg")
                 {
-                    ExtractPKG(file);
+                    await ExtractPKG(file);
                 }
                 else if (Path.GetExtension(file.ToLowerInvariant()) == ".sng")
                 {
@@ -2953,15 +2995,15 @@ namespace Nautilus
                 }
                 else if (Path.GetExtension(file.ToLowerInvariant()) == ".xml")
                 {
-                    ExtractXMA(file);
+                    await ExtractXMA(file);
                 }
                 else if (Path.GetExtension(file.ToLowerInvariant()) == ".psarc")
                 {
-                    ExtractPsArc(file);
+                    await ExtractPsArc(file);
                 }
                 else if (Path.GetFileName(file).ToLowerInvariant() == "song.ini")
                 {
-                    PlayCHFolder(Path.GetDirectoryName(file));
+                    await PlayCHFolder(Path.GetDirectoryName(file));
                 }
                 else
                 {
@@ -3614,7 +3656,7 @@ namespace Nautilus
 
         private async void Visualizer_Shown(object sender, EventArgs e)
         {
-            doImages();
+            await doImages();
             LoadConfig();
             Application.DoEvents();
             CheckLoadFonts();
@@ -4035,12 +4077,13 @@ namespace Nautilus
                     }
                 }
                 else
-                {
-                    StopBASS();
+                {                    
                     if (autoplayMusicVideos.Checked && _mediaPlayer.IsPlaying)
                     {
+                        _mediaPlayer.Pause();
                         _mediaPlayer.Stop();
                     }
+                    StopBASS();
                 }
             }
             catch (Exception)
@@ -4159,7 +4202,7 @@ namespace Nautilus
             BASS_INIT = true;
         }
 
-        private void StartPlayback(bool ignorePlaybackInstruments = false)
+        private async Task StartPlayback(bool ignorePlaybackInstruments = false)
         {
             InitBass();
 
@@ -4230,13 +4273,13 @@ namespace Nautilus
 
             if ((exportYARGAudio.Checked && isYARG) || (exportFNFAudio.Checked && isM4A))
             {
-                SaveAudioToFile(true);
+                await SaveAudioToFile(true);
                 return;
             }
 
             if ((isMP3 && exportGHWTDEAudio.Checked) || (isWAV && exportPowerGigAudio.Checked && !isBandFuse) || (isBandFuse && exportBandFuseAudio.Checked))
             {
-                SaveAudioToFile();
+                await SaveAudioToFile();
                 return;
             }
 
@@ -4301,7 +4344,7 @@ namespace Nautilus
             }                        
         }
 
-        private void SaveAudioToFile(bool isMOGG = false)
+        private async Task SaveAudioToFile(bool isMOGG = false)
         {            
             int encoder = 0;
             var fileOutput = new SaveFileDialog
@@ -4362,16 +4405,16 @@ namespace Nautilus
                 }
                 Environment.CurrentDirectory = Path.GetDirectoryName(fileOutput.FileName);
 
-                loadDefaults();
+                await loadDefaults();
             }
         }
        
-        private void backgroundWorker1_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        private async void backgroundWorker1_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
-            ProcessAudio();
+            await ProcessAudio();
         }
 
-        private void ProcessAudio()
+        private async Task ProcessAudio()
         {
             //analyze mogg file for length if not present in DTA
             if (Parser.Songs[0].Length == 0 && nautilus3.PlayingSongOggData != null && nautilus3.PlayingSongOggData.Count() > 0)
@@ -4396,7 +4439,7 @@ namespace Nautilus
                 picStop.Cursor = Cursors.Hand;
                 if (picAutoPlay.Tag.ToString() != "autoplay" || audioProcessor.CancellationPending) return;
                 PlaybackSeconds = Parser.Songs[0].PreviewStart == 0 || picPreview.Tag.ToString() == "song" ? 0 : (double)Parser.Songs[0].PreviewStart / 1000;
-                StartPlayback();
+                await StartPlayback();
             }
             else
             {
@@ -4405,7 +4448,7 @@ namespace Nautilus
             }
         }
 
-        private void ChangePlaybackInstruments(object sender, MouseEventArgs e)
+        private async void ChangePlaybackInstruments(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left) return;
             var pic = (PictureBox) sender;
@@ -4455,11 +4498,11 @@ namespace Nautilus
             toolTip1.SetToolTip(pic, (enabled? "Disable" : "Enable") + " " + pic.Tag + " track");
             if (picPlayPause.Tag.ToString() != "pause") return;
 
-            StopPlayback();            
-            StartPlayback(isOpus || isOgg || isMP3 || isWAV);
+            StopPlayback();
+            await StartPlayback(isOpus || isOgg || isMP3 || isWAV);
         }
         
-        private void picPlayPause_MouseClick(object sender, MouseEventArgs e)
+        private async void picPlayPause_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left) return;
             if (picPlayPause.Cursor == Cursors.No)
@@ -4498,13 +4541,13 @@ namespace Nautilus
                         toolTip1.SetToolTip(picPlayPause, "Pause");
                         break;
                     default:
-                        StartPlayback();                        
+                        await StartPlayback();                        
                         break;
                 }
             }
             catch (Exception)
             {
-                StartPlayback();
+                await StartPlayback();
             }
         }
 
@@ -4733,7 +4776,7 @@ namespace Nautilus
             chkRating.Checked = !chkRating.Checked;
         }
 
-        private void PlaybackTimer_Tick(object sender, EventArgs e)
+        private async void PlaybackTimer_Tick(object sender, EventArgs e)
         {            
             try
             {
@@ -4774,7 +4817,7 @@ namespace Nautilus
                 StopPlayback();
                 PlaybackSeconds = previewStart == 0 || picPreview.Tag.ToString() == "song" ? 0 : previewStart;
                 if (picLoop.Tag.ToString() != "loop") return;
-                StartPlayback();                
+                await StartPlayback();                
             }
             catch (Exception)
             { }
@@ -5337,7 +5380,7 @@ namespace Nautilus
             txtTime.Text = lblSongLength.Text;
         }
 
-        private void ExtractPsArc(string file)
+        private async Task ExtractPsArc(string file)
         {
             if (file.Contains("_p_") || file.Contains("_p."))
             {
@@ -5359,10 +5402,10 @@ namespace Nautilus
                 MessageBox.Show("Failed to process that PsArc file, can't Visualize", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-            PlayARCFolder(rsFolder);
+            await PlayARCFolder(rsFolder);
         }
 
-        private void PlayARCFolder(string folder)
+        private async Task PlayARCFolder(string folder)
         {
             var audioFolder = folder + "\\audio\\"; //windows\\";
             var OggFiles = Directory.GetFiles(audioFolder, "*.ogg", SearchOption.AllDirectories);
@@ -5374,7 +5417,7 @@ namespace Nautilus
             var sngFolder = folder + "\\songs\\bin\\"; //generic\\";
             var sngFiles = Directory.GetFiles(sngFolder, "*.sng");
                         
-            loadDefaults();
+            await loadDefaults();
 
             bool hasRhythm = false;
             bool hasVocals = false;
@@ -5446,7 +5489,7 @@ namespace Nautilus
             picPlayPause.Cursor = Cursors.Hand;
             picStop.Cursor = Cursors.Hand;
             PlaybackSeconds = picPreview.Tag.ToString() == "preview" ? 30.0 : 0.0;
-            StartPlayback();           
+            await StartPlayback();           
         }
 
         private async Task ExtractYARG(string file)
@@ -5460,12 +5503,17 @@ namespace Nautilus
                 MessageBox.Show("Failed to decode and extract that YARG file, can't Visualize", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-            PlayCHFolder(outFolder);
+            await PlayCHFolder(outFolder);
         }
 
         private async Task ExtractSNG(string file)
         {
-            var outFolder = Application.StartupPath + "\\visualizer\\extracted" + Path.GetFileNameWithoutExtension(file).Trim();
+            var visualizerFolder = Application.StartupPath + "\\visualizer\\";
+            if (!Directory.Exists(visualizerFolder))
+            {
+                Directory.CreateDirectory(visualizerFolder);
+            }            
+            var outFolder = visualizerFolder + Path.GetFileNameWithoutExtension(file).Trim() + "_extracted\\";
             Tools.DeleteFolder(outFolder, true);
             Directory.CreateDirectory(outFolder);
 
@@ -5474,8 +5522,8 @@ namespace Nautilus
             {
                 MessageBox.Show("Failed to decode and extract that SNG file, can't Visualize", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
-            }            
-            PlayCHFolder(outFolder);                       
+            }
+            await PlayCHFolder(outFolder);                       
         }
 
         private void TryPlayCHVideo(string folder)
@@ -5516,9 +5564,10 @@ namespace Nautilus
             }
         }
 
-        private void PlayCHFolder(string outFolder)
-        {
-            loadDefaults();
+        private async Task PlayCHFolder(string outFolder)
+        {            
+            await loadDefaults();
+
             var ini = Directory.GetFiles(outFolder, "song.ini");
             if (ini.Count() > 0)
             {
@@ -5569,13 +5618,13 @@ namespace Nautilus
                     Height = maxHeight;
                     picPlayPause.Cursor = Cursors.Hand;
                     picStop.Cursor = Cursors.Hand;
-                    StartPlayback();
+                    await StartPlayback();
                     return;
                 }
                 Height = maxHeight;
                 picPlayPause.Cursor = Cursors.Hand;
                 picStop.Cursor = Cursors.Hand;
-                StartPlayback();
+                await StartPlayback();
             }
             else if (oggFiles.Count() > 0)
             {
@@ -5589,13 +5638,13 @@ namespace Nautilus
                     Height = maxHeight;
                     picPlayPause.Cursor = Cursors.Hand;
                     picStop.Cursor = Cursors.Hand;
-                    StartPlayback();
+                    await StartPlayback();
                     return;
                 }
                 Height = maxHeight;
                 picPlayPause.Cursor = Cursors.Hand;
                 picStop.Cursor = Cursors.Hand;
-                StartPlayback();
+                await StartPlayback();
             }
             else
             {
@@ -5603,7 +5652,7 @@ namespace Nautilus
             }
         }
 
-        private void ExtractPKG(string file)
+        private async Task ExtractPKG(string file)
         {
             var folder = Application.StartupPath + "\\visualizer\\";
             if (!Directory.Exists(folder))
@@ -5613,7 +5662,7 @@ namespace Nautilus
 
             var outFolder = folder + "PKG";
             Tools.DeleteFolder(outFolder, true);
-            loadDefaults();
+            await loadDefaults();
 
             byte[] dtaBytes = Tools.ReadSongsDTAFromPKG(file);
             if (dtaBytes != null)
@@ -5653,7 +5702,10 @@ namespace Nautilus
                 }
                 else //Onyx and Nautilus encryption
                 {
-                    if (!Tools.DecryptCustomEdat(edat[0], edat[0].Replace(".edat", ""), Tools.GetKLIC(folder))) //might fail if it's a C3 folder???
+                    var content_id = GetPKGContentID(file);
+                    var short_id = GetShortContentID(content_id);
+                    var klic = Tools.GetKLIC(short_id);
+                    if (!Tools.DecryptCustomEdat(edat[0], edat[0].Replace(".edat", ""), klic)) //might fail if it's a C3 folder???
                     {
                         //try again but with C3 fixed klic
                         Tools.DecryptCustomEdat(edat[0], edat[0].Replace(".edat", ""));
@@ -5667,7 +5719,7 @@ namespace Nautilus
             }
             //extract audio file for previewing
             Height = maxHeight;
-            ProcessAudio();
+            await ProcessAudio();
         }
 
         private void ghwtdeWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
@@ -5767,7 +5819,7 @@ namespace Nautilus
             ExtractFSBAudio(fsb3, crowd_offset, spacer3, crowd_audio);
         }
 
-        private void ghwtdeWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        private async void ghwtdeWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             picWorking.Visible = false;
 
@@ -5798,7 +5850,7 @@ namespace Nautilus
                 picPlayPause.Cursor = Cursors.Hand;
                 picStop.Cursor = Cursors.Hand;
                 PlaybackSeconds = picPreview.Tag.ToString() == "preview" ? 30.0 : 0.0;
-                StartPlayback();
+                await StartPlayback();
             }
             else
             {
@@ -5959,7 +6011,7 @@ namespace Nautilus
             }
         }
 
-        private void powerGigWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        private async void powerGigWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             picWorking.Visible = false;
 
@@ -5989,7 +6041,7 @@ namespace Nautilus
                 Height = maxHeight;
                 picPlayPause.Cursor = Cursors.Hand;
                 picStop.Cursor = Cursors.Hand;
-                StartPlayback();
+                await StartPlayback();
             }
             else
             {
@@ -6059,7 +6111,7 @@ namespace Nautilus
             wavFiles = Directory.GetFiles(extracted_path, "*.wav", SearchOption.TopDirectoryOnly);            
         }
 
-        private void bandFuseWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        private async void bandFuseWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             var visualizer = Application.StartupPath + "\\visualizer\\";
             var extracted_path = visualizer + "temp\\";
@@ -6081,7 +6133,7 @@ namespace Nautilus
             picPlayPause.Cursor = Cursors.Hand;
             picStop.Cursor = Cursors.Hand;
             PlaybackSeconds = picPreview.Tag.ToString() == "preview" ? 30.0 : 0.0;
-            StartPlayback();
+            await StartPlayback();
         }
 
         private void exportBandFuseAudio_Click(object sender, EventArgs e)
@@ -6363,7 +6415,7 @@ namespace Nautilus
             Parser.Songs[0].PreviewStart = 30000;
         }
 
-        private void fnfWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        private async void fnfWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             Height = maxHeight;
             picPlayPause.Cursor = Cursors.Hand;
@@ -6371,7 +6423,7 @@ namespace Nautilus
             picWorking.Visible = false;
             PlaybackSeconds = picPreview.Tag.ToString() == "preview" ? 30.0 : 0.0;
             updatePlaybackInstruments();
-            StartPlayback();
+            await StartPlayback();
         }
 
         private void segoeUIToolStrip_Click(object sender, EventArgs e)

@@ -31,7 +31,7 @@ namespace Nautilus
         public CONCreator(Color ButtonBackColor, Color ButtonTextColor)
         {
             InitializeComponent();
-            
+
             Tools = new NemoTools();
             var y = new List<PackageType>();
             nautilus3 = new nTools();
@@ -63,6 +63,116 @@ namespace Nautilus
             toolTip1.SetToolTip(fileList, "Add files here");
             toolTip1.SetToolTip(groupBox1, "Choose the format for your pack - default is CON");
             AddFolder("songs", 0);
+        }
+
+        private DevComponents.AdvTree.Node EnsurePackageFolder(string folderPath)
+        {
+            var parts = folderPath.Split(
+                new[] { '/' },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            var parent = folderTree.Nodes[0];
+            string currentPath = "";
+
+            foreach (var part in parts)
+            {
+                currentPath = string.IsNullOrEmpty(currentPath)
+                    ? part
+                    : currentPath + "/" + part;
+
+                var entry = xSession.GetFolder(currentPath);
+
+                if (entry == null)
+                {
+                    if (!xSession.AddFolder(currentPath))
+                    {
+                        throw new IOException(
+                            "Could not create folder: " + currentPath);
+                    }
+
+                    entry = xSession.GetFolder(currentPath);
+                }
+
+                if (entry == null)
+                {
+                    throw new IOException(
+                        "Could not retrieve folder: " + currentPath);
+                }
+
+                DevComponents.AdvTree.Node existingNode = null;
+
+                foreach (DevComponents.AdvTree.Node node in parent.Nodes)
+                {
+                    var tag = node.Tag as CFolderEntry;
+
+                    if (tag != null &&
+                        string.Equals(tag.Path, currentPath,
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        existingNode = node;
+                        break;
+                    }
+                }
+
+                if (existingNode == null)
+                {
+                    existingNode = GetFoldNode(entry);
+                    parent.Nodes.Add(existingNode);
+                }
+
+                parent = existingNode;
+            }
+
+            return parent;
+        }
+
+        private bool ImportPackageFile(string file, string folder)
+        {
+            if (!File.Exists(file))
+                return false;
+
+            string xPath = folder + "/" + Path.GetFileName(file);
+
+            if (xSession.GetFile(xPath) != null)
+                return false;
+
+            if (Path.GetExtension(file).Equals(
+                ".mogg", StringComparison.OrdinalIgnoreCase))
+            {
+                nautilus3.WriteOutData(
+                    nautilus3.DeObfM(File.ReadAllBytes(file)), file);
+
+                moggs.Add(file);
+            }
+
+            if (!xSession.AddFile(file, xPath))
+            {
+                throw new IOException(
+                    "Could not add file: " + xPath);
+            }
+
+            btnCreate.Enabled = true;
+            return true;
+        }
+
+        private void ImportPackageFolder(
+    string sourceFolder, string destinationFolder)
+        {
+            EnsurePackageFolder(destinationFolder);
+
+            foreach (var file in Directory.GetFiles(sourceFolder))
+            {
+                ImportPackageFile(file, destinationFolder);
+            }
+
+            foreach (var subfolder in Directory.GetDirectories(sourceFolder))
+            {
+                string subfolderName = Path.GetFileName(subfolder);
+
+                ImportPackageFolder(
+                    subfolder,
+                    destinationFolder + "/" + subfolderName);
+            }
         }
 
         private void AddFolder(string folder, int node_depth = 0)
@@ -435,11 +545,7 @@ namespace Nautilus
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            picWorking.Visible = false;
-            foreach (var mogg in moggs)
-            {
-                //nautilus3.WriteOutData(nautilus3.ObfM(File.ReadAllBytes(mogg)), mogg);
-            }
+            picWorking.Visible = false;            
             var xExplorer = new CONExplorer(Color.FromArgb(34, 169, 31), Color.White);
             xExplorer.LoadCON(xOut);
             Close();
@@ -541,45 +647,95 @@ namespace Nautilus
 
         private void HandleDragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-                e.Effect = DragDropEffects.All;
+            e.Effect = !picWorking.Visible &&
+               e.Data.GetDataPresent(DataFormats.FileDrop)
+                ? DragDropEffects.Copy
+                : DragDropEffects.None;
         }
 
         private void advTree1_DragDrop(object sender, DragEventArgs e)
         {
-            MessageBox.Show("Drag and drop feature for folders has been disabled for being problematic", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            return;
-            /*if (picWorking.Visible) return;
-            var folder = (string[])e.Data.GetData(DataFormats.FileDrop);
-            if (!Directory.Exists(folder[0])) return;
-            Tools.CurrentFolder = folder[0];
-            var dta = Path.GetDirectoryName(folder[0]) + "\\songs.dta";
-            if (File.Exists(dta))
-            {
-                GetFiles(dta, "songs");
-            }
-            var shortName = Path.GetFileName(folder[0]);            
-            AddFolder("songs/" + shortName, 1);
-            folderTree.SelectedNode = folderTree.Nodes[0].Nodes[0].LastNode;
-            if (dupFolder)
-            {
-                dupFolder = false;
+            if (picWorking.Visible)
                 return;
+
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+                return;
+
+            var folders = e.Data.GetData(DataFormats.FileDrop) as string[];
+
+            if (folders == null || folders.Length == 0)
+                return;
+
+            folderTree.BeginUpdate();
+
+            try
+            {
+                foreach (var folder in folders)
+                {
+                    if (!Directory.Exists(folder))
+                        continue;
+
+                    string shortName = new DirectoryInfo(folder).Name;
+                    string destination = "songs/" + shortName;
+
+                    if (xSession.GetFolder(destination) != null)
+                    {
+                        MessageBox.Show(
+                            "There is already a folder with the name '" +
+                            shortName + "'.\n\n" +
+                            "Try deleting the existing folder first.",
+                            Text,
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Exclamation);
+
+                        continue;
+                    }
+
+                    EnsurePackageFolder("songs");
+
+                    // Import songs.dta if one exists in the parent folder
+                    // and the package doesn't already contain one.
+
+                    string parent = Path.GetDirectoryName(
+                        folder.TrimEnd('\\', '/'));
+
+                    if (!string.IsNullOrEmpty(parent))
+                    {
+                        string dta = Path.Combine(parent, "songs.dta");
+
+                        if (File.Exists(dta))
+                        {
+                            ImportPackageFile(dta, "songs");
+                        }
+                    }
+
+                    // Import the entire song folder recursively.
+
+                    ImportPackageFolder(folder, destination);
+
+                    folderTree.SelectedNode =
+                        EnsurePackageFolder(destination);
+
+                    folderTree.SelectedNode.ExpandAll();
+
+                    GetSelFiles(
+                        (CFolderEntry)folderTree.SelectedNode.Tag);
+
+                    btnCreate.Enabled = true;
+                }
             }
-            var files = Directory.GetFiles(folder[0],"*.*",SearchOption.TopDirectoryOnly);            
-            foreach (var file in files.Where(file => !Directory.Exists(file)))
+            catch (Exception ex)
             {
-                GetFiles(file, "songs/" + shortName);
-            }            
-            if (!Directory.Exists(folder[0] + "\\gen")) return;
-            AddFolder("songs/" + shortName + "/gen", 2);
-            folderTree.SelectedNode = folderTree.Nodes[0].Nodes[0].Nodes[0].LastNode;
-            var subfiles = Directory.GetFiles(folder[0] + "\\gen", "*.*", SearchOption.TopDirectoryOnly);
-            foreach (var subfile in subfiles.Where(subfile => !Directory.Exists(subfile)))
+                MessageBox.Show(
+                    "Error importing folder:\n\n" + ex.Message,
+                    Text,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            finally
             {
-                GetFiles(subfile, "songs/" + shortName + "/gen");
-            }            
-            GetSelFiles((CFolderEntry)(folderTree.SelectedNode.Tag));*/
+                folderTree.EndUpdate();
+            }
         }
 
         private void txtDisplay_KeyDown(object sender, KeyEventArgs e)
@@ -654,6 +810,14 @@ namespace Nautilus
                     break;
             }
             TopMost = picPin.Tag.ToString() == "pinned";
+        }
+
+        private void folderTree_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effect = !picWorking.Visible &&
+               e.Data.GetDataPresent(DataFormats.FileDrop)
+        ? DragDropEffects.Copy
+        : DragDropEffects.None;
         }
     }    
 }

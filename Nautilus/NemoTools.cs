@@ -3562,10 +3562,9 @@ namespace Nautilus
             }
         }
 
-        public string GetKLIC(string folder)
+        public string GetKLIC(string file_id)
         {
-            var folder_value = Path.GetFileName(folder);
-            var unhashed_klic = "Ih38rtW1ng3r" + folder_value + "10025250";
+            var unhashed_klic = "Ih38rtW1ng3r" + file_id + "10025250";
             return CreateMD5(unhashed_klic);
         }
 

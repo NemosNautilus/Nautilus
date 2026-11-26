@@ -114,7 +114,7 @@ namespace Nautilus
                 }
                 else
                 {
-                    Log("That's not a valid file to drop here, only CON / LIVE / DTA files are allowed");
+                    Log("That's not a valid file to drop here, only CON / LIVE / PKG / DTA files are allowed");
                 }
             }
             catch (Exception ex)
@@ -1744,9 +1744,31 @@ namespace Nautilus
         {
             if (isPKG)
             {
-                MessageBox.Show("Not supported (yet) when working with PKG files", Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                var query = MessageBox.Show("Extracting individual PKG files out of a pack is not supported, but I can extract this entire PKG file to a folder\n" +
+                    "\nClick Yes to extract all contents to a folder\nClick No to cancel", "Extract All?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (query == DialogResult.No) return;
+
+                Log("Extracting PS3 PKG file ... sit tight");
+                Log("THIS MIGHT TAKE A WHILE. DON'T CLOSE ME DOWN!");
+
+                picWorking.Visible = true;
+                Application.DoEvents();
+
+                var success = Tools.ExtractPS3PKG(pack, pack + "_extracted\\");
+                if (success)
+                {
+                    Log("Extracted PKG pack contents successfully");
+                }
+                else
+                {
+                    Log("Error extracting files from input PKG pack");
+                }
+
+                picWorking.Visible = false;
+                Application.DoEvents();
                 return;
             }
+
             Log("Extracting the selected file ... sit tight");
             Log("THIS MIGHT TAKE A WHILE. DON'T CLOSE ME DOWN!");
 

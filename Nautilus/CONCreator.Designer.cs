@@ -365,10 +365,12 @@
             // folderTree
             // 
             this.folderTree.AccessibleRole = System.Windows.Forms.AccessibleRole.Outline;
+            this.folderTree.AllowDrop = true;
             this.folderTree.BackColor = System.Drawing.SystemColors.Window;
             // 
             // 
             // 
+            this.folderTree.BackgroundStyle.BackgroundImage = global::Nautilus.Properties.Resources.dragdropfolder2;
             this.folderTree.BackgroundStyle.BackgroundImagePosition = DevComponents.DotNetBar.eStyleBackgroundImage.Center;
             this.folderTree.BackgroundStyle.Class = "TreeBorderKey";
             this.folderTree.DragDropEnabled = false;
@@ -385,6 +387,7 @@
             this.folderTree.Text = "advTree1";
             this.folderTree.DragDrop += new System.Windows.Forms.DragEventHandler(this.advTree1_DragDrop);
             this.folderTree.DragEnter += new System.Windows.Forms.DragEventHandler(this.HandleDragEnter);
+            this.folderTree.DragOver += new System.Windows.Forms.DragEventHandler(this.folderTree_DragOver);
             // 
             // node1
             // 
